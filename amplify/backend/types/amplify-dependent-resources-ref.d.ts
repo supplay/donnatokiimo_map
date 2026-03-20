@@ -1,6 +1,18 @@
 export type AmplifyDependentResourcesAttributes = {
+  "api": {
+    "donnatokiimomap": {
+      "GraphQLAPIEndpointOutput": "string",
+      "GraphQLAPIIdOutput": "string",
+      "GraphQLAPIKeyOutput": "string"
+    },
+    "locationApi": {
+      "ApiId": "string",
+      "ApiName": "string",
+      "RootUrl": "string"
+    }
+  },
   "auth": {
-    "donnatokiimomapfbb27a9d": {
+    "donnatokiimomapa632128a": {
       "AppClientID": "string",
       "AppClientIDWeb": "string",
       "IdentityPoolId": "string",
@@ -10,9 +22,12 @@ export type AmplifyDependentResourcesAttributes = {
       "UserPoolName": "string"
     }
   },
-  "storage": {
-    "s3efcda499": {
-      "BucketName": "string",
+  "function": {
+    "locationHandler": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
       "Region": "string"
     }
   }
