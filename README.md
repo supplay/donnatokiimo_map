@@ -117,6 +117,10 @@ graph TD
     style ALS_Tracker fill:#22c55e,stroke:#fff,stroke-width:2px
     style AppSync fill:#ed1c24,stroke:#fff,stroke-width:2px
 ```
+
+![構成図](./donnatokiimo.drawio.svg)
+
+
 ## システムアーキテクチャの解説
 本アプリは、スケーラビリティとリアルタイム性を両立するため、AWS Amplifyをベースとしたイベント駆動型（Event-Driven）のサーバーレスアーキテクチャを採用しています。
 
