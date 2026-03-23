@@ -118,7 +118,7 @@ graph TD
     style AppSync fill:#ed1c24,stroke:#fff,stroke-width:2px
 ```
 
-![構成図](./donnatokiimo.drawio.svg)
+![構成図](./docs/images/donnatokiimo.drawio.svg)
 
 
 ## システムアーキテクチャの解説
