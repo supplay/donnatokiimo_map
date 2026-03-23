@@ -1,3 +1,24 @@
+import { uploadData } from "aws-amplify/storage";
+
+// Gen2 Storage用アップロード関数
+const handleUpload = async (file) => {
+  try {
+    const result = await uploadData({
+      key: `public/${file.name}`,
+      data: file,
+    }).result;
+    console.log("成功！:", result);
+  } catch (error) {
+    console.error("失敗詳細:", error);
+  }
+};
+
+// ファイル選択イベントハンドラ
+const handleChange = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  await handleUpload(file);
+};
 // App.jsx
 import { useEffect, useRef, useState } from "react";
 import React from "react";
@@ -76,9 +97,11 @@ import { Bell, BellOff } from "lucide-react";
 import { Authenticator, translations } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import { I18n } from "aws-amplify/utils";
+
 import { Amplify } from "aws-amplify";
 import { generateClient, post } from "aws-amplify/api";
-import amplifyconfig from "./amplifyconfiguration.json";
+import { uploadData } from "aws-amplify/storage";
+import awsmobile from "./aws-exports";
 
 /* -------------------------------------------------------------------------- */
 /* 初期設定・グローバル変数                                                   */
@@ -107,7 +130,16 @@ if (typeof document !== "undefined") {
 }
 
 // Amplify 設定（1回だけ）
-Amplify.configure(amplifyconfig);
+Amplify.configure({
+  ...awsmobile,
+  Storage: {
+    S3: {
+      bucket: awsmobile.aws_user_files_s3_bucket,
+      region: awsmobile.aws_user_files_s3_bucket_region
+    }
+  }
+});
+console.log("設定されたバケット:", Amplify.getConfig().Storage?.S3?.bucket);
 I18n.putVocabularies(translations);
 I18n.setLanguage("ja");
 
@@ -143,30 +175,19 @@ const userLocationIcon = L.divIcon({
 /* ユーティリティ関数                                                         */
 /* -------------------------------------------------------------------------- */
 
-// お客さんのスマホから1kmの柵をAWSに登録
-const registerUserGeofence = async (userId, lat, lng) => {
-  const restOperation = post({
-    apiName: "locationApi",
-    path: "/location",
-    options: {
-      body: {
-        action: "registerUserGeofence",
-        userId,
-        lat,
-        lng,
-        radiusKm: 1.0,
-      },
-    },
-  });
-
-  try {
-    const { body } = await restOperation.response;
-    await body.json();
-    console.log("1kmの柵をAWSに立てたバイ！");
-  } catch (err) {
-    console.error("柵の登録に失敗したバイ…", err);
-  }
-};
+// ファイルアップロード例（Amplify v6用）
+// const uploadFile = async (file) => {
+//   try {
+//     const result = await uploadData({
+//       key: file.name,
+//       data: file,
+//       options: { contentType: file.type }
+//     }).result;
+//     console.log("アップロード成功", result);
+//   } catch (err) {
+//     console.error("アップロード失敗", err);
+//   }
+// };
 
 // おじさんの位置情報をAWS Location Serviceに送信
 const updateOjisanPosition = async (lat, lng) => {
