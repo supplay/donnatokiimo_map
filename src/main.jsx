@@ -1,13 +1,20 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 
-
-
-
 import { Amplify } from "aws-amplify";
-import outputs from "../amplify_outputs.json"; // Gen2形式の最新設定
+import awsmobile from "../../src/aws-exports";
 
-Amplify.configure(outputs);
+Amplify.configure({
+  ...awsmobile,
+  Storage: {
+    S3: {
+      bucket: awsmobile.aws_user_files_s3_bucket,
+      region: awsmobile.aws_user_files_s3_bucket_region
+    }
+  }
+});
+
+console.log("設定されたバケット(main):", Amplify.getConfig().Storage?.S3?.bucket);
 
 import App from "./App.jsx";
 

@@ -1,0 +1,13 @@
+{
+    "AppSyncApiName": "donnatokiimomap",
+    "DynamoDBBillingMode": "PAY_PER_REQUEST",
+    "DynamoDBEnableServerSideEncryption": false,
+    "AuthCognitoUserPoolId": {
+        "Fn::GetAtt": [
+            "authdonnatokiimomapa632128a",
+            "Outputs.UserPoolId"
+        ]
+    },
+    "S3DeploymentBucket": "amplify-donnatokiimomap-de-23f9e-deployment",
+    "S3DeploymentRootKey": "amplify-appsync-files/119f1cbb2a1b411fd8a33e001d3a74faaf1ae5bb"
+}

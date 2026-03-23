@@ -1,88 +1,9 @@
-import { uploadData } from "aws-amplify/storage";
-
-// Gen2 Storage用アップロード関数
-const handleUpload = async (file) => {
-  try {
-    const result = await uploadData({
-      key: `public/${file.name}`,
-      data: file,
-    }).result;
-    console.log("成功！:", result);
-  } catch (error) {
-    console.error("失敗詳細:", error);
-  }
-};
-
-// ファイル選択イベントハンドラ
-const handleChange = async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-  await handleUpload(file);
-};
 // App.jsx
 import { useEffect, useRef, useState } from "react";
-import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-
-// エラーバウンダリ
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    console.error("🔴 ERROR BOUNDARY キャッチ:", error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div style={{
-          height: "100vh",
-          width: "100%",
-          background: "#fee",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "20px",
-          fontFamily: "'M PLUS Rounded 1c', sans-serif",
-          color: "#c00",
-        }}>
-          <h1>⚠️ エラーが発生したバイ</h1>
-          <p style={{ fontSize: "1.1rem", whiteSpace: "pre-wrap" }}>
-            {this.state.error?.toString()}
-          </p>
-          <button 
-            onClick={() => window.location.reload()}
-            style={{
-              marginTop: "20px",
-              padding: "12px 30px",
-              fontSize: "1rem",
-              background: "#c00",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-            }}
-          >
-            再読み込み
-          </button>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
 
 // GraphQL（自動生成の queries/mutations を使うもの）
 import { getShop } from "./graphql/queries";
@@ -97,11 +18,9 @@ import { Bell, BellOff } from "lucide-react";
 import { Authenticator, translations } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import { I18n } from "aws-amplify/utils";
-
 import { Amplify } from "aws-amplify";
 import { generateClient, post } from "aws-amplify/api";
-import { uploadData } from "aws-amplify/storage";
-import awsmobile from "./aws-exports";
+import amplifyconfig from "./amplifyconfiguration.json";
 
 /* -------------------------------------------------------------------------- */
 /* 初期設定・グローバル変数                                                   */
@@ -130,16 +49,7 @@ if (typeof document !== "undefined") {
 }
 
 // Amplify 設定（1回だけ）
-Amplify.configure({
-  ...awsmobile,
-  Storage: {
-    S3: {
-      bucket: awsmobile.aws_user_files_s3_bucket,
-      region: awsmobile.aws_user_files_s3_bucket_region
-    }
-  }
-});
-console.log("設定されたバケット:", Amplify.getConfig().Storage?.S3?.bucket);
+Amplify.configure(amplifyconfig);
 I18n.putVocabularies(translations);
 I18n.setLanguage("ja");
 
@@ -175,19 +85,30 @@ const userLocationIcon = L.divIcon({
 /* ユーティリティ関数                                                         */
 /* -------------------------------------------------------------------------- */
 
-// ファイルアップロード例（Amplify v6用）
-// const uploadFile = async (file) => {
-//   try {
-//     const result = await uploadData({
-//       key: file.name,
-//       data: file,
-//       options: { contentType: file.type }
-//     }).result;
-//     console.log("アップロード成功", result);
-//   } catch (err) {
-//     console.error("アップロード失敗", err);
-//   }
-// };
+// お客さんのスマホから1kmの柵をAWSに登録
+const registerUserGeofence = async (userId, lat, lng) => {
+  const restOperation = post({
+    apiName: "locationApi",
+    path: "/location",
+    options: {
+      body: {
+        action: "registerUserGeofence",
+        userId,
+        lat,
+        lng,
+        radiusKm: 1.0,
+      },
+    },
+  });
+
+  try {
+    const { body } = await restOperation.response;
+    await body.json();
+    console.log("1kmの柵をAWSに立てたバイ！");
+  } catch (err) {
+    console.error("柵の登録に失敗したバイ…", err);
+  }
+};
 
 // おじさんの位置情報をAWS Location Serviceに送信
 const updateOjisanPosition = async (lat, lng) => {
@@ -625,7 +546,7 @@ function AdminPage({ signOut }) {
             style={{
               flex: 1,
               padding: 8,
-              background: "#e71337e8",
+              background: "#8e44ad",
               color: "white",
               borderRadius: 5,
               border: "none",
@@ -1254,7 +1175,6 @@ function CustomerPage() {
   const [weatherPhrase, setWeatherPhrase] = useState("");
   const [config, setConfig] = useState({ menu: [], schedule: [] });
   const lastToggleAtRef = useRef(0);
-  const isMountedRef = useRef(true); // マウント状態を追跡
 
   const handleNotifyButtonPress = (e) => {
     e.preventDefault();
@@ -1298,6 +1218,7 @@ function CustomerPage() {
             const currentLat = userPos?.lat ?? null;
             const currentLng = userPos?.lng ?? null;
             const guestUserId = `guest-${Date.now()}`;
+
             const response = await apiClient.graphql({
               query: CREATE_USER_SUBSCRIPTION,
               variables: {
@@ -1406,85 +1327,39 @@ function CustomerPage() {
     init();
 
     // ✅ 自動生成された onUpdateShop subscription を使用
-    console.log("🔵 店主位置購読を開始");
-    const subShopObs = apiClient.graphql({ 
+    const subShop = apiClient.graphql({ 
       query: onUpdateShop,
       authMode: "apiKey"
-    });
-
-    const subShop = subShopObs.subscribe({
+    }).subscribe({
       next: ({ data }) => {
-        console.log("📍 店主位置更新受信:", data);
-        if (!isMountedRef.current) {
-          console.warn("📍 コンポーネントがアンマウント済み、スキップ");
-          return;
-        }
         try {
           const updated = data?.onUpdateShop;
-          console.log("📍 解析後:", updated);
-          if (!updated) {
-            console.warn("📍 更新データが null");
-            return;
-          }
           if (updated?.id === VAN_ID && updated?.isOperating) {
-            console.log("📍 営業中に更新:", updated);
             setVanPos(updated);
           } else if (updated?.id === VAN_ID && !updated?.isOperating) {
-            console.log("📍 営業終了");
             setVanPos(null);
           }
         } catch (parseErr) {
-          console.error("🔴 店主位置の設定中にエラー:", parseErr);
-          throw parseErr; // Error Boundary へ
+          console.error("店主位置の設定中にエラー:", parseErr);
         }
       },
       error: (err) => {
-        console.error("🔴 店主位置の購読エラー:", err);
-        // エラー時もポーリングでカバー
+        console.error("店主位置の購読エラー:", err);
       },
-      complete: () => {
-        console.log("✅ 店主位置購読完了");
-      }
     });
 
-    console.log("🟢 設定更新購読を開始");
-    const subConfigObs = apiClient.graphql({ 
+    const subConfig = apiClient.graphql({ 
       query: ON_UPDATE_CONFIG,
       authMode: "apiKey"
-    });
-
-    const subConfig = subConfigObs.subscribe({
+    }).subscribe({
       next: ({ data }) => {
-        console.log("⚙️ 設定更新受信:", data);
-        if (!isMountedRef.current) {
-          console.warn("⚙️ コンポーネントがアンマウント済み、スキップ");
-          return;
-        }
-        try {
-          if (!data?.onUpdateConfig) {
-            console.warn("⚙️ 設定データが null");
-            return;
-          }
-          if (data.onUpdateConfig.id === CONFIG_ID) {
-            const menuJson = data.onUpdateConfig.menuJson || "[]";
-            const scheduleJson = data.onUpdateConfig.scheduleJson || "[]";
-            console.log("⚙️ JSON解析前:", { menuJson, scheduleJson });
-            const menu = JSON.parse(menuJson);
-            const schedule = JSON.parse(scheduleJson);
-            console.log("⚙️ 解析後:", { menu, schedule });
-            setConfig({ menu, schedule });
-          }
-        } catch (parseErr) {
-          console.error("🔴 設定データ解析エラー:", parseErr);
-          throw parseErr; // Error Boundary へ
+        if (data.onUpdateConfig?.id === CONFIG_ID) {
+          setConfig({
+            menu: JSON.parse(data.onUpdateConfig.menuJson || "[]"),
+            schedule: JSON.parse(data.onUpdateConfig.scheduleJson || "[]"),
+          });
         }
       },
-      error: (err) => {
-        console.error("🔴 設定更新購読エラー:", err);
-      },
-      complete: () => {
-        console.log("✅ 設定更新購読完了");
-      }
     });
 
     let watchId;
@@ -1535,13 +1410,10 @@ function CustomerPage() {
     }
 
     return () => {
-      console.log("🟠 CustomerPage クリーンアップ開始");
-      isMountedRef.current = false; // アンマウント状態
       subShop.unsubscribe();
       subConfig.unsubscribe();
       window.clearInterval(pollingId);
       if (watchId) navigator.geolocation.clearWatch(watchId);
-      console.log("🟠 CustomerPage クリーンアップ完了");
     };
   }, [userSubscriptionId]);
 
@@ -1670,9 +1542,9 @@ function CustomerPage() {
         }}
       >
         {[
-          { label: "おしながき", icon: "📙", color: "#8e44ad", action: () => setShowMenu(true) },
-          { label: "EVENT", icon: "🗓️", color: "#8e44ad", action: () => setShowCalendar(true) },
-          { label: "MY POINT", icon: "✨", color: "#8e44ad", action: () => setShowMyPage(true) },
+          { label: "おしながき", icon: "📙", color: "#d35400", action: () => setShowMenu(true) },
+          { label: "EVENT", icon: "🗓️", color: "#e74c3c", action: () => setShowCalendar(true) },
+          { label: "MY POINT", icon: "✨", color: "#8e44ad", action: () => setShowMyPage(true), special: true },
         ].map((btn, i) => (
           <button
             key={i}
@@ -1802,6 +1674,7 @@ function CustomerPage() {
                 <p style={{ textAlign: "center", color: "#999" }}>イベント出店募集中！</p>
               )}
             </div>
+
           }
           onClose={() => setShowCalendar(false)}
           color="#91D370"
@@ -1869,7 +1742,7 @@ export default function App() {
   }, []);
 
   return (
-    <ErrorBoundary>
+    <>
       {showSplash && <LaunchSplash />}
       <BrowserRouter>
         <Routes>
@@ -1901,6 +1774,6 @@ export default function App() {
           />
         </Routes>
       </BrowserRouter>
-    </ErrorBoundary>
+    </>
   );
 }

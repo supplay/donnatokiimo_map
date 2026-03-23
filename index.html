@@ -21,20 +21,18 @@
     <meta name="apple-mobile-web-app-title" content="どんなとき芋" />
 
     <script>
-      // loadイベントを待つことで、画面全体が準備できてから書き換える
-      window.addEventListener("DOMContentLoaded", () => {
+      (function () {
         var isAdminPath = window.location.pathname.startsWith("/kanri_aki");
+        var manifest = document.getElementById("app-manifest");
+        var themeColor = document.querySelector('meta[name="theme-color"]');
+        var appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+
         if (isAdminPath) {
-          var manifest = document.getElementById("app-manifest");
           if (manifest) manifest.setAttribute("href", "/manifest-admin.json");
-
-          var themeColor = document.querySelector('meta[name="theme-color"]');
           if (themeColor) themeColor.setAttribute("content", "#2c3e50");
-
-          var appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
           if (appleTitle) appleTitle.setAttribute("content", "芋・管理");
         }
-      });
+      })();
     </script>
 
     <style>
