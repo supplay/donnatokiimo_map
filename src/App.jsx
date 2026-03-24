@@ -146,7 +146,7 @@ const userLocationIcon = L.divIcon({
 // お客さんのスマホから1kmの柵をAWSに登録
 const registerUserGeofence = async (userId, lat, lng) => {
   const restOperation = post({
-    apiName: "locationApi",
+    apiName: "donnatokiimomap",
     path: "/location",
     options: {
       body: {
@@ -171,7 +171,7 @@ const registerUserGeofence = async (userId, lat, lng) => {
 // おじさんの位置情報をAWS Location Serviceに送信
 const updateOjisanPosition = async (lat, lng) => {
   const restOperation = post({
-    apiName: "locationApi",
+    apiName: "donnatokiimomap",
     path: "/location",
     options: {
       body: {
@@ -1234,6 +1234,7 @@ function CustomerPage() {
   const [showMyPage, setShowMyPage] = useState(false);
   const [weatherPhrase, setWeatherPhrase] = useState("");
   const [config, setConfig] = useState({ menu: [], schedule: [] });
+  const [showNotifyInfo, setShowNotifyInfo] = useState(false); // 通知ON説明モーダル
   const lastToggleAtRef = useRef(0);
   const isMountedRef = useRef(true); // マウント状態を追跡
 
@@ -1265,7 +1266,7 @@ function CustomerPage() {
       
       if (permission === "granted") {
         setIsGeofenceOn(true);
-        alert("通知ON！焼きいも屋さんが近くに来たらお知らせするバイ！");
+        setShowNotifyInfo(true); // 通知ON説明モーダルを表示
 
         navigator.serviceWorker.ready
           .then(async (reg) => {
@@ -1552,7 +1553,7 @@ function CustomerPage() {
       const wData = await weatherRes.json();
 
       const restOperation = post({
-        apiName: "locationApi",
+        apiName: "donnatokiimomap",
         path: "/location",
         options: {
           body: {
@@ -1755,6 +1756,62 @@ function CustomerPage() {
         )}
       </MapContainer>
 
+      {/* 通知ON説明モーダル */}
+      {showNotifyInfo && (
+        <Modal
+          title="通知ONになったバイ！"
+          color="#ff7e5f"
+          onClose={() => setShowNotifyInfo(false)}
+          content={
+            <div style={{ textAlign: "center", fontSize: "1.1rem" }}>
+              <div style={{ marginBottom: 16 }}>
+                焼きいも屋さんが近くに来たら<br />
+                通知でお知らせするけんね！
+              </div>
+              <div style={{
+                background: "#fffbe6",
+                borderRadius: 12,
+                padding: 12,
+                marginBottom: 16,
+                border: "1px solid #ffd580"
+              }}>
+                <div style={{ color: "#27ae60", fontWeight: "bold", marginBottom: 8 }}>
+                  <span style={{ fontSize: 22 }}>✔</span> 他のアプリを使いよっても大丈夫やよ！
+                </div>
+                <div style={{ color: "#e67e22", fontWeight: "bold", marginBottom: 8 }}>
+                  <span style={{ fontSize: 22 }}>⚠</span> スマホの画面を真っ黒（スリープ）にしたり
+                  アプリを完全に終了させると声が届かんことなるんじゃ…
+                </div>
+              </div>
+              <div style={{
+                background: "linear-gradient(90deg, #ffb36b 0%, #ff7e5f 100%)",
+                color: "#fff",
+                borderRadius: 8,
+                padding: "10px 0",
+                fontWeight: "bold",
+                marginBottom: 16
+              }}>
+                アツアツの通知を届けけん<br />
+                画面はそのままで待っちょってね🔥
+              </div>
+              <button
+                onClick={() => setShowNotifyInfo(false)}
+                style={{
+                  background: "#27ae60",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "12px 40px",
+                  fontSize: "1.1rem",
+                  fontWeight: "bold"
+                }}
+              >
+                OK！
+              </button>
+            </div>
+          }
+        />
+      )}
       {/* モーダル類 */}
       {showMenu && (
         <Modal

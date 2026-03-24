@@ -146,7 +146,7 @@ const userLocationIcon = L.divIcon({
 // お客さんのスマホから1kmの柵をAWSに登録
 const registerUserGeofence = async (userId, lat, lng) => {
   const restOperation = post({
-    apiName: "locationApi",
+    apiName: "donnatokiimomap",
     path: "/location",
     options: {
       body: {
@@ -171,7 +171,7 @@ const registerUserGeofence = async (userId, lat, lng) => {
 // おじさんの位置情報をAWS Location Serviceに送信
 const updateOjisanPosition = async (lat, lng) => {
   const restOperation = post({
-    apiName: "locationApi",
+    apiName: "donnatokiimomap",
     path: "/location",
     options: {
       body: {
@@ -1531,7 +1531,7 @@ function CustomerPage() {
       const wData = await weatherRes.json();
 
       const restOperation = post({
-        apiName: "locationApi",
+        apiName: "donnatokiimomap",
         path: "/location",
         options: {
           body: {
