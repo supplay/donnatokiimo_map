@@ -6,7 +6,7 @@
 
 /* eslint-disable */
 import * as React from "react";
-import { fetchUserAttributes, signOut } from "aws-amplify/auth";
+import { Auth } from "aws-amplify";
 import { DataStore } from "aws-amplify/datastore";
 import { Hub } from "aws-amplify/utils";
 export const UI_CHANNEL = "ui";

@@ -1224,6 +1224,8 @@ function PointCard({ user, signOut }) {
  * ------------------------------------------------------------------------- */
 function CustomerPage() {
   const [vanPos, setVanPos] = useState(null);
+  // 60秒間の店主位置履歴
+  const [vanHistory, setVanHistory] = useState([]);
   const [userPos, setUserPos] = useState(null);
   const [isGeofenceOn, setIsGeofenceOn] = useState(false);
   const [userSubscriptionId, setUserSubscriptionId] = useState(null);
@@ -1317,6 +1319,25 @@ function CustomerPage() {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   };
+
+  // 60秒履歴: vanPosが変わるたびに履歴を更新
+  useEffect(() => {
+    if (vanPos && vanPos.latitude && vanPos.longitude && vanPos.isOperating) {
+      setVanHistory((prev) => {
+        const now = Date.now();
+        // 60秒以内の履歴だけ残す
+        const filtered = prev.filter((h) => now - h.timestamp < 60000);
+        // 直前と同じ位置なら追加しない
+        if (filtered.length > 0) {
+          const last = filtered[filtered.length - 1];
+          if (Math.abs(last.lat - vanPos.latitude) < 0.00001 && Math.abs(last.lng - vanPos.longitude) < 0.00001) {
+            return filtered;
+          }
+        }
+        return [...filtered, { lat: vanPos.latitude, lng: vanPos.longitude, timestamp: now }];
+      });
+    }
+  }, [vanPos]);
 
   useEffect(() => {
     if (isGeofenceOn && vanPos && userPos) {
@@ -1700,6 +1721,20 @@ function CustomerPage() {
             </Popup>
           </Marker>
         )}
+        {/* 60秒以内の店主位置履歴を黄色丸で表示 */}
+        {vanHistory.map((h, idx) => (
+          <Marker
+            key={h.timestamp}
+            position={[h.lat, h.lng]}
+            icon={L.divIcon({
+              html: '<div style="width:18px;height:18px;border-radius:50%;background:rgba(255,220,40,0.85);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.18);"></div>',
+              className: "empty-class",
+              iconSize: [18, 18],
+              iconAnchor: [9, 9],
+              popupAnchor: [0, -8],
+            })}
+          />
+        ))}
         {vanPos?.isOperating && (
           <Marker
             position={[vanPos.latitude, vanPos.longitude]}

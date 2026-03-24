@@ -9,11 +9,14 @@ frontend:
     phases:
         preBuild:
             commands:
-                - 'cd frontend && npm install'
+                - npm ci
         build:
             commands:
-                - 'cd frontend && npm run build'
+                - npm run build
     artifacts:
-        baseDirectory: frontend/dist
+        baseDirectory: dist
         files:
             - '**/*'
+    cache:
+        paths:
+            - node_modules/**/*

@@ -1,36 +1,29 @@
 {
-  "work": {
+  "dev": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-donnatokiimomap-work-3ef17-authRole",
-      "UnauthRoleArn": "arn:aws:iam::209479306837:role/amplify-donnatokiimomap-work-3ef17-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::209479306837:role/amplify-donnatokiimomap-work-3ef17-authRole",
+      "AuthRoleName": "amplify-donnatokiimomap-dev-270d2-authRole",
+      "UnauthRoleArn": "arn:aws:iam::209479306837:role/amplify-donnatokiimomap-dev-270d2-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::209479306837:role/amplify-donnatokiimomap-dev-270d2-authRole",
       "Region": "ap-northeast-1",
-      "DeploymentBucketName": "amplify-donnatokiimomap-work-3ef17-deployment",
-      "UnauthRoleName": "amplify-donnatokiimomap-work-3ef17-unauthRole",
-      "StackName": "amplify-donnatokiimomap-work-3ef17",
-      "StackId": "arn:aws:cloudformation:ap-northeast-1:209479306837:stack/amplify-donnatokiimomap-work-3ef17/89ba7ea0-15e9-11f1-a6e8-0a7dc2f7dfcd",
-      "AmplifyAppId": "d1s6z8mw18wui2"
+      "DeploymentBucketName": "amplify-donnatokiimomap-dev-270d2-deployment",
+      "UnauthRoleName": "amplify-donnatokiimomap-dev-270d2-unauthRole",
+      "StackName": "amplify-donnatokiimomap-dev-270d2",
+      "StackId": "arn:aws:cloudformation:ap-northeast-1:209479306837:stack/amplify-donnatokiimomap-dev-270d2/8ed1f710-26bf-11f1-bf10-061a113e88bf",
+      "AmplifyAppId": "d2ebbfp1y843pr"
     },
     "categories": {
+      "auth": {
+        "donnatokiimomap2616deca": {},
+        "userPoolGroups": {}
+      },
       "hosting": {
         "amplifyhosting": {
-          "appId": "d1s6z8mw18wui2",
+          "appId": "d2ebbfp1y843pr",
           "type": "manual"
         }
       },
       "api": {
-        "donnatokiimomap": {},
-        "locationApi": {}
-      },
-      "auth": {
-        "donnatokiimomapa632128a": {}
-      },
-      "function": {
-        "locationHandler": {
-          "trackerName": "DonnnatokiimoTracker",
-          "deploymentBucketName": "amplify-donnatokiimomap-work-3ef17-deployment",
-          "s3Key": "amplify-builds/locationHandler-676268594d6677336366-build.zip"
-        }
+        "donnatokiimomap": {}
       }
     }
   }

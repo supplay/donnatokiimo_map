@@ -4,17 +4,8 @@
     "apiName": "donnatokiimomap",
     "serviceName": "AppSync",
     "defaultAuthType": {
-      "mode": "AMAZON_COGNITO_USER_POOLS",
-      "cognitoUserPoolId": "authdonnatokiimomapa632128a"
-    },
-    "conflictResolution": {},
-    "additionalAuthTypes": [
-      {
-        "mode": "API_KEY",
-        "expirationTime": 365,
-        "apiKeyExpirationDate": "2027-03-03T02:52:50.969Z",
-        "keyDescription": "public-read-access"
-      }
-    ]
+      "mode": "API_KEY",
+      "expirationTime": 7
+    }
   }
 }

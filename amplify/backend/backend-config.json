@@ -1,55 +1,24 @@
 {
   "api": {
     "donnatokiimomap": {
-      "dependsOn": [
-        {
-          "attributes": [
-            "UserPoolId"
-          ],
-          "category": "auth",
-          "resourceName": "donnatokiimomapa632128a"
-        }
-      ],
+      "dependsOn": [],
       "output": {
         "authConfig": {
-          "additionalAuthenticationProviders": [
-            {
-              "apiKeyConfig": {
-                "apiKeyExpirationDate": "2027-03-03T02:52:50.969Z",
-                "apiKeyExpirationDays": 365,
-                "description": "public-read-access"
-              },
-              "authenticationType": "API_KEY"
-            }
-          ],
+          "additionalAuthenticationProviders": [],
           "defaultAuthentication": {
-            "authenticationType": "AMAZON_COGNITO_USER_POOLS",
-            "userPoolConfig": {
-              "userPoolId": "authdonnatokiimomapa632128a"
-            }
+            "apiKeyConfig": {
+              "apiKeyExpirationDays": 7
+            },
+            "authenticationType": "API_KEY"
           }
         }
       },
       "providerPlugin": "awscloudformation",
       "service": "AppSync"
-    },
-    "locationApi": {
-      "dependsOn": [
-        {
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
-          "category": "function",
-          "resourceName": "locationHandler"
-        }
-      ],
-      "providerPlugin": "awscloudformation",
-      "service": "API Gateway"
     }
   },
   "auth": {
-    "donnatokiimomapa632128a": {
+    "donnatokiimomap2616deca": {
       "customAuth": false,
       "dependsOn": [],
       "frontendAuthConfig": {
@@ -72,24 +41,22 @@
       },
       "providerPlugin": "awscloudformation",
       "service": "Cognito"
-    }
-  },
-  "function": {
-    "locationHandler": {
-      "build": true,
+    },
+    "userPoolGroups": {
       "dependsOn": [
         {
           "attributes": [
-            "GraphQLAPIIdOutput",
-            "GraphQLAPIEndpointOutput",
-            "GraphQLAPIKeyOutput"
+            "UserPoolId",
+            "AppClientIDWeb",
+            "AppClientID",
+            "IdentityPoolId"
           ],
-          "category": "api",
-          "resourceName": "donnatokiimomap"
+          "category": "auth",
+          "resourceName": "donnatokiimomap2616deca"
         }
       ],
       "providerPlugin": "awscloudformation",
-      "service": "Lambda"
+      "service": "Cognito-UserPool-Groups"
     }
   },
   "hosting": {
@@ -97,48 +64,6 @@
       "providerPlugin": "awscloudformation",
       "service": "amplifyhosting",
       "type": "manual"
-    }
-  },
-  "parameters": {
-    "AMPLIFY_function_locationHandler_deploymentBucketName": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "locationHandler"
-        }
-      ]
-    },
-    "AMPLIFY_function_locationHandler_s3Key": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "locationHandler"
-        }
-      ]
-    },
-    "AMPLIFY_function_locationHandler_trackerName": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "locationHandler"
-        }
-      ]
-    },
-    "AMPLIFY_hosting_amplifyhosting_appId": {
-      "usedBy": [
-        {
-          "category": "hosting",
-          "resourceName": "amplifyhosting"
-        }
-      ]
-    },
-    "AMPLIFY_hosting_amplifyhosting_type": {
-      "usedBy": [
-        {
-          "category": "hosting",
-          "resourceName": "amplifyhosting"
-        }
-      ]
     }
   }
 }
