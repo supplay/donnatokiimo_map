@@ -1,0 +1,13 @@
+type Store @model 
+  @auth(rules: [
+    { allow: groups, groups: ["Admins"] }, # 店主はフルアクセス
+    { allow: private, operations: [read] }, # ログイン者は読み取りOK
+    { allow: public, operations: [read] }  # 未ログインでも地図は見れる
+  ]) {
+  id: ID!
+  name: String!
+  description: String
+  lat: Float
+  lng: Float
+  isOperating: Boolean
+}

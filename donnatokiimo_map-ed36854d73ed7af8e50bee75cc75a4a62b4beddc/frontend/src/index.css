@@ -1,0 +1,13 @@
+/* 余計な余白や配置設定をリセット */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* 地図のコンテナを画面いっぱいに広げる */
+.leaflet-container {
+  width: 100%;
+  height: 100vh;
+}
