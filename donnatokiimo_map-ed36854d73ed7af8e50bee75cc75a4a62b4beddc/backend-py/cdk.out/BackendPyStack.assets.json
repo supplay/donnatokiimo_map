@@ -1,0 +1,34 @@
+{
+  "version": "48.0.0",
+  "files": {
+    "258a6919bb23b369387dd85dbf46c2584f3bf748db5f9e8826a2b5bc28ff5a97": {
+      "displayName": "AiGeneratorLambda/Code",
+      "source": {
+        "path": "asset.258a6919bb23b369387dd85dbf46c2584f3bf748db5f9e8826a2b5bc28ff5a97",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "current_account-current_region-5431dfb1": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "258a6919bb23b369387dd85dbf46c2584f3bf748db5f9e8826a2b5bc28ff5a97.zip",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    },
+    "482556fee02370e0b4e4fc938d6ce1614960650af2840c8a8740279f7f8c2923": {
+      "displayName": "BackendPyStack Template",
+      "source": {
+        "path": "BackendPyStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-current_region-11f21802": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "482556fee02370e0b4e4fc938d6ce1614960650af2840c8a8740279f7f8c2923.json",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}
