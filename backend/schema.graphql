@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ----------------------------------------
 # 1. お客さん位置や補助位置情報
 # ----------------------------------------
@@ -9,10 +10,14 @@ type Area
       { allow: public, operations: [read, create] }
     ]
   ) {
+=======
+type Area {
+>>>>>>> 6bac5b2e4aea2b86dc790f324e461d8709455b31
   id: ID!
   name: String!
   lat: Float!
   lng: Float!
+<<<<<<< HEAD
   catchCopy: String
 }
 
@@ -86,4 +91,23 @@ type UserPoint
   id: ID!
   owner: String
   points: Int!
+=======
+  catchCopy: String # AIが生成する一言
+}
+
+type Query {
+  # 今日の営業エリアを取得
+  getAreas: [Area]
+}
+
+type Mutation {
+  # お義兄さんがエリアを登録する
+  createArea(id: ID!, name: String!, lat: Float!, lng: Float!): Area
+}
+
+type Subscription {
+  # お義兄さんが接近した時の通知をアプリで受け取る（リアルタイム用）
+  onAreaEntered(id: ID!): Area
+    @aws_subscribe(mutations: ["createArea"])
+>>>>>>> 6bac5b2e4aea2b86dc790f324e461d8709455b31
 }

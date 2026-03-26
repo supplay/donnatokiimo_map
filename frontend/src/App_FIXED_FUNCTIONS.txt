@@ -1,0 +1,71 @@
+// お客さんのスマホから1kmの柵をAWSに登録
+const registerUserGeofence = async (userId, lat, lng) => {
+  const client = await getLocationClient();
+  if (!client) {
+    console.warn("LocationClient が利用できないため、geofence登録をスキップします");
+    return;
+  }
+
+  const command = new PutGeofenceCommand({
+    CollectionName: "CustomersGeofence",
+    GeofenceId: `fence-${userId}`,
+    Geometry: { Polygon: createCirclePolygon(lat, lng, 1.0) },
+  });
+
+  try {
+    await client.send(command);
+    console.log("1kmの柵をAWSに立てたバイ！");
+  } catch (err) {
+    console.error("柵の登録に失敗したバイ…", err);
+  }
+};
+
+// Lambda経由でgeofence登録（API Gateway経由）
+const registerUserGeofenceViaLambda = async (userId, lat, lng) => {
+  try {
+    const response = await apiClient.graphql({
+      query: /* GraphQL */ `
+        mutation RegisterGeofence($userId: String!, $lat: Float!, $lng: Float!) {
+          registerGeofence(input: { userId: $userId, latitude: $lat, longitude: $lng }) {
+            success
+            message
+          }
+        }
+      `,
+      variables: { userId, lat, lng },
+      authMode: "apiKey", // 未認証ユーザーでもアクセス可能
+    });
+    console.log("Lambda経由でgeofenceを登録したバイ！", response);
+  } catch (err) {
+    console.error("Lambda geofence登録エラー:", err);
+    // エラーをログに残すだけで、アプリは継続
+    console.warn("geofence登録に失敗しましたが、アプリは継続できます");
+  }
+};
+
+// おじさんの位置情報をAWS Location Serviceに送信
+const updateOjisanPosition = async (lat, lng) => {
+  const client = await getLocationClient();
+  if (!client) {
+    console.warn("LocationClient が利用できないため、位置送信をスキップします");
+    return;
+  }
+
+  const command = new BatchUpdateDevicePositionCommand({
+    TrackerName: "DonnnatokiimoTracker",
+    Updates: [
+      {
+        DeviceId: "Ojisan-Mobile-001",
+        Position: [lng, lat], // Location Service は [経度, 緯度]
+        SampleTime: new Date(),
+      },
+    ],
+  });
+
+  try {
+    await client.send(command);
+    console.log("おじさんの位置、AWSに届けたバイ！");
+  } catch (err) {
+    console.error("送信失敗…", err);
+  }
+};

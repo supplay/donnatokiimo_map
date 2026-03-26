@@ -1,6 +1,29 @@
 {
+<<<<<<< HEAD
   "auth": {
     "donnatokiimomap7659bd90": {
+=======
+  "api": {
+    "donnatokiimomap": {
+      "dependsOn": [],
+      "output": {
+        "authConfig": {
+          "additionalAuthenticationProviders": [],
+          "defaultAuthentication": {
+            "apiKeyConfig": {
+              "apiKeyExpirationDays": 7
+            },
+            "authenticationType": "API_KEY"
+          }
+        }
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "AppSync"
+    }
+  },
+  "auth": {
+    "donnatokiimomap2616deca": {
+>>>>>>> 6bac5b2e4aea2b86dc790f324e461d8709455b31
       "customAuth": false,
       "dependsOn": [],
       "frontendAuthConfig": {
@@ -23,6 +46,7 @@
       },
       "providerPlugin": "awscloudformation",
       "service": "Cognito"
+<<<<<<< HEAD
     }
   },
   "function": {
@@ -31,6 +55,24 @@
       "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+=======
+    },
+    "userPoolGroups": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId",
+            "AppClientIDWeb",
+            "AppClientID",
+            "IdentityPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "donnatokiimomap2616deca"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito-UserPool-Groups"
+>>>>>>> 6bac5b2e4aea2b86dc790f324e461d8709455b31
     }
   },
   "hosting": {
@@ -39,6 +81,7 @@
       "service": "amplifyhosting",
       "type": "manual"
     }
+<<<<<<< HEAD
   },
   "parameters": {
     "AMPLIFY_function_donnatokiimomap7946ee2e_deploymentBucketName": {
@@ -73,5 +116,7 @@
         }
       ]
     }
+=======
+>>>>>>> 6bac5b2e4aea2b86dc790f324e461d8709455b31
   }
 }
