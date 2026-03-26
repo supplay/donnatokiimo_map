@@ -1,6 +1,6 @@
 export type AmplifyDependentResourcesAttributes = {
   "auth": {
-    "donnatokiimomapfbb27a9d": {
+    "donnatokiimomap7659bd90": {
       "AppClientID": "string",
       "AppClientIDWeb": "string",
       "IdentityPoolId": "string",
@@ -10,9 +10,12 @@ export type AmplifyDependentResourcesAttributes = {
       "UserPoolName": "string"
     }
   },
-  "storage": {
-    "s3efcda499": {
-      "BucketName": "string",
+  "function": {
+    "donnatokiimomap7946ee2e": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
       "Region": "string"
     }
   }

@@ -33,9 +33,9 @@ export const listUserPoints = /* GraphQL */ `
     }
   }
 `;
-export const getShop = /* GraphQL */ `
-  query GetShop($id: ID!) {
-    getShop(id: $id) {
+export const getStore = /* GraphQL */ `
+  query GetStore($id: ID!) {
+    getStore(id: $id) {
       id
       name
       latitude
@@ -48,13 +48,13 @@ export const getShop = /* GraphQL */ `
     }
   }
 `;
-export const listShops = /* GraphQL */ `
-  query ListShops(
-    $filter: ModelShopFilterInput
+export const listStores = /* GraphQL */ `
+  query ListStores(
+    $filter: ModelStoreFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    listShops(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    listStores(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
         name

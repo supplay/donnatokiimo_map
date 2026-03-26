@@ -1,23 +1,89 @@
-type Area {
+# ----------------------------------------
+# 1. お客さん位置や補助位置情報
+# ----------------------------------------
+type Area
+  @model
+  @auth(
+    rules: [
+      { allow: groups, groups: ["Admins"], operations: [create, update, delete, read] }
+      { allow: public, operations: [read, create] }
+    ]
+  ) {
   id: ID!
   name: String!
   lat: Float!
   lng: Float!
-  catchCopy: String # AIが生成する一言
+  catchCopy: String
 }
 
-type Query {
-  # 今日の営業エリアを取得
-  getAreas: [Area]
+# ----------------------------------------
+# 2. 移動販売の現在地・営業状態
+# ----------------------------------------
+type Store
+  @model
+  @auth(
+    rules: [
+      { allow: groups, groups: ["Admins"], operations: [create, update, delete, read] }
+      { allow: public, operations: [read] }
+    ]
+  ) {
+  id: ID!
+  name: String!
+  description: String
+  lat: Float
+  lng: Float
+  isOperating: Boolean
 }
 
-type Mutation {
-  # お義兄さんがエリアを登録する
-  createArea(id: ID!, name: String!, lat: Float!, lng: Float!): Area
+# ----------------------------------------
+# 3. メニュー・出店予定の共通設定
+# ----------------------------------------
+type Config
+  @model
+  @auth(
+    rules: [
+      { allow: groups, groups: ["Admins"], operations: [create, update, delete, read] }
+      { allow: public, operations: [read] }
+    ]
+  ) {
+  id: ID!
+  menuJson: String
+  scheduleJson: String
+  dummy: String
 }
 
-type Subscription {
-  # お義兄さんが接近した時の通知をアプリで受け取る（リアルタイム用）
-  onAreaEntered(id: ID!): Area
-    @aws_subscribe(mutations: ["createArea"])
+# ----------------------------------------
+# 4. 通知購読情報
+# ゲストでも通知ONできるよう public create/update/read を許可
+# ----------------------------------------
+type UserSubscription
+  @model
+  @auth(
+    rules: [
+      { allow: groups, groups: ["Admins"], operations: [create, update, delete, read] }
+      { allow: public, operations: [create, update, read] }
+    ]
+  ) {
+  id: ID!
+  userId: String!
+  subscription: String!
+  userLat: Float
+  userLng: Float
+}
+
+# ----------------------------------------
+# 5. ユーザーのポイント
+# ログインユーザー本人だけが自分のポイントを操作
+# ----------------------------------------
+type UserPoint
+  @model
+  @auth(
+    rules: [
+      { allow: owner, ownerField: "owner", operations: [create, read, update, delete] }
+      { allow: groups, groups: ["Admins"], operations: [read, update] }
+    ]
+  ) {
+  id: ID!
+  owner: String
+  points: Int!
 }

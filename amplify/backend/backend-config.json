@@ -1,6 +1,6 @@
 {
   "auth": {
-    "donnatokiimomapfbb27a9d": {
+    "donnatokiimomap7659bd90": {
       "customAuth": false,
       "dependsOn": [],
       "frontendAuthConfig": {
@@ -25,11 +25,53 @@
       "service": "Cognito"
     }
   },
-  "storage": {
-    "s3efcda499": {
+  "function": {
+    "donnatokiimomap7946ee2e": {
+      "build": true,
       "dependsOn": [],
       "providerPlugin": "awscloudformation",
-      "service": "S3"
+      "service": "Lambda"
+    }
+  },
+  "hosting": {
+    "amplifyhosting": {
+      "providerPlugin": "awscloudformation",
+      "service": "amplifyhosting",
+      "type": "manual"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_donnatokiimomap7946ee2e_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "donnatokiimomap7946ee2e"
+        }
+      ]
+    },
+    "AMPLIFY_function_donnatokiimomap7946ee2e_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "donnatokiimomap7946ee2e"
+        }
+      ]
+    },
+    "AMPLIFY_hosting_amplifyhosting_appId": {
+      "usedBy": [
+        {
+          "category": "hosting",
+          "resourceName": "amplifyhosting"
+        }
+      ]
+    },
+    "AMPLIFY_hosting_amplifyhosting_type": {
+      "usedBy": [
+        {
+          "category": "hosting",
+          "resourceName": "amplifyhosting"
+        }
+      ]
     }
   }
 }

@@ -1,12 +1,12 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const createShop = /* GraphQL */ `
-  mutation CreateShop(
-    $input: CreateShopInput!
-    $condition: ModelShopConditionInput
+export const createStore = /* GraphQL */ `
+  mutation CreateStore(
+    $input: CreateStoreInput!
+    $condition: ModelStoreConditionInput
   ) {
-    createShop(input: $input, condition: $condition) {
+    createStore(input: $input, condition: $condition) {
       id
       name
       latitude
@@ -19,12 +19,12 @@ export const createShop = /* GraphQL */ `
     }
   }
 `;
-export const updateShop = /* GraphQL */ `
-  mutation UpdateShop(
-    $input: UpdateShopInput!
-    $condition: ModelShopConditionInput
+export const updateStore = /* GraphQL */ `
+  mutation UpdateStore(
+    $input: UpdateStoreInput!
+    $condition: ModelStoreConditionInput
   ) {
-    updateShop(input: $input, condition: $condition) {
+    updateStore(input: $input, condition: $condition) {
       id
       name
       latitude
@@ -37,12 +37,12 @@ export const updateShop = /* GraphQL */ `
     }
   }
 `;
-export const deleteShop = /* GraphQL */ `
-  mutation DeleteShop(
-    $input: DeleteShopInput!
-    $condition: ModelShopConditionInput
+export const deleteStore = /* GraphQL */ `
+  mutation DeleteStore(
+    $input: DeleteStoreInput!
+    $condition: ModelStoreConditionInput
   ) {
-    deleteShop(input: $input, condition: $condition) {
+    deleteStore(input: $input, condition: $condition) {
       id
       name
       latitude
