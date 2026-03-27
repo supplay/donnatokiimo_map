@@ -65,11 +65,6 @@ export default function App() {
               {({ signOut }) => <AdminPage signOut={signOut} />}
             </Authenticator>
           } />
-          <Route path="/admin/*" element={
-            <Authenticator hideSignUp={true}>
-              {({ signOut }) => <AdminPage signOut={signOut} />}
-            </Authenticator>
-          } />
           <Route path="/admin-signup" element={<AdminSignup />} />
           <Route path="/mypage" element={
             <Authenticator>{({ signOut, user }) => <PointCard user={user} signOut={signOut} />}</Authenticator>

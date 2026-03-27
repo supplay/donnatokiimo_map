@@ -3,12 +3,13 @@ importScripts("https://www.gstatic.com/firebasejs/12.11.0/firebase-app-compat.js
 importScripts("https://www.gstatic.com/firebasejs/12.11.0/firebase-messaging-compat.js");
 
 firebase.initializeApp({
-  apiKey: "...",            // TODO: Firebase コンソールの値を入力（src/firebase.js と同じ値）
-  authDomain: "...",
-  projectId: "...",
-  storageBucket: "...",
-  messagingSenderId: "...",
-  appId: "...",
+  apiKey: "AIzaSyDIpgZj68CdmN85wSuLFlyYQDcvFfQdr1E",
+  authDomain: "donnatokiimo-6e7be.firebaseapp.com",
+  projectId: "donnatokiimo-6e7be",
+  storageBucket: "donnatokiimo-6e7be.firebasestorage.app",
+  messagingSenderId: "154464848783",
+  appId: "1:154464848783:web:e68ae3d04a193c20c659fa",
+  measurementId: "G-4D7XK01FY0",
 });
 
 const messaging = firebase.messaging();

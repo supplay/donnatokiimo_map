@@ -21,7 +21,8 @@ import PointCard from "../components/PointCard.jsx";
 import { messaging, getToken } from "../firebase.js";
 
 // Firebase コンソール > プロジェクト設定 > Cloud Messaging > ウェブプッシュ証明書 の鍵ペア
-const FCM_VAPID_KEY = "..."; // TODO: Firebase VAPID鍵を入力
+const FCM_VAPID_KEY = "BN2AwI13slGtx56om9P68uGilFCIkb8B82yHzKIPYsTD8YLc2N9OdDhTF0W7LhvoShJQr0xaaaieCSOEt30bRso";
+const AWS_API_URL = "https://a79c454sgh.execute-api.us-east-1.amazonaws.com/v1/tokens";
 const VAN_ID = "KEI-VAN-001";
 const CONFIG_ID = "GLOBAL-CONFIG";
 
@@ -157,11 +158,26 @@ function Modal({ title, content, onClose, color = "#d35400" }) {
 
 function MapAutoPan({ pos, secondaryPos = null, lock = false }) {
   const map = useMap();
+  const hasFittedRef = useRef(false);
+  const userDraggedRef = useRef(false);
+
+  // ユーザーがドラッグ/ズームしたら追従を止める
+  useEffect(() => {
+    const onDrag = () => { userDraggedRef.current = true; };
+    map.on("dragstart", onDrag);
+    map.on("zoomstart", onDrag);
+    return () => {
+      map.off("dragstart", onDrag);
+      map.off("zoomstart", onDrag);
+    };
+  }, [map]);
 
   useEffect(() => {
     if (!pos?.lat || !pos?.lng) return;
+    if (userDraggedRef.current) return;
 
     if (lock && secondaryPos?.lat && secondaryPos?.lng) {
+      if (hasFittedRef.current) return;
       const bounds = L.latLngBounds(
         [
           [pos.lat, pos.lng],
@@ -169,13 +185,17 @@ function MapAutoPan({ pos, secondaryPos = null, lock = false }) {
         ],
       );
       map.fitBounds(bounds.pad(0.35), { animate: true });
+      hasFittedRef.current = true;
       return;
     }
 
-    map.flyTo([pos.lat, pos.lng], Math.max(map.getZoom(), 15), {
-      animate: true,
-      duration: 0.8,
-    });
+    if (!hasFittedRef.current) {
+      map.flyTo([pos.lat, pos.lng], Math.max(map.getZoom(), 15), {
+        animate: true,
+        duration: 0.8,
+      });
+      hasFittedRef.current = true;
+    }
   }, [map, pos, secondaryPos, lock]);
 
   return null;
@@ -261,8 +281,28 @@ export default function CustomerPage() {
 
       console.log("FCMトークン取得成功:", fcmToken);
 
-      const currentLat = userPos?.lat ?? null;
-      const currentLng = userPos?.lng ?? null;
+      // GPS座標を取得してAWS API Gatewayへ送信（ジオフェンス作成用）
+      const gpsPos = await new Promise((resolve) => {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+          () => resolve({ lat: userPos?.lat ?? null, lng: userPos?.lng ?? null }),
+          { enableHighAccuracy: true, timeout: 10000 },
+        );
+      });
+
+      await fetch(AWS_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lat: gpsPos.lat,
+          lng: gpsPos.lng,
+          token: fcmToken,
+        }),
+      });
+      console.log("あなたの周り1kmに柵を張ったバイ！");
+
+      const currentLat = gpsPos.lat;
+      const currentLng = gpsPos.lng;
       const guestUserId = `guest-${Date.now()}`;
 
       const response = await client.graphql({
