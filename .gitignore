@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 
-=======
 # Logs
 logs
 *.log
@@ -69,7 +67,7 @@ amplifytools.xcconfig
 .secret-*
 **.sample
 #amplify-do-not-edit-end
->>>>>>> 6bac5b2e4aea2b86dc790f324e461d8709455b31
+6bac5b2e4aea2b86dc790f324e461d8709455b31
 
 #amplify-do-not-edit-begin
 amplify/\#current-cloud-backend

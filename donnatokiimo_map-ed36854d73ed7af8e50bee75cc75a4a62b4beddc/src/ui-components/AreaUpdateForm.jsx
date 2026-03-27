@@ -17,7 +17,6 @@ import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { generateClient } from "aws-amplify/api";
 import { getArea } from "../graphql/queries";
 import { updateArea } from "../graphql/mutations";
-const client = generateClient();
 export default function AreaUpdateForm(props) {
   const {
     id: idProp,

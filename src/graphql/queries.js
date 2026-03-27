@@ -6,9 +6,9 @@ export const getUserPoint = /* GraphQL */ `
     getUserPoint(id: $id) {
       id
       points
+      owner
       createdAt
       updatedAt
-      owner
       __typename
     }
   }
@@ -23,9 +23,9 @@ export const listUserPoints = /* GraphQL */ `
       items {
         id
         points
+        owner
         createdAt
         updatedAt
-        owner
         __typename
       }
       nextToken
@@ -33,20 +33,55 @@ export const listUserPoints = /* GraphQL */ `
     }
   }
 `;
-<<<<<<< HEAD
+export const getUserSubscription = /* GraphQL */ `
+  query GetUserSubscription($id: ID!) {
+    getUserSubscription(id: $id) {
+      id
+      userId
+      subscription
+      userLat
+      userLng
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listUserSubscriptions = /* GraphQL */ `
+  query ListUserSubscriptions(
+    $filter: ModelUserSubscriptionFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listUserSubscriptions(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        userId
+        subscription
+        userLat
+        userLng
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getStore = /* GraphQL */ `
   query GetStore($id: ID!) {
     getStore(id: $id) {
-=======
-export const getShop = /* GraphQL */ `
-  query GetShop($id: ID!) {
-    getShop(id: $id) {
->>>>>>> 6bac5b2e4aea2b86dc790f324e461d8709455b31
       id
       name
-      latitude
-      longitude
+      lat
+      lng
       isOperating
+      catchCopy
       lastUpdated
       createdAt
       updatedAt
@@ -54,7 +89,6 @@ export const getShop = /* GraphQL */ `
     }
   }
 `;
-<<<<<<< HEAD
 export const listStores = /* GraphQL */ `
   query ListStores(
     $filter: ModelStoreFilterInput
@@ -62,21 +96,13 @@ export const listStores = /* GraphQL */ `
     $nextToken: String
   ) {
     listStores(filter: $filter, limit: $limit, nextToken: $nextToken) {
-=======
-export const listShops = /* GraphQL */ `
-  query ListShops(
-    $filter: ModelShopFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listShops(filter: $filter, limit: $limit, nextToken: $nextToken) {
->>>>>>> 6bac5b2e4aea2b86dc790f324e461d8709455b31
       items {
         id
         name
-        latitude
-        longitude
+        lat
+        lng
         isOperating
+        catchCopy
         lastUpdated
         createdAt
         updatedAt

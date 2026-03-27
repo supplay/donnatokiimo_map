@@ -513,8 +513,8 @@ function AdminPage({ signOut }) {
         const input = {
           id: VAN_ID,
           name: "どんなとき芋",
-          latitude,
-          longitude,
+          lat: latitude,
+          lng: longitude,
           isOperating: true,
           lastUpdated: new Date().toISOString(),
         };

@@ -1,144 +1,28 @@
-// VAPID公開鍵（あなたの値に置き換えてください）
-const VAPID_PUBLIC_KEY = "ここにあなたの公開鍵";
-
-// Base64→Uint8Array変換関数
-function urlBase64ToUint8Array(base64String) {
-  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding)
-    .replace(/-/g, "+")
-    .replace(/_/g, "/");
-
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
-  }
-  return outputArray;
-}
-
-// 通知ON処理
-const enableNotification = async () => {
-  try {
-    const permission = await Notification.requestPermission();
-
-    if (permission !== "granted") {
-      alert("通知が許可されてないバイ");
-      return;
-    }
-
-    const reg = await navigator.serviceWorker.ready;
-
-    const sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
-    });
-
-    const guestUserId = `guest-${Date.now()}`;
-
-    // 🔥 ① GraphQLに保存
-    await client.graphql({
-      query: CREATE_USER_SUBSCRIPTION,
-      variables: {
-        input: {
-          userId: guestUserId,
-          subscription: JSON.stringify(sub),
-        },
-      },
-      authMode: "apiKey",
-    });
-
-    // 🔥 ② Geofence登録
-    if (userPos?.lat && userPos?.lng) {
-      await registerUserGeofence(guestUserId, userPos.lat, userPos.lng);
-    }
-
-    alert("通知ONになったバイ🔥");
-  } catch (err) {
-    console.error(err);
-    alert("通知設定でエラー");
-  }
-};
-import {
-  LocationClient,
-  PutGeofenceCommand,
-} from "@aws-sdk/client-location";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  LocationClient,
-  PutGeofenceCommand,
-} from "@aws-sdk/client-location";
-import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/api";
-import amplifyconfig from "../amplifyconfiguration.json";
+import { Authenticator } from "@aws-amplify/ui-react";
+import "@aws-amplify/ui-react/styles.css";
+
 import { getStore } from "../graphql/queries";
 import { onUpdateStore } from "../graphql/subscriptions";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Bell, BellOff } from "lucide-react";
-import { Authenticator } from "@aws-amplify/ui-react";
-import "@aws-amplify/ui-react/styles.css";
+
 import PointCard from "../components/PointCard.jsx";
 
-import {
-  LocationClient,
-  PutGeofenceCommand,
-} from "@aws-sdk/client-location";
-import { Amplify } from "aws-amplify";
-import { generateClient } from "aws-amplify/api";
-import amplifyconfig from "../amplifyconfiguration.json";
-import { getStore } from "../graphql/queries";
-import { onUpdateStore } from "../graphql/subscriptions";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import { Bell, BellOff } from "lucide-react";
-import { Authenticator } from "@aws-amplify/ui-react";
-import "@aws-amplify/ui-react/styles.css";
-import PointCard from "../components/PointCard.jsx";
-
-
-// ...既存のGraphQL定義・UI・ロジックは前回案内の通り、全て上書き済み...
-Amplify.configure(amplifyconfig);
-const client = generateClient();
-
-
-const locationClient = new LocationClient({ region: "ap-northeast-1" });
-const GEOFENCE_COLLECTION = "CustomersGeofence";
+const VAPID_PUBLIC_KEY =
+  "BDMMgHhPRWm3yYrG9eGj4UjPJ8yTkYa295Nq8jC8DRn7MBw7J4Bwq1DFII87lq7DuiX4EjJ0WM0BqwLDD2d0sOI";
 const VAN_ID = "KEI-VAN-001";
 const CONFIG_ID = "GLOBAL-CONFIG";
-
-function createCirclePolygon(lat, lng, radiusKm) {
-  const points = 32;
-  const coords = [];
-  const distanceX = radiusKm / (111.32 * Math.cos((lat * Math.PI) / 180));
-  const distanceY = radiusKm / 110.574;
-  for (let i = 0; i <= points; i++) {
-    const theta = (i / points) * (2 * Math.PI);
-    const x = distanceX * Math.cos(theta);
-    const y = distanceY * Math.sin(theta);
-    coords.push([lng + x, lat + y]); // ←重要：lng, lat
-  }
-  return [coords];
-}
-
-const registerUserGeofence = async (userId, lat, lng) => {
-  try {
-    const polygon = createCirclePolygon(lat, lng, 1);
-    const command = new PutGeofenceCommand({
-      CollectionName: GEOFENCE_COLLECTION,
-      GeofenceId: userId,
-      Geometry: {
-        Polygon: polygon,
-      },
-    });
-    await locationClient.send(command);
-    console.log("ジオフェンス登録成功");
-  } catch (err) {
-    console.error("ジオフェンス登録失敗:", err);
-  }
-};
 
 const GET_CONFIG = /* GraphQL */ `
   query GetConfig($id: ID!) {
@@ -146,6 +30,7 @@ const GET_CONFIG = /* GraphQL */ `
       id
       menuJson
       scheduleJson
+      dummy
     }
   }
 `;
@@ -156,18 +41,7 @@ const ON_UPDATE_CONFIG = /* GraphQL */ `
       id
       menuJson
       scheduleJson
-    }
-  }
-`;
-
-const CREATE_AREA = /* GraphQL */ `
-  mutation CreateArea($input: CreateAreaInput!) {
-    createArea(input: $input) {
-      id
-      name
-      lat
-      lng
-      catchCopy
+      dummy
     }
   }
 `;
@@ -215,202 +89,130 @@ const userLocationIcon = L.divIcon({
   popupAnchor: [0, -16],
 });
 
-function CustomerPage() {
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+
+  return outputArray;
+}
+
+function Modal({ title, content, onClose, color = "#d35400" }) {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.45)",
+        zIndex: 3000,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "16px",
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          width: "min(92vw, 440px)",
+          maxHeight: "82vh",
+          overflowY: "auto",
+          background: "#fffaf2",
+          borderRadius: "20px",
+          padding: "20px",
+          boxShadow: "0 12px 30px rgba(0,0,0,0.25)",
+          border: `4px solid ${color}`,
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          style={{
+            fontSize: "1.2rem",
+            fontWeight: "bold",
+            color,
+            marginBottom: "16px",
+            textAlign: "center",
+          }}
+        >
+          {title}
+        </div>
+
+        <div>{content}</div>
+
+        <div style={{ marginTop: "18px", textAlign: "center" }}>
+          <button
+            onClick={onClose}
+            style={{
+              background: color,
+              color: "#fff",
+              border: "none",
+              borderRadius: "10px",
+              padding: "10px 28px",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            閉じる
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MapAutoPan({ pos, secondaryPos = null, lock = false }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!pos?.lat || !pos?.lng) return;
+
+    if (lock && secondaryPos?.lat && secondaryPos?.lng) {
+      const bounds = L.latLngBounds(
+        [
+          [pos.lat, pos.lng],
+          [secondaryPos.lat, secondaryPos.lng],
+        ],
+      );
+      map.fitBounds(bounds.pad(0.35), { animate: true });
+      return;
+    }
+
+    map.flyTo([pos.lat, pos.lng], Math.max(map.getZoom(), 15), {
+      animate: true,
+      duration: 0.8,
+    });
+  }, [map, pos, secondaryPos, lock]);
+
+  return null;
+}
+
+export default function CustomerPage() {
+  const clientRef = useRef(null);
+  if (!clientRef.current) {
+    clientRef.current = generateClient();
+  }
+  const client = clientRef.current;
+
   const [vanPos, setVanPos] = useState(null);
+  const [vanHistory, setVanHistory] = useState([]);
   const [userPos, setUserPos] = useState(null);
+  const [isGeofenceOn, setIsGeofenceOn] = useState(false);
+  const [userSubscriptionId, setUserSubscriptionId] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showMyPage, setShowMyPage] = useState(false);
-  const [isGeofenceOn, setIsGeofenceOn] = useState(false);
-  const [showNotifyInfo, setShowNotifyInfo] = useState(false);
-  const [vanHistory, setVanHistory] = useState([]);
+  const [weatherPhrase, setWeatherPhrase] = useState("");
   const [config, setConfig] = useState({ menu: [], schedule: [] });
-  const [userSubscriptionId, setUserSubscriptionId] = useState(null);
+  const [showNotifyInfo, setShowNotifyInfo] = useState(false);
 
   const lastToggleAtRef = useRef(0);
-  const registeredRef = useRef(false);
+  const isMountedRef = useRef(true);
 
-  // Areaテーブルにも登録したい場合は下記を利用
-  const registerUserGeofenceArea = async (userId, lat, lng) => {
-    try {
-      const input = {
-        name: userId,
-        lat,
-        lng,
-        catchCopy: "1kmの柵登録",
-      };
-
-      await client.graphql({
-        query: CREATE_AREA,
-        variables: { input },
-        authMode: "apiKey",
-      });
-
-      console.log("1kmの柵をGraphQLで登録したバイ！");
-    } catch (err) {
-      console.error("柵の登録に失敗したバイ…", err);
-    }
-  };
-
-  useEffect(() => {
-    const loadStore = async () => {
-      try {
-        const res = await client.graphql({
-          query: getStore,
-          variables: { id: VAN_ID },
-          authMode: "apiKey",
-        });
-
-        const store = res.data?.getStore;
-        if (store?.isOperating) {
-          setVanPos(store);
-        } else {
-          setVanPos(null);
-        }
-      } catch (e) {
-        console.error("Store Load Error", e);
-      }
-    };
-
-    loadStore();
-  }, []);
-
-  useEffect(() => {
-    const sub = client
-      .graphql({
-        query: onUpdateStore,
-        authMode: "apiKey",
-      })
-      .subscribe({
-        next: ({ data }) => {
-          const updated = data?.onUpdateStore;
-          if (!updated) return;
-          if (updated.id !== VAN_ID) return;
-
-          if (updated.isOperating) {
-            setVanPos(updated);
-          } else {
-            setVanPos(null);
-          }
-        },
-        error: (err) => {
-          console.error("Store subscription error", err);
-        },
-      });
-
-    return () => sub.unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    const loadConfig = async () => {
-      try {
-        const res = await client.graphql({
-          query: GET_CONFIG,
-          variables: { id: CONFIG_ID },
-          authMode: "apiKey",
-        });
-
-        if (res.data?.getConfig) {
-          setConfig({
-            menu: JSON.parse(res.data.getConfig.menuJson || "[]"),
-            schedule: JSON.parse(res.data.getConfig.scheduleJson || "[]"),
-          });
-        }
-      } catch (e) {
-        console.error("Config Load Error", e);
-      }
-    };
-
-    loadConfig();
-  }, []);
-
-  useEffect(() => {
-    const sub = client
-      .graphql({
-        query: ON_UPDATE_CONFIG,
-        authMode: "apiKey",
-      })
-      .subscribe({
-        next: ({ data }) => {
-          const updated = data?.onUpdateConfig;
-          if (!updated) return;
-          if (updated.id !== CONFIG_ID) return;
-
-          setConfig({
-            menu: JSON.parse(updated.menuJson || "[]"),
-            schedule: JSON.parse(updated.scheduleJson || "[]"),
-          });
-        },
-        error: (err) => {
-          console.error("Config subscription error", err);
-        },
-      });
-
-    return () => sub.unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (!navigator.geolocation) return;
-
-    const watchId = navigator.geolocation.watchPosition(
-      async (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        setUserPos({ lat, lng });
-
-        if (!registeredRef.current) {
-          registeredRef.current = true;
-          const tempUserId = `guest-${Math.floor(Math.random() * 100000)}`;
-          await registerUserGeofence(tempUserId, lat, lng);
-        }
-
-        if (userSubscriptionId) {
-          client
-            .graphql({
-              query: UPDATE_USER_SUBSCRIPTION,
-              variables: {
-                input: {
-                  id: userSubscriptionId,
-                  userLat: lat,
-                  userLng: lng,
-                },
-              },
-              authMode: "apiKey",
-            })
-            .catch((err) => console.log("位置更新エラー:", err));
-        }
-      },
-      (err) => {
-        console.error("現在地取得エラー:", err);
-      },
-      { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
-    );
-
-    return () => navigator.geolocation.clearWatch(watchId);
-  }, [userSubscriptionId]);
-
-  useEffect(() => {
-    if (vanPos?.lat && vanPos?.lng && vanPos?.isOperating) {
-      setVanHistory((prev) => {
-        const now = Date.now();
-        const filtered = prev.filter((h) => now - h.timestamp < 60000);
-
-        if (filtered.length > 0) {
-          const last = filtered[filtered.length - 1];
-          if (
-            Math.abs(last.lat - vanPos.lat) < 0.00001 &&
-            Math.abs(last.lng - vanPos.lng) < 0.00001
-          ) {
-            return filtered;
-          }
-        }
-
-        return [...filtered, { lat: vanPos.lat, lng: vanPos.lng, timestamp: now }];
-      });
-    }
-  }, [vanPos]);
-
-  // 通知ボタン押下時の処理（enableNotificationを呼ぶだけの例）
   const handleNotifyButtonPress = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -419,7 +221,7 @@ function CustomerPage() {
     if (now - lastToggleAtRef.current < 500) return;
     lastToggleAtRef.current = now;
 
-    enableNotification();
+    toggleGeofence();
   };
 
   const toggleGeofence = async () => {
@@ -435,59 +237,316 @@ function CustomerPage() {
     }
 
     try {
+      const now = Date.now();
+      if (now - lastToggleAtRef.current < 500) return;
+      lastToggleAtRef.current = now;
+
       const permission = await Notification.requestPermission();
 
-      if (permission === "granted") {
-        navigator.serviceWorker.ready
-          .then(async (reg) => {
-            const sub = await reg.pushManager.subscribe({
-              userVisibleOnly: true,
-              applicationServerKey: "あなたのVAPID公開鍵",
-            });
-
-            const subObj = sub.toJSON ? sub.toJSON() : sub;
-            const currentLat = userPos?.lat ?? null;
-            const currentLng = userPos?.lng ?? null;
-            const guestUserId = `guest-${Date.now()}`;
-
-            // Areaテーブル登録（従来）
-            await registerUserGeofenceArea(guestUserId, currentLat, currentLng);
-
-            // UserSubscription保存
-            const response = await client.graphql({
-              query: CREATE_USER_SUBSCRIPTION,
-              variables: {
-                input: {
-                  userId: guestUserId,
-                  subscription: JSON.stringify(subObj),
-                  userLat: currentLat,
-                  userLng: currentLng,
-                },
-              },
-              authMode: "apiKey",
-            });
-
-            if (response.data?.createUserSubscription?.id) {
-              setUserSubscriptionId(response.data.createUserSubscription.id);
-              // UserSubscription保存後にジオフェンス登録
-              if (currentLat && currentLng) {
-                await registerUserGeofence(guestUserId, currentLat, currentLng);
-              }
-            }
-          })
-          .catch((e) => console.log("SW準備中...", e));
-
-        setIsGeofenceOn(true);
-        setShowNotifyInfo(true);
-      } else if (permission === "denied") {
-        alert("通知がブロックされてるバイ！\n\nブラウザ設定から通知を許可してね。");
-      } else {
-        alert("通知を許可してもらわないとONにできんバイ...");
+      if (permission !== "granted") {
+        if (permission === "denied") {
+          alert(
+            "通知がブロックされてるバイ！\n\nブラウザの設定から「通知」を許可してね！",
+          );
+        } else {
+          alert("通知を許可してもらわないとONにできんバイ...");
+        }
+        return;
       }
+
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+      });
+
+      const subObj = sub.toJSON ? sub.toJSON() : sub;
+      const currentLat = userPos?.lat ?? null;
+      const currentLng = userPos?.lng ?? null;
+      const guestUserId = `guest-${Date.now()}`;
+
+      const response = await client.graphql({
+        query: CREATE_USER_SUBSCRIPTION,
+        variables: {
+          input: {
+            userId: guestUserId,
+            subscription: JSON.stringify(subObj),
+            userLat: currentLat,
+            userLng: currentLng,
+          },
+        },
+        authMode: "apiKey",
+      });
+
+      if (response?.data?.createUserSubscription?.id) {
+        setUserSubscriptionId(response.data.createUserSubscription.id);
+      }
+
+      setIsGeofenceOn(true);
+      setShowNotifyInfo(true);
     } catch (err) {
       console.error("通知許可エラー:", err);
       alert("通知の設定に失敗したバイ...");
       setIsGeofenceOn(false);
+    }
+  };
+
+  const getDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371000;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  useEffect(() => {
+    if (vanPos && vanPos.lat && vanPos.lng && vanPos.isOperating) {
+      setVanHistory((prev) => {
+        const now = Date.now();
+        const filtered = prev.filter((h) => now - h.timestamp < 60000);
+
+        if (filtered.length > 0) {
+          const last = filtered[filtered.length - 1];
+          if (
+            Math.abs(last.lat - vanPos.lat) < 0.00001 &&
+            Math.abs(last.lng - vanPos.lng) < 0.00001
+          ) {
+            return filtered;
+          }
+        }
+
+        return [
+          ...filtered,
+          { lat: vanPos.lat, lng: vanPos.lng, timestamp: now },
+        ];
+      });
+    }
+  }, [vanPos]);
+
+  useEffect(() => {
+    if (isGeofenceOn && vanPos && userPos) {
+      const dist = getDistance(userPos.lat, userPos.lng, vanPos.lat, vanPos.lng);
+
+      if (dist <= 1000) {
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker.ready
+            .then((registration) => {
+              registration.showNotification("ホカホカのお知らせ！🍠", {
+                body: `焼き芋屋さんが1km圏内に来たバイ！今の距離は約${Math.round(dist)}m。`,
+                icon: "/favicon.ico",
+                badge: "/favicon.ico",
+                vibrate: [200, 100, 200],
+              });
+            })
+            .catch((err) => {
+              console.error("通知表示エラー:", err);
+            });
+        }
+
+        setIsGeofenceOn(false);
+      }
+    }
+  }, [vanPos, userPos, isGeofenceOn]);
+
+  useEffect(() => {
+    const fetchLatestShop = async () => {
+      try {
+        const latest = await client.graphql({
+          query: getStore,
+          variables: { id: VAN_ID },
+          authMode: "apiKey",
+        });
+
+        const store = latest?.data?.getStore;
+        if (store?.id === VAN_ID) {
+          setVanPos(store.isOperating ? store : null);
+        }
+      } catch (e) {
+        console.error("店主位置の再取得エラー:", e);
+      }
+    };
+
+    const init = async () => {
+      try {
+        const res = await client.graphql({
+          query: getStore,
+          variables: { id: VAN_ID },
+          authMode: "apiKey",
+        });
+
+        if (res?.data?.getStore?.isOperating) {
+          setVanPos(res.data.getStore);
+        } else {
+          setVanPos(null);
+        }
+
+        const cRes = await client.graphql({
+          query: GET_CONFIG,
+          variables: { id: CONFIG_ID },
+          authMode: "apiKey",
+        });
+
+        if (cRes?.data?.getConfig) {
+          setConfig({
+            menu: JSON.parse(cRes.data.getConfig.menuJson || "[]"),
+            schedule: JSON.parse(cRes.data.getConfig.scheduleJson || "[]"),
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    init();
+
+    console.log("🔵 店主位置購読を開始");
+    const subShopObs = client.graphql({
+      query: onUpdateStore,
+      authMode: "apiKey",
+    });
+
+    const subShop = subShopObs.subscribe({
+      next: ({ data }) => {
+        console.log("📍 店主位置更新受信:", data);
+
+        if (!isMountedRef.current) return;
+
+        try {
+          const updated = data?.onUpdateStore;
+          if (!updated) return;
+
+          if (updated.id === VAN_ID && updated.isOperating) {
+            setVanPos(updated);
+          } else if (updated.id === VAN_ID && !updated.isOperating) {
+            setVanPos(null);
+          }
+        } catch (parseErr) {
+          console.error("🔴 店主位置の設定中にエラー:", parseErr);
+        }
+      },
+      error: (err) => {
+        console.error("🔴 店主位置の購読エラー:", err);
+      },
+      complete: () => {
+        console.log("✅ 店主位置購読完了");
+      },
+    });
+
+    console.log("🟢 設定更新購読を開始");
+    const subConfigObs = client.graphql({
+      query: ON_UPDATE_CONFIG,
+      authMode: "apiKey",
+    });
+
+    const subConfig = subConfigObs.subscribe({
+      next: ({ data }) => {
+        console.log("⚙️ 設定更新受信:", data);
+
+        if (!isMountedRef.current) return;
+
+        try {
+          if (!data?.onUpdateConfig) return;
+          if (data.onUpdateConfig.id === CONFIG_ID) {
+            const menu = JSON.parse(data.onUpdateConfig.menuJson || "[]");
+            const schedule = JSON.parse(data.onUpdateConfig.scheduleJson || "[]");
+            setConfig({ menu, schedule });
+          }
+        } catch (parseErr) {
+          console.error("🔴 設定データ解析エラー:", parseErr);
+        }
+      },
+      error: (err) => {
+        console.error("🔴 設定更新購読エラー:", err);
+      },
+      complete: () => {
+        console.log("✅ 設定更新購読完了");
+      },
+    });
+
+    let watchId;
+    const pollingId = window.setInterval(fetchLatestShop, 10000);
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          setUserPos({ lat, lng });
+        },
+        (err) => console.error(err),
+        { enableHighAccuracy: true },
+      );
+
+      let lastUpdateTime = 0;
+
+      watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          setUserPos({ lat, lng });
+
+          const now = Date.now();
+          if (now - lastUpdateTime > 5000) {
+            lastUpdateTime = now;
+            if (userSubscriptionId) {
+              client
+                .graphql({
+                  query: UPDATE_USER_SUBSCRIPTION,
+                  variables: {
+                    input: {
+                      id: userSubscriptionId,
+                      userLat: lat,
+                      userLng: lng,
+                    },
+                  },
+                  authMode: "apiKey",
+                })
+                .catch((err) => console.log("位置更新エラー:", err));
+            }
+          }
+        },
+        (err) => console.error(err),
+        { enableHighAccuracy: true },
+      );
+    }
+
+    return () => {
+      console.log("🟠 CustomerPage クリーンアップ開始");
+      isMountedRef.current = false;
+      subShop.unsubscribe();
+      subConfig.unsubscribe();
+      window.clearInterval(pollingId);
+      if (watchId) navigator.geolocation.clearWatch(watchId);
+      console.log("🟠 CustomerPage クリーンアップ完了");
+    };
+  }, [client, userSubscriptionId]);
+
+  const fetchWeatherPhrase = async () => {
+    setWeatherPhrase("おじさん考え中じゃ...");
+
+    try {
+      const weatherRes = await fetch(
+        `https://weather.tsukumijima.net/api/forecast/city/440020?cache=${Date.now()}`,
+      );
+      const wData = await weatherRes.json();
+      const telop = wData?.forecasts?.[0]?.telop ?? "晴れ";
+      const temp = wData?.forecasts?.[0]?.temperature?.max?.celsius ?? "20";
+
+      const candidates = [
+        `${telop}の日も、焼き芋は心にしみるバイ！`,
+        `最高気温${temp}℃。そんな日こそホクホクいも日和じゃ！`,
+        `お天気は${telop}、お芋はいつでも食べごろバイ！`,
+      ];
+
+      setWeatherPhrase(candidates[Math.floor(Math.random() * candidates.length)]);
+    } catch (err) {
+      setWeatherPhrase("おっと、通信がよくなかみたいじゃ。焼き芋は熱々バイ！");
     }
   };
 
@@ -498,15 +557,8 @@ function CustomerPage() {
         width: "100%",
         position: "relative",
         backgroundColor: "#fdf5e6",
-        overflow: "hidden",
       }}
     >
-      {/* 通知ONボタン例 */}
-      <div style={{ position: "absolute", top: 90, right: 20, zIndex: 10000 }}>
-        <button onClick={enableNotification} style={{ fontSize: "1.1rem", padding: "10px 18px", borderRadius: 8, background: "#ff7e5f", color: "#fff", border: "none", fontWeight: 700, boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}>
-          🔔 通知ON
-        </button>
-      </div>
       <div
         style={{
           position: "absolute",
@@ -614,54 +666,6 @@ function CustomerPage() {
         </div>
       </div>
 
-      <MapContainer
-        center={[33.321, 130.941]}
-        zoom={15}
-        style={{ height: "100%", width: "100%", zIndex: 0 }}
-        zoomControl={false}
-      >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
-        {userPos && (
-          <Marker position={[userPos.lat, userPos.lng]} icon={userLocationIcon}>
-            <Popup>
-              <div style={{ textAlign: "center", padding: "4px 6px" }}>
-                <strong style={{ color: "#1d4ed8" }}>あなたの現在地</strong>
-              </div>
-            </Popup>
-          </Marker>
-        )}
-
-        {vanHistory.map((h, idx) => (
-          <Marker
-            key={`${h.timestamp}-${idx}`}
-            position={[h.lat, h.lng]}
-            icon={L.divIcon({
-              html: '<div style="width:18px;height:18px;border-radius:50%;background:rgba(255,220,40,0.85);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.18);"></div>',
-              className: "empty-class",
-              iconSize: [18, 18],
-              iconAnchor: [9, 9],
-              popupAnchor: [0, -8],
-            })}
-          />
-        ))}
-
-        {vanPos?.isOperating && (
-          <Marker position={[vanPos.lat, vanPos.lng]} icon={sweetPotatoIcon}>
-            <Popup>
-              <div style={{ textAlign: "center", padding: "5px" }}>
-                <strong style={{ color: "#9913b7" }}>どんなとき芋 巡り店</strong>
-                <br />
-                <hr />
-                <p style={{ margin: "5px 0 0", color: "#d35400", fontWeight: "bold" }}>
-                  ほっこり焼けちょるバイ！
-                </p>
-              </div>
-            </Popup>
-          </Marker>
-        )}
-      </MapContainer>
-
       <div
         style={{
           position: "absolute",
@@ -675,128 +679,211 @@ function CustomerPage() {
           padding: "0 15px",
         }}
       >
-        <button
-          onClick={() => setShowMenu(true)}
-          style={{
-            flex: 1,
-            maxWidth: "110px",
-            height: "75px",
-            borderRadius: "20px",
-            background: "#fff",
-            border: "3px solid #d35400",
-            boxShadow: "0 8px 15px rgba(0,0,0,0.15)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-          }}
-        >
-          <span style={{ fontSize: "1.4rem" }}>📙</span>
-          <span style={{ fontSize: "0.75rem", fontWeight: "900", color: "#d35400" }}>
-            おしながき
-          </span>
-        </button>
-
-        <button
-          onClick={() => setShowCalendar(true)}
-          style={{
-            flex: 1,
-            maxWidth: "110px",
-            height: "75px",
-            borderRadius: "20px",
-            background: "#fff",
-            border: "3px solid #d35400",
-            boxShadow: "0 8px 15px rgba(0,0,0,0.15)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-          }}
-        >
-          <span style={{ fontSize: "1.4rem" }}>🗓️</span>
-          <span style={{ fontSize: "0.75rem", fontWeight: "900", color: "#d35400" }}>
-            EVENT
-          </span>
-        </button>
-
-        <button
-          onClick={() => setShowMyPage(true)}
-          style={{
-            flex: 1,
-            maxWidth: "110px",
-            height: "75px",
-            borderRadius: "20px",
-            background: "#fff",
-            border: "3px solid #d35400",
-            boxShadow: "0 8px 15px rgba(0,0,0,0.15)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-          }}
-        >
-          <span style={{ fontSize: "1.4rem" }}>✨</span>
-          <span style={{ fontSize: "0.75rem", fontWeight: "900", color: "#d35400" }}>
-            MY POINT
-          </span>
-        </button>
-      </div>
-
-      {showMenu && (
-        <div
-          onClick={() => setShowMenu(false)}
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0,0,0,0.7)",
-            zIndex: 2000,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
+        {[
+          {
+            label: "おしながき",
+            icon: "📙",
+            color: "#d35400",
+            action: () => setShowMenu(true),
+          },
+          {
+            label: "EVENT",
+            icon: "🗓️",
+            color: "#2980b9",
+            action: () => setShowCalendar(true),
+          },
+          {
+            label: "MY POINT",
+            icon: "✨",
+            color: "#8e44ad",
+            action: () => setShowMyPage(true),
+          },
+        ].map((btn, i) => (
+          <button
+            key={i}
+            onClick={btn.action}
             style={{
+              flex: 1,
+              maxWidth: "110px",
+              height: "75px",
+              borderRadius: "20px",
               background: "#fff",
-              borderRadius: "15px",
-              width: "85%",
-              maxWidth: "420px",
-              whiteSpace: "pre-wrap",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+              border: `3px solid ${btn.color}`,
+              boxShadow: "0 8px 15px rgba(0,0,0,0.15)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
             }}
           >
-            <div
+            <span style={{ fontSize: "1.4rem" }}>{btn.icon}</span>
+            <span
               style={{
-                background: "#d35400",
-                color: "#fff",
-                borderTopLeftRadius: "15px",
-                borderTopRightRadius: "15px",
-                padding: "16px 0 10px 0",
-                textAlign: "center",
-                fontWeight: "bold",
-                fontSize: "1.25rem",
+                fontSize: "0.75rem",
+                fontWeight: "900",
+                color: btn.color,
               }}
             >
-              おしながき
-            </div>
+              {btn.label}
+            </span>
+          </button>
+        ))}
+      </div>
 
-            <div
-              style={{
-                fontSize: "1.1rem",
-                lineHeight: "1.6",
-                margin: "20px 0",
-                padding: "0 18px",
-                maxHeight: "50vh",
-                overflowY: "auto",
-              }}
-            >
+      <MapContainer
+        center={[33.321, 130.941]}
+        zoom={15}
+        style={{ height: "100%", width: "100%", zIndex: 0 }}
+        zoomControl={false}
+      >
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+
+        <MapAutoPan
+          pos={
+            vanPos?.isOperating ? { lat: vanPos.lat, lng: vanPos.lng } : userPos
+          }
+          secondaryPos={vanPos?.isOperating && userPos ? userPos : null}
+          lock={Boolean(vanPos?.isOperating)}
+        />
+
+        {userPos && (
+          <Marker position={[userPos.lat, userPos.lng]} icon={userLocationIcon}>
+            <Popup>
+              <div style={{ textAlign: "center", padding: "4px 6px" }}>
+                <strong style={{ color: "#1d4ed8" }}>あなたの現在地</strong>
+              </div>
+            </Popup>
+          </Marker>
+        )}
+
+        {vanHistory.map((h) => (
+          <Marker
+            key={h.timestamp}
+            position={[h.lat, h.lng]}
+            icon={L.divIcon({
+              html: '<div style="width:18px;height:18px;border-radius:50%;background:rgba(255,220,40,0.85);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.18);"></div>',
+              className: "empty-class",
+              iconSize: [18, 18],
+              iconAnchor: [9, 9],
+              popupAnchor: [0, -8],
+            })}
+          />
+        ))}
+
+        {vanPos?.isOperating && (
+          <Marker
+            position={[vanPos.lat, vanPos.lng]}
+            icon={sweetPotatoIcon}
+            eventHandlers={{ click: fetchWeatherPhrase }}
+          >
+            <Popup>
+              <div style={{ textAlign: "center", padding: "5px" }}>
+                <strong style={{ color: "#9913b7" }}>どんなとき芋 巡り店</strong>
+                <br />
+                <hr />
+                <p
+                  style={{
+                    margin: "5px 0 0",
+                    color: "#d35400",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {weatherPhrase || "ほっこり焼けちょるバイ！"}
+                </p>
+              </div>
+            </Popup>
+          </Marker>
+        )}
+      </MapContainer>
+
+      {showNotifyInfo && (
+        <Modal
+          title="通知ONになったバイ！"
+          color="#ff7e5f"
+          onClose={() => setShowNotifyInfo(false)}
+          content={
+            <div style={{ textAlign: "center", fontSize: "1.1rem" }}>
+              <div style={{ marginBottom: 16 }}>
+                焼きいも屋さんが近くに来たら
+                <br />
+                通知でお知らせするけんね！
+              </div>
+
+              <div
+                style={{
+                  background: "#fffbe6",
+                  borderRadius: 12,
+                  padding: 12,
+                  marginBottom: 16,
+                  border: "1px solid #ffd580",
+                }}
+              >
+                <div
+                  style={{
+                    color: "#27ae60",
+                    fontWeight: "bold",
+                    marginBottom: 8,
+                  }}
+                >
+                  <span style={{ fontSize: 22 }}>✔</span>{" "}
+                  他のアプリを使いよっても大丈夫やよ！
+                </div>
+                <div
+                  style={{
+                    color: "#e67e22",
+                    fontWeight: "bold",
+                    marginBottom: 8,
+                  }}
+                >
+                  <span style={{ fontSize: 22 }}>⚠</span>{" "}
+                  スマホの画面を真っ黒（スリープ）にしたり
+                  アプリを完全に終了させると声が届かんことなるんじゃ…
+                </div>
+              </div>
+
+              <div
+                style={{
+                  background:
+                    "linear-gradient(90deg, #ffb36b 0%, #ff7e5f 100%)",
+                  color: "#fff",
+                  borderRadius: 8,
+                  padding: "10px 0",
+                  fontWeight: "bold",
+                  marginBottom: 16,
+                }}
+              >
+                アツアツの通知を届けけん
+                <br />
+                画面はそのままで待っちょってね🔥
+              </div>
+
+              <button
+                onClick={() => setShowNotifyInfo(false)}
+                style={{
+                  background: "#27ae60",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "12px 40px",
+                  fontSize: "1.1rem",
+                  fontWeight: "bold",
+                }}
+              >
+                OK！
+              </button>
+            </div>
+          }
+        />
+      )}
+
+      {showMenu && (
+        <Modal
+          title="おしながき"
+          color="#d35400"
+          onClose={() => setShowMenu(false)}
+          content={
+            <div>
               {config.menu.length > 0 ? (
                 config.menu.map((item, idx) => (
                   <div
@@ -805,7 +892,10 @@ function CustomerPage() {
                       display: "flex",
                       justifyContent: "space-between",
                       padding: "12px 0",
-                      borderBottom: idx < config.menu.length - 1 ? "1px solid #eee" : "none",
+                      borderBottom:
+                        idx < config.menu.length - 1
+                          ? "1px solid #eee"
+                          : "none",
                     }}
                   >
                     <span style={{ fontSize: "1.1rem", fontWeight: "600" }}>
@@ -823,82 +913,22 @@ function CustomerPage() {
                   </div>
                 ))
               ) : (
-                <p style={{ textAlign: "center", color: "#999" }}>メニュー準備中バイ！</p>
+                <p style={{ textAlign: "center", color: "#999" }}>
+                  メニュー準備中バイ！
+                </p>
               )}
             </div>
-
-            <button
-              onClick={() => setShowMenu(false)}
-              style={{
-                width: "90%",
-                margin: "0 auto 18px auto",
-                display: "block",
-                padding: "12px",
-                background: "#e6ecf1",
-                color: "#444",
-                border: "none",
-                borderRadius: "8px",
-                fontWeight: 600,
-              }}
-            >
-              閉じる
-            </button>
-          </div>
-        </div>
+          }
+        />
       )}
 
       {showCalendar && (
-        <div
-          onClick={() => setShowCalendar(false)}
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0,0,0,0.7)",
-            zIndex: 2000,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: "#fff",
-              borderRadius: "15px",
-              width: "85%",
-              maxWidth: "420px",
-              whiteSpace: "pre-wrap",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
-            }}
-          >
-            <div
-              style={{
-                background: "#91D370",
-                color: "#fff",
-                borderTopLeftRadius: "15px",
-                borderTopRightRadius: "15px",
-                padding: "16px 0 10px 0",
-                textAlign: "center",
-                fontWeight: "bold",
-                fontSize: "1.25rem",
-              }}
-            >
-              出店予定
-            </div>
-
-            <div
-              style={{
-                fontSize: "1.1rem",
-                lineHeight: "1.6",
-                margin: "20px 0",
-                padding: "0 18px",
-                maxHeight: "50vh",
-                overflowY: "auto",
-              }}
-            >
+        <Modal
+          title="出店予定"
+          color="#91D370"
+          onClose={() => setShowCalendar(false)}
+          content={
+            <div>
               {config.schedule.length > 0 ? (
                 config.schedule.map((item, idx) => (
                   <div
@@ -911,89 +941,34 @@ function CustomerPage() {
                       borderLeft: "4px solid #91D370",
                     }}
                   >
-                    <div style={{ fontSize: "0.9rem", color: "#666", marginBottom: "4px" }}>
+                    <div
+                      style={{
+                        fontSize: "0.9rem",
+                        color: "#666",
+                        marginBottom: "4px",
+                      }}
+                    >
                       📅 {item.date}
                     </div>
-                    <div style={{ fontSize: "1.1rem", fontWeight: "600", color: "#333" }}>
+                    <div
+                      style={{
+                        fontSize: "1.1rem",
+                        fontWeight: "600",
+                        color: "#333",
+                      }}
+                    >
                       📍 {item.place}
                     </div>
                   </div>
                 ))
               ) : (
-                <p style={{ textAlign: "center", color: "#999" }}>イベント出店募集中！</p>
+                <p style={{ textAlign: "center", color: "#999" }}>
+                  イベント出店募集中！
+                </p>
               )}
             </div>
-
-            <button
-              onClick={() => setShowCalendar(false)}
-              style={{
-                width: "90%",
-                margin: "0 auto 18px auto",
-                display: "block",
-                padding: "12px",
-                background: "#e6ecf1",
-                color: "#444",
-                border: "none",
-                borderRadius: "8px",
-                fontWeight: 600,
-              }}
-            >
-              閉じる
-            </button>
-          </div>
-        </div>
-      )}
-
-      {showNotifyInfo && (
-        <div
-          onClick={() => setShowNotifyInfo(false)}
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0,0,0,0.7)",
-            zIndex: 2500,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: "#fff",
-              borderRadius: "15px",
-              width: "85%",
-              maxWidth: "420px",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
-              padding: "20px",
-              textAlign: "center",
-            }}
-          >
-            <h2 style={{ marginTop: 0, color: "#ff7e5f" }}>通知ONになったバイ！</h2>
-            <p>
-              焼きいも屋さんが近くに来たら
-              <br />
-              通知でお知らせするけんね！
-            </p>
-            <button
-              onClick={() => setShowNotifyInfo(false)}
-              style={{
-                background: "#27ae60",
-                color: "#fff",
-                border: "none",
-                borderRadius: 8,
-                padding: "12px 40px",
-                fontSize: "1.1rem",
-                fontWeight: "bold",
-              }}
-            >
-              OK！
-            </button>
-          </div>
-        </div>
+          }
+        />
       )}
 
       {showMyPage && (
@@ -1010,17 +985,28 @@ function CustomerPage() {
             padding: "20px",
           }}
         >
-          <button onClick={() => setShowMyPage(false)} style={{ marginBottom: "20px" }}>
+          <button
+            onClick={() => setShowMyPage(false)}
+            style={{
+              marginBottom: "20px",
+              background: "#666",
+              color: "#fff",
+              border: "none",
+              borderRadius: "8px",
+              padding: "10px 16px",
+              cursor: "pointer",
+            }}
+          >
             ← 戻る
           </button>
 
           <Authenticator>
-            {({ signOut, user }) => <PointCard user={user} signOut={signOut} />}
+            {({ signOut, user }) => (
+              <PointCard user={user} signOut={signOut} />
+            )}
           </Authenticator>
         </div>
       )}
     </div>
   );
 }
-
-export default CustomerPage;

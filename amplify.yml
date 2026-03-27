@@ -1,5 +1,3 @@
-version: 1
-<<<<<<< HEAD
 backend:
   phases:
     build:
@@ -21,26 +19,31 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
-=======
-appSourceDirectory: "frontend"
-backend:
-    phases:
-        build:
-            commands:
-                - 'amplifyPush --simple'
-frontend:
-    phases:
-        preBuild:
-            commands:
-                - npm ci
-        build:
-            commands:
-                - npm run build
-    artifacts:
-        baseDirectory: dist
         files:
             - '**/*'
     cache:
         paths:
             - node_modules/**/*
->>>>>>> 6bac5b2e4aea2b86dc790f324e461d8709455b31
+6bac5b2e4aea2b86dc790f324e461d8709455b31
+version: 1
+backend:
+  phases:
+    build:
+      commands:
+        - amplifyPush --simple
+
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: dist
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*

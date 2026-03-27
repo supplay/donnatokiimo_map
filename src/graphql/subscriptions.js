@@ -1,20 +1,105 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-<<<<<<< HEAD
+export const onCreateUserPoint = /* GraphQL */ `
+  subscription OnCreateUserPoint(
+    $filter: ModelSubscriptionUserPointFilterInput
+  ) {
+    onCreateUserPoint(filter: $filter) {
+      id
+      points
+      owner
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateUserPoint = /* GraphQL */ `
+  subscription OnUpdateUserPoint(
+    $filter: ModelSubscriptionUserPointFilterInput
+  ) {
+    onUpdateUserPoint(filter: $filter) {
+      id
+      points
+      owner
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteUserPoint = /* GraphQL */ `
+  subscription OnDeleteUserPoint(
+    $filter: ModelSubscriptionUserPointFilterInput
+  ) {
+    onDeleteUserPoint(filter: $filter) {
+      id
+      points
+      owner
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateUserSubscription = /* GraphQL */ `
+  subscription OnCreateUserSubscription(
+    $filter: ModelSubscriptionUserSubscriptionFilterInput
+  ) {
+    onCreateUserSubscription(filter: $filter) {
+      id
+      userId
+      subscription
+      userLat
+      userLng
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateUserSubscription = /* GraphQL */ `
+  subscription OnUpdateUserSubscription(
+    $filter: ModelSubscriptionUserSubscriptionFilterInput
+  ) {
+    onUpdateUserSubscription(filter: $filter) {
+      id
+      userId
+      subscription
+      userLat
+      userLng
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteUserSubscription = /* GraphQL */ `
+  subscription OnDeleteUserSubscription(
+    $filter: ModelSubscriptionUserSubscriptionFilterInput
+  ) {
+    onDeleteUserSubscription(filter: $filter) {
+      id
+      userId
+      subscription
+      userLat
+      userLng
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const onCreateStore = /* GraphQL */ `
   subscription OnCreateStore($filter: ModelSubscriptionStoreFilterInput) {
     onCreateStore(filter: $filter) {
-=======
-export const onCreateShop = /* GraphQL */ `
-  subscription OnCreateShop($filter: ModelSubscriptionShopFilterInput) {
-    onCreateShop(filter: $filter) {
->>>>>>> 6bac5b2e4aea2b86dc790f324e461d8709455b31
       id
       name
-      latitude
-      longitude
+      lat
+      lng
       isOperating
+      catchCopy
       lastUpdated
       createdAt
       updatedAt
@@ -22,20 +107,15 @@ export const onCreateShop = /* GraphQL */ `
     }
   }
 `;
-<<<<<<< HEAD
 export const onUpdateStore = /* GraphQL */ `
   subscription OnUpdateStore($filter: ModelSubscriptionStoreFilterInput) {
     onUpdateStore(filter: $filter) {
-=======
-export const onUpdateShop = /* GraphQL */ `
-  subscription OnUpdateShop($filter: ModelSubscriptionShopFilterInput) {
-    onUpdateShop(filter: $filter) {
->>>>>>> 6bac5b2e4aea2b86dc790f324e461d8709455b31
       id
       name
-      latitude
-      longitude
+      lat
+      lng
       isOperating
+      catchCopy
       lastUpdated
       createdAt
       updatedAt
@@ -43,21 +123,55 @@ export const onUpdateShop = /* GraphQL */ `
     }
   }
 `;
-<<<<<<< HEAD
 export const onDeleteStore = /* GraphQL */ `
   subscription OnDeleteStore($filter: ModelSubscriptionStoreFilterInput) {
     onDeleteStore(filter: $filter) {
-=======
-export const onDeleteShop = /* GraphQL */ `
-  subscription OnDeleteShop($filter: ModelSubscriptionShopFilterInput) {
-    onDeleteShop(filter: $filter) {
->>>>>>> 6bac5b2e4aea2b86dc790f324e461d8709455b31
       id
       name
-      latitude
-      longitude
+      lat
+      lng
       isOperating
+      catchCopy
       lastUpdated
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateConfig = /* GraphQL */ `
+  subscription OnCreateConfig($filter: ModelSubscriptionConfigFilterInput) {
+    onCreateConfig(filter: $filter) {
+      id
+      menuJson
+      scheduleJson
+      dummy
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateConfig = /* GraphQL */ `
+  subscription OnUpdateConfig($filter: ModelSubscriptionConfigFilterInput) {
+    onUpdateConfig(filter: $filter) {
+      id
+      menuJson
+      scheduleJson
+      dummy
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteConfig = /* GraphQL */ `
+  subscription OnDeleteConfig($filter: ModelSubscriptionConfigFilterInput) {
+    onDeleteConfig(filter: $filter) {
+      id
+      menuJson
+      scheduleJson
+      dummy
       createdAt
       updatedAt
       __typename

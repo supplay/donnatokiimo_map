@@ -111,9 +111,6 @@ Amplify.configure(amplifyconfig);
 I18n.putVocabularies(translations);
 I18n.setLanguage("ja");
 
-// GraphQL クライアント（認証モードは呼び出し時に指定）
-const apiClient = generateClient();
-
 const VAN_ID = "KEI-VAN-001";
 const CONFIG_ID = "GLOBAL-CONFIG";
 
@@ -1824,7 +1821,11 @@ function LaunchSplash() {
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
-
+  const apiClientRef = useRef(null);
+if (!apiClientRef.current) {
+  apiClientRef.current = generateClient();
+}
+const apiClient = apiClientRef.current;
   useEffect(() => {
     const timerId = window.setTimeout(() => {
       setShowSplash(false);

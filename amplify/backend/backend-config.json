@@ -1,19 +1,32 @@
 {
-<<<<<<< HEAD
-  "auth": {
-    "donnatokiimomap7659bd90": {
-=======
   "api": {
     "donnatokiimomap": {
-      "dependsOn": [],
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "donnatokiimomap7659bd90"
+        }
+      ],
       "output": {
         "authConfig": {
-          "additionalAuthenticationProviders": [],
+          "additionalAuthenticationProviders": [
+            {
+              "apiKeyConfig": {
+                "apiKeyExpirationDate": "2027-03-26T05:27:35.650Z",
+                "apiKeyExpirationDays": 365,
+                "description": "public-access"
+              },
+              "authenticationType": "API_KEY"
+            }
+          ],
           "defaultAuthentication": {
-            "apiKeyConfig": {
-              "apiKeyExpirationDays": 7
-            },
-            "authenticationType": "API_KEY"
+            "authenticationType": "AMAZON_COGNITO_USER_POOLS",
+            "userPoolConfig": {
+              "userPoolId": "authdonnatokiimomap7659bd90"
+            }
           }
         }
       },
@@ -22,8 +35,7 @@
     }
   },
   "auth": {
-    "donnatokiimomap2616deca": {
->>>>>>> 6bac5b2e4aea2b86dc790f324e461d8709455b31
+    "donnatokiimomap7659bd90": {
       "customAuth": false,
       "dependsOn": [],
       "frontendAuthConfig": {
@@ -46,7 +58,6 @@
       },
       "providerPlugin": "awscloudformation",
       "service": "Cognito"
-<<<<<<< HEAD
     }
   },
   "function": {
@@ -55,24 +66,6 @@
       "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
-=======
-    },
-    "userPoolGroups": {
-      "dependsOn": [
-        {
-          "attributes": [
-            "UserPoolId",
-            "AppClientIDWeb",
-            "AppClientID",
-            "IdentityPoolId"
-          ],
-          "category": "auth",
-          "resourceName": "donnatokiimomap2616deca"
-        }
-      ],
-      "providerPlugin": "awscloudformation",
-      "service": "Cognito-UserPool-Groups"
->>>>>>> 6bac5b2e4aea2b86dc790f324e461d8709455b31
     }
   },
   "hosting": {
@@ -81,7 +74,6 @@
       "service": "amplifyhosting",
       "type": "manual"
     }
-<<<<<<< HEAD
   },
   "parameters": {
     "AMPLIFY_function_donnatokiimomap7946ee2e_deploymentBucketName": {
@@ -116,7 +108,5 @@
         }
       ]
     }
-=======
->>>>>>> 6bac5b2e4aea2b86dc790f324e461d8709455b31
   }
 }

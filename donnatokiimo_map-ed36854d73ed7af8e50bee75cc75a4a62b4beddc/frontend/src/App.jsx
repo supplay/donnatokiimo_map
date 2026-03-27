@@ -17,10 +17,7 @@ import { Bell, BellOff } from "lucide-react";
 
 import { Authenticator, translations } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
-import { I18n } from "aws-amplify/utils";
-import { Amplify } from "aws-amplify";
 import { generateClient, post } from "aws-amplify/api";
-import amplifyconfig from "./amplifyconfiguration.json";
 
 /* -------------------------------------------------------------------------- */
 /* 初期設定・グローバル変数                                                   */
@@ -48,13 +45,6 @@ if (typeof document !== "undefined") {
   }
 }
 
-// Amplify 設定（1回だけ）
-Amplify.configure(amplifyconfig);
-I18n.putVocabularies(translations);
-I18n.setLanguage("ja");
-
-// GraphQL クライアント（認証モードは呼び出し時に指定）
-const apiClient = generateClient();
 
 const VAN_ID = "KEI-VAN-001";
 const CONFIG_ID = "GLOBAL-CONFIG";

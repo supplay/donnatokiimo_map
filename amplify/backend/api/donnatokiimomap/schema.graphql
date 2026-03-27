@@ -1,13 +1,49 @@
-type Store @model 
+type Store
+  @model
   @auth(rules: [
-    { allow: groups, groups: ["Admins"] }, # 店主はフルアクセス
-    { allow: private, operations: [read] }, # ログイン者は読み取りOK
-    { allow: public, operations: [read] }  # 未ログインでも地図は見れる
+    { allow: public, operations: [read] },
+    { allow: private, operations: [read, create, update] }
   ]) {
   id: ID!
-  name: String!
-  description: String
+  name: String
   lat: Float
   lng: Float
   isOperating: Boolean
+  catchCopy: String
+  lastUpdated: AWSDateTime
+}
+
+type Config
+  @model
+  @auth(rules: [
+    { allow: public, operations: [read] },
+    { allow: private, operations: [read, create, update] }
+  ]) {
+  id: ID!
+  menuJson: String
+  scheduleJson: String
+  dummy: String
+}
+
+type UserPoint
+  @model
+  @auth(rules: [
+    { allow: private, operations: [read, create, update] }
+  ]) {
+  id: ID!
+  points: Int!
+  owner: String
+}
+
+type UserSubscription
+  @model
+  @auth(rules: [
+    { allow: public, operations: [create, update] },
+    { allow: private, operations: [read, create, update] }
+  ]) {
+  id: ID!
+  userId: String!
+  subscription: String!
+  userLat: Float
+  userLng: Float
 }

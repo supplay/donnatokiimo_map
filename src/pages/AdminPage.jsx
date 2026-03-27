@@ -1,44 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  LocationClient,
-  BatchUpdateDevicePositionCommand,
-} from "@aws-sdk/client-location";
+import { generateClient } from "aws-amplify/api";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Amplify } from "aws-amplify";
-import { generateClient } from "aws-amplify/api";
-import amplifyconfig from "../amplifyconfiguration.json";
+
 import { getStore } from "../graphql/queries";
 import { updateStore, createStore } from "../graphql/mutations";
 
-Amplify.configure(amplifyconfig);
-const client = generateClient();
-
-
-const locationClient = new LocationClient({ region: "ap-northeast-1" });
-const TRACKER_NAME = "DonnatokiimoTracker";
 const VAN_ID = "KEI-VAN-001";
 const CONFIG_ID = "GLOBAL-CONFIG";
-
-const sendLocationToTracker = async (lat, lng) => {
-  try {
-    const command = new BatchUpdateDevicePositionCommand({
-      TrackerName: TRACKER_NAME,
-      Updates: [
-        {
-          DeviceId: VAN_ID,
-          Position: [lng, lat], // Location Serviceは [lng, lat]
-          SampleTime: new Date(),
-        },
-      ],
-    });
-    await locationClient.send(command);
-    console.log("Location Serviceへ位置送信したバイ！");
-  } catch (err) {
-    console.error("Location Service送信失敗:", err);
-  }
-};
+const TRACKER_SYNC_URL = "https://72flap745ckwg2dk7by7rvlqmm0rvupv.lambda-url.ap-northeast-1.on.aws/";
 
 const GET_CONFIG = /* GraphQL */ `
   query GetConfig($id: ID!) {
@@ -81,12 +52,39 @@ const sweetPotatoIcon = L.divIcon({
   popupAnchor: [0, -18],
 });
 
+async function syncTracker(id, lat, lng, isOperating) {
+  try {
+    await fetch(TRACKER_SYNC_URL, {
+      method: "POST",
+      mode: "no-cors",
+      keepalive: true,
+      headers: {
+        "Content-Type": "text/plain;charset=UTF-8",
+      },
+      body: JSON.stringify({
+        id,
+        lat,
+        lng,
+        isOperating,
+      }),
+    });
+  } catch (err) {
+    console.error("Tracker同期エラー:", err);
+  }
+}
+
 function AdminPage({ signOut }) {
   const [editType, setEditType] = useState(null);
   const [isTracking, setIsTracking] = useState(false);
   const [myPos, setMyPos] = useState([33.321, 130.941]);
   const [menuItems, setMenuItems] = useState([]);
   const [scheduleItems, setScheduleItems] = useState([]);
+
+  const clientRef = useRef(null);
+  if (!clientRef.current) {
+    clientRef.current = generateClient();
+  }
+  const client = clientRef.current;
 
   const watchIdRef = useRef(null);
   const lastStoreUpdateAtRef = useRef(0);
@@ -98,6 +96,7 @@ function AdminPage({ signOut }) {
     if (manifestTag) {
       manifestTag.setAttribute("href", "/manifest-admin.json");
     }
+
     return () => {
       if (manifestTag) {
         manifestTag.setAttribute("href", "/manifest.json");
@@ -106,6 +105,8 @@ function AdminPage({ signOut }) {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
     const loadConfig = async () => {
       try {
         const res = await client.graphql({
@@ -114,9 +115,10 @@ function AdminPage({ signOut }) {
           authMode: "userPool",
         });
 
-        if (res.data?.getConfig) {
-          setMenuItems(JSON.parse(res.data.getConfig.menuJson || "[]"));
-          setScheduleItems(JSON.parse(res.data.getConfig.scheduleJson || "[]"));
+        const conf = res?.data?.getConfig;
+        if (!cancelled && conf) {
+          setMenuItems(JSON.parse(conf.menuJson || "[]"));
+          setScheduleItems(JSON.parse(conf.scheduleJson || "[]"));
         }
       } catch (e) {
         console.error("Config Load Error", e);
@@ -131,12 +133,14 @@ function AdminPage({ signOut }) {
           authMode: "userPool",
         });
 
-        const store = res.data?.getStore;
-        if (store?.lat && store?.lng) {
-          setMyPos([store.lat, store.lng]);
-        }
-        if (store?.isOperating) {
-          setIsTracking(true);
+        const store = res?.data?.getStore;
+        if (!cancelled && store) {
+          if (typeof store.lat === "number" && typeof store.lng === "number") {
+            setMyPos([store.lat, store.lng]);
+          }
+          if (store.isOperating) {
+            setIsTracking(true);
+          }
         }
       } catch (e) {
         console.error("Store Load Error", e);
@@ -145,14 +149,18 @@ function AdminPage({ signOut }) {
 
     loadConfig();
     loadStore();
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [client]);
 
   const saveConfig = async () => {
     const input = {
       id: CONFIG_ID,
       menuJson: JSON.stringify(menuItems),
       scheduleJson: JSON.stringify(scheduleItems),
-      dummy: "updated-" + Date.now(),
+      dummy: `updated-${Date.now()}`,
     };
 
     try {
@@ -199,6 +207,7 @@ function AdminPage({ signOut }) {
         },
         authMode: "userPool",
       });
+      await syncTracker(VAN_ID, myPos[0], myPos[1], false);
       console.log("営業停止を保存したバイ");
     } catch (err) {
       console.error("営業停止保存エラー:", err);
@@ -231,7 +240,7 @@ function AdminPage({ signOut }) {
 
         const now = Date.now();
         if (
-          now - lastStoreUpdateAtRef.current < 2500 ||
+          now - lastStoreUpdateAtRef.current < 20000 ||
           isSendingStoreUpdateRef.current
         ) {
           return;
@@ -254,6 +263,7 @@ function AdminPage({ signOut }) {
             variables: { input },
             authMode: "userPool",
           });
+          await syncTracker(VAN_ID, lat, lng, true);
           console.log("店主位置を更新したバイ！");
         } catch (err) {
           try {
@@ -262,12 +272,12 @@ function AdminPage({ signOut }) {
               variables: { input },
               authMode: "userPool",
             });
+            await syncTracker(VAN_ID, lat, lng, true);
             console.log("Storeを新規作成したバイ！");
           } catch (createErr) {
             console.error("Store更新/作成エラー:", createErr);
           }
         } finally {
-          await sendLocationToTracker(lat, lng);
           isSendingStoreUpdateRef.current = false;
         }
       },
@@ -287,7 +297,7 @@ function AdminPage({ signOut }) {
         enableHighAccuracy: true,
         maximumAge: 10000,
         timeout: 15000,
-      }
+      },
     );
 
     watchIdRef.current = watchId;
@@ -385,15 +395,18 @@ function AdminPage({ signOut }) {
 
             <div style={{ margin: "16px 0" }}>
               {menuItems.map((it, idx) => (
-                <div key={idx} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                <div
+                  key={idx}
+                  style={{ display: "flex", gap: 8, marginBottom: 8 }}
+                >
                   <input
                     value={it.label}
                     placeholder="品名"
                     onChange={(e) =>
                       setMenuItems(
                         menuItems.map((x, i) =>
-                          i === idx ? { ...x, label: e.target.value } : x
-                        )
+                          i === idx ? { ...x, label: e.target.value } : x,
+                        ),
                       )
                     }
                     style={{ flex: 2, padding: 8 }}
@@ -404,8 +417,8 @@ function AdminPage({ signOut }) {
                     onChange={(e) =>
                       setMenuItems(
                         menuItems.map((x, i) =>
-                          i === idx ? { ...x, price: e.target.value } : x
-                        )
+                          i === idx ? { ...x, price: e.target.value } : x,
+                        ),
                       )
                     }
                     style={{ flex: 1, padding: 8 }}
@@ -521,8 +534,8 @@ function AdminPage({ signOut }) {
                     onChange={(e) =>
                       setScheduleItems(
                         scheduleItems.map((x, i) =>
-                          i === idx ? { ...x, date: e.target.value } : x
-                        )
+                          i === idx ? { ...x, date: e.target.value } : x,
+                        ),
                       )
                     }
                     style={{ padding: 8 }}
@@ -533,8 +546,8 @@ function AdminPage({ signOut }) {
                     onChange={(e) =>
                       setScheduleItems(
                         scheduleItems.map((x, i) =>
-                          i === idx ? { ...x, place: e.target.value } : x
-                        )
+                          i === idx ? { ...x, place: e.target.value } : x,
+                        ),
                       )
                     }
                     style={{ padding: 8 }}
