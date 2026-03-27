@@ -1,0 +1,8 @@
+{
+  "source": ["aws.geo"],
+  "detail-type": ["Location Geofence Event"],
+  "detail": {
+    "EventType": ["ENTER"],
+    "GeofenceId": ["test-customer-001"]
+  }
+}

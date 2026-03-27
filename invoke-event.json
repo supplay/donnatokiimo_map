@@ -1,0 +1,9 @@
+{
+  "detail": {
+    "EventType": "ENTER",
+    "GeofenceId": "test-geofence",
+    "DeviceId": "KEI-VAN-001",
+    "Position": [130.9395, 33.326358],
+    "SampleTime": "2026-03-27T03:20:00Z"
+  }
+}

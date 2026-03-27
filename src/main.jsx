@@ -4,7 +4,7 @@ import { Amplify } from "aws-amplify";
 import { I18n } from "aws-amplify/utils";
 import { translations } from "@aws-amplify/ui-react";
 import App from "./App.jsx";
-import config from "./amplifyconfiguration.json";
+import config from "./amplifyConfig";
 
 Amplify.configure(config);
 I18n.putVocabularies(translations);

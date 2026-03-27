@@ -18,9 +18,10 @@ import "leaflet/dist/leaflet.css";
 import { Bell, BellOff } from "lucide-react";
 
 import PointCard from "../components/PointCard.jsx";
+import { messaging, getToken } from "../firebase.js";
 
-const VAPID_PUBLIC_KEY =
-  "BDMMgHhPRWm3yYrG9eGj4UjPJ8yTkYa295Nq8jC8DRn7MBw7J4Bwq1DFII87lq7DuiX4EjJ0WM0BqwLDD2d0sOI";
+// Firebase コンソール > プロジェクト設定 > Cloud Messaging > ウェブプッシュ証明書 の鍵ペア
+const FCM_VAPID_KEY = "..."; // TODO: Firebase VAPID鍵を入力
 const VAN_ID = "KEI-VAN-001";
 const CONFIG_ID = "GLOBAL-CONFIG";
 
@@ -89,18 +90,7 @@ const userLocationIcon = L.divIcon({
   popupAnchor: [0, -16],
 });
 
-function urlBase64ToUint8Array(base64String) {
-  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
 
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
-  }
-
-  return outputArray;
-}
 
 function Modal({ title, content, onClose, color = "#d35400" }) {
   return (
@@ -212,14 +202,15 @@ export default function CustomerPage() {
 
   const lastToggleAtRef = useRef(0);
   const isMountedRef = useRef(true);
+  const userSubscriptionIdRef = useRef(null);
+
+  useEffect(() => {
+    userSubscriptionIdRef.current = userSubscriptionId;
+  }, [userSubscriptionId]);
 
   const handleNotifyButtonPress = (e) => {
     e.preventDefault();
     e.stopPropagation();
-
-    const now = Date.now();
-    if (now - lastToggleAtRef.current < 500) return;
-    lastToggleAtRef.current = now;
 
     toggleGeofence();
   };
@@ -254,13 +245,22 @@ export default function CustomerPage() {
         return;
       }
 
+      // Firebase SW の登録を待つ
       const reg = await navigator.serviceWorker.ready;
-      const sub = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+
+      // FCM トークンを取得
+      const fcmToken = await getToken(messaging, {
+        vapidKey: FCM_VAPID_KEY,
+        serviceWorkerRegistration: reg,
       });
 
-      const subObj = sub.toJSON ? sub.toJSON() : sub;
+      if (!fcmToken) {
+        alert("FCMトークンの取得に失敗したバイ...");
+        return;
+      }
+
+      console.log("FCMトークン取得成功:", fcmToken);
+
       const currentLat = userPos?.lat ?? null;
       const currentLng = userPos?.lng ?? null;
       const guestUserId = `guest-${Date.now()}`;
@@ -270,7 +270,7 @@ export default function CustomerPage() {
         variables: {
           input: {
             userId: guestUserId,
-            subscription: JSON.stringify(subObj),
+            subscription: fcmToken,
             userLat: currentLat,
             userLng: currentLng,
           },
@@ -355,7 +355,9 @@ export default function CustomerPage() {
   }, [vanPos, userPos, isGeofenceOn]);
 
   useEffect(() => {
-    const fetchLatestShop = async () => {
+    isMountedRef.current = true;
+
+    const loadStoreAndConfig = async () => {
       try {
         const latest = await client.graphql({
           query: getStore,
@@ -367,43 +369,25 @@ export default function CustomerPage() {
         if (store?.id === VAN_ID) {
           setVanPos(store.isOperating ? store : null);
         }
-      } catch (e) {
-        console.error("店主位置の再取得エラー:", e);
-      }
-    };
 
-    const init = async () => {
-      try {
-        const res = await client.graphql({
-          query: getStore,
-          variables: { id: VAN_ID },
-          authMode: "apiKey",
-        });
-
-        if (res?.data?.getStore?.isOperating) {
-          setVanPos(res.data.getStore);
-        } else {
-          setVanPos(null);
-        }
-
-        const cRes = await client.graphql({
+        const configResponse = await client.graphql({
           query: GET_CONFIG,
           variables: { id: CONFIG_ID },
           authMode: "apiKey",
         });
 
-        if (cRes?.data?.getConfig) {
+        if (configResponse?.data?.getConfig) {
           setConfig({
-            menu: JSON.parse(cRes.data.getConfig.menuJson || "[]"),
-            schedule: JSON.parse(cRes.data.getConfig.scheduleJson || "[]"),
+            menu: JSON.parse(configResponse.data.getConfig.menuJson || "[]"),
+            schedule: JSON.parse(configResponse.data.getConfig.scheduleJson || "[]"),
           });
         }
       } catch (e) {
-        console.error(e);
+        console.error("公開データの取得エラー:", e);
       }
     };
 
-    init();
+    loadStoreAndConfig();
 
     console.log("🔵 店主位置購読を開始");
     const subShopObs = client.graphql({
@@ -470,7 +454,7 @@ export default function CustomerPage() {
     });
 
     let watchId;
-    const pollingId = window.setInterval(fetchLatestShop, 10000);
+    const pollingId = window.setInterval(loadStoreAndConfig, 10000);
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -494,13 +478,14 @@ export default function CustomerPage() {
           const now = Date.now();
           if (now - lastUpdateTime > 5000) {
             lastUpdateTime = now;
-            if (userSubscriptionId) {
+            const currentSubscriptionId = userSubscriptionIdRef.current;
+            if (currentSubscriptionId) {
               client
                 .graphql({
                   query: UPDATE_USER_SUBSCRIPTION,
                   variables: {
                     input: {
-                      id: userSubscriptionId,
+                      id: currentSubscriptionId,
                       userLat: lat,
                       userLng: lng,
                     },
@@ -525,7 +510,7 @@ export default function CustomerPage() {
       if (watchId) navigator.geolocation.clearWatch(watchId);
       console.log("🟠 CustomerPage クリーンアップ完了");
     };
-  }, [client, userSubscriptionId]);
+  }, [client]);
 
   const fetchWeatherPhrase = async () => {
     setWeatherPhrase("おじさん考え中じゃ...");
