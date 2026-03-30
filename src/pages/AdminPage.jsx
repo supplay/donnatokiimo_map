@@ -1,12 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
 import { generateClient } from "aws-amplify/api";
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import AdminPointPanel from "../components/AdminPointPanel.jsx";
 
 import { getStore } from "../graphql/queries";
 import { updateStore, createStore } from "../graphql/mutations";
+
+function MapFollow({ pos }) {
+  const map = useMap();
+  useEffect(() => {
+    if (pos) {
+      map.setView(pos, map.getZoom(), { animate: true });
+    }
+  }, [map, pos]);
+  return null;
+}
 
 const VAN_ID = "KEI-VAN-001";
 const CONFIG_ID = "GLOBAL-CONFIG";
@@ -769,6 +779,7 @@ function AdminPage({ signOut }) {
         zoomControl={false}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <MapFollow pos={myPos} />
         <Marker position={myPos} icon={sweetPotatoIcon} />
       </MapContainer>
     </div>

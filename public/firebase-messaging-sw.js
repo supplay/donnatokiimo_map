@@ -1,6 +1,14 @@
 // Firebase Cloud Messaging Service Worker
-importScripts("https://www.gstatic.com/firebasejs/12.11.0/firebase-app-compat.js");
-importScripts("https://www.gstatic.com/firebasejs/12.11.0/firebase-messaging-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js");
+
+// 古い sw.js が残っている場合でも即時に置き換える
+self.addEventListener("install", (event) => {
+  event.waitUntil(self.skipWaiting());
+});
+self.addEventListener("activate", (event) => {
+  event.waitUntil(clients.claim());
+});
 
 firebase.initializeApp({
   apiKey: "AIzaSyDIpgZj68CdmN85wSuLFlyYQDcvFfQdr1E",
@@ -18,12 +26,18 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log("[firebase-messaging-sw.js] バックグラウンド通知:", payload);
 
-  const { title, body } = payload.notification || {};
-  self.registration.showNotification(title || "どんなとき芋", {
-    body: body || "",
+  // notification フィールド優先、なければ data フィールドで代替
+  const notif = payload.notification || {};
+  const data = payload.data || {};
+  const title = notif.title || data.title || "どんなとき芋";
+  const body = notif.body || data.body || "";
+
+  self.registration.showNotification(title, {
+    body,
     icon: "/favicon.ico",
     badge: "/favicon.ico",
     vibrate: [200, 100, 200],
+    data: payload.data || {},
   });
 });
 

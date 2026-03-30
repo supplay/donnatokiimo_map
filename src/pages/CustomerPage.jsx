@@ -156,47 +156,35 @@ function Modal({ title, content, onClose, color = "#d35400" }) {
   );
 }
 
-function MapAutoPan({ pos, secondaryPos = null, lock = false }) {
+function MapAutoPan({ vanPos, userPos }) {
   const map = useMap();
   const hasFittedRef = useRef(false);
-  const userDraggedRef = useRef(false);
 
-  // ユーザーがドラッグ/ズームしたら追従を止める
+  // 初回のみ: 芋マーカーとユーザー位置を両方表示
   useEffect(() => {
-    const onDrag = () => { userDraggedRef.current = true; };
-    map.on("dragstart", onDrag);
-    map.on("zoomstart", onDrag);
-    return () => {
-      map.off("dragstart", onDrag);
-      map.off("zoomstart", onDrag);
-    };
-  }, [map]);
-
-  useEffect(() => {
-    if (!pos?.lat || !pos?.lng) return;
-    if (userDraggedRef.current) return;
-
-    if (lock && secondaryPos?.lat && secondaryPos?.lng) {
-      if (hasFittedRef.current) return;
+    if (hasFittedRef.current) return;
+    if (vanPos?.lat && vanPos?.lng && userPos?.lat && userPos?.lng) {
       const bounds = L.latLngBounds(
         [
-          [pos.lat, pos.lng],
-          [secondaryPos.lat, secondaryPos.lng],
+          [vanPos.lat, vanPos.lng],
+          [userPos.lat, userPos.lng],
         ],
       );
       map.fitBounds(bounds.pad(0.35), { animate: true });
       hasFittedRef.current = true;
-      return;
-    }
-
-    if (!hasFittedRef.current) {
-      map.flyTo([pos.lat, pos.lng], Math.max(map.getZoom(), 15), {
-        animate: true,
-        duration: 0.8,
-      });
+    } else if (vanPos?.lat && vanPos?.lng) {
+      map.setView([vanPos.lat, vanPos.lng], 15, { animate: true });
       hasFittedRef.current = true;
     }
-  }, [map, pos, secondaryPos, lock]);
+  }, [map, vanPos, userPos]);
+
+  // 以降は常に芋マーカーを中心に追従
+  useEffect(() => {
+    if (!hasFittedRef.current) return;
+    if (vanPos?.lat && vanPos?.lng) {
+      map.setView([vanPos.lat, vanPos.lng], map.getZoom(), { animate: true });
+    }
+  }, [map, vanPos]);
 
   return null;
 }
@@ -794,11 +782,8 @@ export default function CustomerPage() {
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
         <MapAutoPan
-          pos={
-            vanPos?.isOperating ? { lat: vanPos.lat, lng: vanPos.lng } : userPos
-          }
-          secondaryPos={vanPos?.isOperating && userPos ? userPos : null}
-          lock={Boolean(vanPos?.isOperating)}
+          vanPos={vanPos?.isOperating ? { lat: vanPos.lat, lng: vanPos.lng } : null}
+          userPos={userPos}
         />
 
         {userPos && (
@@ -852,83 +837,65 @@ export default function CustomerPage() {
       </MapContainer>
 
       {showNotifyInfo && (
-        <Modal
-          title="通知ONになったバイ！"
-          color="#ff7e5f"
-          onClose={() => setShowNotifyInfo(false)}
-          content={
-            <div style={{ textAlign: "center", fontSize: "1.1rem" }}>
-              <div style={{ marginBottom: 16 }}>
-                焼きいも屋さんが近くに来たら
-                <br />
-                通知でお知らせするけんね！
-              </div>
-
-              <div
-                style={{
-                  background: "#fffbe6",
-                  borderRadius: 12,
-                  padding: 12,
-                  marginBottom: 16,
-                  border: "1px solid #ffd580",
-                }}
-              >
-                <div
-                  style={{
-                    color: "#27ae60",
-                    fontWeight: "bold",
-                    marginBottom: 8,
-                  }}
-                >
-                  <span style={{ fontSize: 22 }}>✔</span>{" "}
-                  他のアプリを使いよっても大丈夫やよ！
-                </div>
-                <div
-                  style={{
-                    color: "#e67e22",
-                    fontWeight: "bold",
-                    marginBottom: 8,
-                  }}
-                >
-                  <span style={{ fontSize: 22 }}>⚠</span>{" "}
-                  スマホの画面を真っ黒（スリープ）にしたり
-                  アプリを完全に終了させると声が届かんことなるんじゃ…
-                </div>
-              </div>
-
-              <div
-                style={{
-                  background:
-                    "linear-gradient(90deg, #ffb36b 0%, #ff7e5f 100%)",
-                  color: "#fff",
-                  borderRadius: 8,
-                  padding: "10px 0",
-                  fontWeight: "bold",
-                  marginBottom: 16,
-                }}
-              >
-                アツアツの通知を届けけん
-                <br />
-                画面はそのままで待っちょってね🔥
-              </div>
-
-              <button
-                onClick={() => setShowNotifyInfo(false)}
-                style={{
-                  background: "#27ae60",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 8,
-                  padding: "12px 40px",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                }}
-              >
-                OK！
-              </button>
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.45)",
+            zIndex: 3000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "16px",
+          }}
+          onClick={() => setShowNotifyInfo(false)}
+        >
+          <div
+            style={{
+              width: "min(80vw, 320px)",
+              background: "#fffaf2",
+              borderRadius: "20px",
+              padding: "24px 20px",
+              boxShadow: "0 12px 30px rgba(0,0,0,0.25)",
+              border: "4px solid #ff7e5f",
+              textAlign: "center",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                fontSize: "1.2rem",
+                fontWeight: "bold",
+                color: "#ff7e5f",
+                marginBottom: "12px",
+              }}
+            >
+              通知ONになったバイ！
             </div>
-          }
-        />
+
+            <div style={{ fontSize: "1rem", color: "#333", marginBottom: "20px" }}>
+              焼きいも屋さんが近くに来たら
+              <br />
+              通知でお知らせするけんね！
+            </div>
+
+            <button
+              onClick={() => setShowNotifyInfo(false)}
+              style={{
+                background: "#ff7e5f",
+                color: "#fff",
+                border: "none",
+                borderRadius: 10,
+                padding: "12px 48px",
+                fontSize: "1.1rem",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+            >
+              OK！
+            </button>
+          </div>
+        </div>
       )}
 
       {showMenu && (

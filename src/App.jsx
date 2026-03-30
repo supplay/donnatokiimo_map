@@ -39,12 +39,21 @@ export default function App() {
         .catch((err) => console.error("Firebase SW 登録失敗:", err));
     }
 
-    // 3. フォアグラウンド通知ハンドラ
+    // 3. フォアグラウンド通知ハンドラ（SW経由でないと Chrome では表示されないため registration を使う）
     const unsubscribe = onMessage(messaging, (payload) => {
       console.log("📩 フォアグラウンド通知:", payload);
-      const { title, body } = payload.notification || {};
-      if (title) {
-        new Notification(title, { body, icon: "/favicon.ico" });
+      const notif = payload.notification || {};
+      const data = payload.data || {};
+      const title = notif.title || data.title || "どんなとき芋";
+      const body = notif.body || data.body || "";
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.ready
+          .then((reg) => reg.showNotification(title, { body, icon: "/favicon.ico" }))
+          .catch(() => {
+            if (Notification.permission === "granted") {
+              new Notification(title, { body, icon: "/favicon.ico" });
+            }
+          });
       }
     });
 
@@ -62,7 +71,7 @@ export default function App() {
           {/* お客さん用トップページ */}
           <Route path="/" element={<CustomerPage />} />
 
-          {/* 管理画面：パスを /kanri_aki に変更 */}
+          {/* 【新】管理画面の入り口 */}
           <Route
             path="/kanri_aki"
             element={
@@ -72,13 +81,11 @@ export default function App() {
             }
           />
 
-          {/* /admin にアクセスしたら /kanri_aki に飛ばす */}
-          <Route path="/admin" element={<Navigate to="/kanri_aki" replace />} />
+          {/* 旧 /admin へのアクセスを /kanri_aki へリダイレクト（転送） */}
+          <Route path="/admin/*" element={<Navigate to="/kanri_aki" replace />} />
 
-          <Route path="/admin-signup" element={<AdminSignup />} />
-          <Route path="/mypage" element={
-            <Authenticator>{({ signOut, user }) => <PointCard user={user} signOut={signOut} />}</Authenticator>
-          } />
+          {/* 指定外のURLはすべてトップページへ飛ばす */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </ErrorBoundary>
