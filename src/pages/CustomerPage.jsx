@@ -219,6 +219,7 @@ export default function CustomerPage() {
   const [weatherPhrase, setWeatherPhrase] = useState("");
   const [config, setConfig] = useState({ menu: [], schedule: [] });
   const [showNotifyInfo, setShowNotifyInfo] = useState(false);
+  const [notifyStatus, setNotifyStatus] = useState(null);
 
   const lastToggleAtRef = useRef(0);
   const isMountedRef = useRef(true);
@@ -238,12 +239,14 @@ export default function CustomerPage() {
   const toggleGeofence = async () => {
     if (isGeofenceOn) {
       setIsGeofenceOn(false);
-      alert("通知OFFにしたバイ！");
+      setNotifyStatus("通知OFFにしたバイ！");
+      setTimeout(() => setNotifyStatus(null), 2000);
       return;
     }
 
     if (!("Notification" in window)) {
-      alert("このブラウザは通知機能に対応してないバイ...");
+      setNotifyStatus("このブラウザは通知機能に対応してないバイ...");
+      setTimeout(() => setNotifyStatus(null), 3000);
       return;
     }
 
@@ -252,36 +255,37 @@ export default function CustomerPage() {
       if (now - lastToggleAtRef.current < 500) return;
       lastToggleAtRef.current = now;
 
+      // 1. 先にUIを動かす（体感速度アップ）
+      setNotifyStatus("通知ONにしたバイ！...（登録中）");
+
       const permission = await Notification.requestPermission();
 
       if (permission !== "granted") {
         if (permission === "denied") {
-          alert(
-            "通知がブロックされてるバイ！\n\nブラウザの設定から「通知」を許可してね！",
-          );
+          setNotifyStatus("通知がブロックされてるバイ！設定から許可してね！");
         } else {
-          alert("通知を許可してもらわないとONにできんバイ...");
+          setNotifyStatus("通知を許可してもらわないとONにできんバイ...");
         }
+        setTimeout(() => setNotifyStatus(null), 3000);
         return;
       }
 
-      // Firebase SW の登録を待つ
+      // 2. 裏で非同期にFCMトークン取得・保存
       const reg = await navigator.serviceWorker.ready;
 
-      // FCM トークンを取得
       const fcmToken = await getToken(messaging, {
         vapidKey: FCM_VAPID_KEY,
         serviceWorkerRegistration: reg,
       });
 
       if (!fcmToken) {
-        alert("FCMトークンの取得に失敗したバイ...");
+        setNotifyStatus("FCMトークンの取得に失敗したバイ...");
+        setTimeout(() => setNotifyStatus(null), 3000);
         return;
       }
 
       console.log("FCMトークン取得成功:", fcmToken);
 
-      // GPS座標を取得してAWS API Gatewayへ送信（ジオフェンス作成用）
       const gpsPos = await new Promise((resolve) => {
         navigator.geolocation.getCurrentPosition(
           (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
@@ -322,12 +326,16 @@ export default function CustomerPage() {
         setUserSubscriptionId(response.data.createUserSubscription.id);
       }
 
+      // 3. 完了したらメッセージを更新
       setIsGeofenceOn(true);
       setShowNotifyInfo(true);
+      setNotifyStatus("通知ONになったバイ！準備万端バイ！");
     } catch (err) {
       console.error("通知許可エラー:", err);
-      alert("通知の設定に失敗したバイ...");
+      setNotifyStatus("通知の設定に失敗したバイ...");
       setIsGeofenceOn(false);
+    } finally {
+      setTimeout(() => setNotifyStatus(null), 2500);
     }
   };
 
@@ -584,6 +592,27 @@ export default function CustomerPage() {
         backgroundColor: "#fdf5e6",
       }}
     >
+      {notifyStatus && (
+        <div
+          style={{
+            position: "fixed",
+            top: 20,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 9999999,
+            background: "#333",
+            color: "#fff",
+            padding: "10px 24px",
+            borderRadius: 20,
+            fontSize: "0.95rem",
+            fontWeight: "bold",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+          }}
+        >
+          {notifyStatus}
+        </div>
+      )}
+
       <div
         style={{
           position: "absolute",

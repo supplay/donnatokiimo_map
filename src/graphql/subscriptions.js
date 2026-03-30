@@ -4,13 +4,14 @@
 export const onCreateUserPoint = /* GraphQL */ `
   subscription OnCreateUserPoint(
     $filter: ModelSubscriptionUserPointFilterInput
+    $owner: String
   ) {
-    onCreateUserPoint(filter: $filter) {
+    onCreateUserPoint(filter: $filter, owner: $owner) {
       id
       points
-      owner
       createdAt
       updatedAt
+      owner
       __typename
     }
   }
@@ -18,13 +19,14 @@ export const onCreateUserPoint = /* GraphQL */ `
 export const onUpdateUserPoint = /* GraphQL */ `
   subscription OnUpdateUserPoint(
     $filter: ModelSubscriptionUserPointFilterInput
+    $owner: String
   ) {
-    onUpdateUserPoint(filter: $filter) {
+    onUpdateUserPoint(filter: $filter, owner: $owner) {
       id
       points
-      owner
       createdAt
       updatedAt
+      owner
       __typename
     }
   }
@@ -32,13 +34,14 @@ export const onUpdateUserPoint = /* GraphQL */ `
 export const onDeleteUserPoint = /* GraphQL */ `
   subscription OnDeleteUserPoint(
     $filter: ModelSubscriptionUserPointFilterInput
+    $owner: String
   ) {
-    onDeleteUserPoint(filter: $filter) {
+    onDeleteUserPoint(filter: $filter, owner: $owner) {
       id
       points
-      owner
       createdAt
       updatedAt
+      owner
       __typename
     }
   }

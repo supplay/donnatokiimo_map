@@ -6,9 +6,9 @@ export const getUserPoint = /* GraphQL */ `
     getUserPoint(id: $id) {
       id
       points
-      owner
       createdAt
       updatedAt
+      owner
       __typename
     }
   }
@@ -23,9 +23,9 @@ export const listUserPoints = /* GraphQL */ `
       items {
         id
         points
-        owner
         createdAt
         updatedAt
+        owner
         __typename
       }
       nextToken

@@ -1,6 +1,6 @@
 import { Authenticator } from "@aws-amplify/ui-react";
 import React, { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AdminSignup from "./pages/AdminSignup.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
@@ -59,12 +59,22 @@ export default function App() {
       {showSplash && <LaunchSplash />}
       <BrowserRouter>
         <Routes>
+          {/* お客さん用トップページ */}
           <Route path="/" element={<CustomerPage />} />
-          <Route path="/kanri_aki" element={
-            <Authenticator hideSignUp={true}>
-              {({ signOut }) => <AdminPage signOut={signOut} />}
-            </Authenticator>
-          } />
+
+          {/* 管理画面：パスを /kanri_aki に変更 */}
+          <Route
+            path="/kanri_aki"
+            element={
+              <Authenticator hideSignUp={true}>
+                {({ signOut }) => <AdminPage signOut={signOut} />}
+              </Authenticator>
+            }
+          />
+
+          {/* /admin にアクセスしたら /kanri_aki に飛ばす */}
+          <Route path="/admin" element={<Navigate to="/kanri_aki" replace />} />
+
           <Route path="/admin-signup" element={<AdminSignup />} />
           <Route path="/mypage" element={
             <Authenticator>{({ signOut, user }) => <PointCard user={user} signOut={signOut} />}</Authenticator>

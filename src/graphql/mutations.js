@@ -114,9 +114,9 @@ export const createUserPoint = /* GraphQL */ `
     createUserPoint(input: $input, condition: $condition) {
       id
       points
-      owner
       createdAt
       updatedAt
+      owner
       __typename
     }
   }
@@ -129,9 +129,9 @@ export const updateUserPoint = /* GraphQL */ `
     updateUserPoint(input: $input, condition: $condition) {
       id
       points
-      owner
       createdAt
       updatedAt
+      owner
       __typename
     }
   }
@@ -144,9 +144,9 @@ export const deleteUserPoint = /* GraphQL */ `
     deleteUserPoint(input: $input, condition: $condition) {
       id
       points
-      owner
       createdAt
       updatedAt
+      owner
       __typename
     }
   }

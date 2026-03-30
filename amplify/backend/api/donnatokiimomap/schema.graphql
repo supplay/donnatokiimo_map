@@ -27,12 +27,9 @@ type Config
 
 type UserPoint
   @model
-  @auth(rules: [
-    { allow: private, operations: [read, create, update] }
-  ]) {
+  @auth(rules: [{ allow: owner }]) {
   id: ID!
   points: Int!
-  owner: String
 }
 
 type UserSubscription

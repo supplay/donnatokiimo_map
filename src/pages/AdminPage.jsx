@@ -3,6 +3,7 @@ import { generateClient } from "aws-amplify/api";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import AdminPointPanel from "../components/AdminPointPanel.jsx";
 
 import { getStore } from "../graphql/queries";
 import { updateStore, createStore } from "../graphql/mutations";
@@ -79,6 +80,8 @@ function AdminPage({ signOut }) {
   const [myPos, setMyPos] = useState([33.321, 130.941]);
   const [menuItems, setMenuItems] = useState([]);
   const [scheduleItems, setScheduleItems] = useState([]);
+  const [statusMessage, setStatusMessage] = useState(null);
+  const [showQR, setShowQR] = useState(false);
 
   const clientRef = useRef(null);
   if (!clientRef.current) {
@@ -156,6 +159,9 @@ function AdminPage({ signOut }) {
   }, [client]);
 
   const saveConfig = async () => {
+    // 1. 先にUIを更新（体感速度アップ）
+    setStatusMessage("保存中バイ...");
+
     const input = {
       id: CONFIG_ID,
       menuJson: JSON.stringify(menuItems),
@@ -169,7 +175,7 @@ function AdminPage({ signOut }) {
         variables: { input },
         authMode: "userPool",
       });
-      alert("保存したバイ！");
+      setStatusMessage("保存したバイ！");
       setEditType(null);
     } catch (e) {
       try {
@@ -178,16 +184,19 @@ function AdminPage({ signOut }) {
           variables: { input },
           authMode: "userPool",
         });
-        alert("初回保存に成功したバイ！");
+        setStatusMessage("初回保存に成功したバイ！");
         setEditType(null);
       } catch (err) {
         console.error("Config Save Error", err);
-        alert("保存エラーバイ");
+        setStatusMessage("保存エラーバイ...");
       }
+    } finally {
+      setTimeout(() => setStatusMessage(null), 2000);
     }
   };
 
   const stopTracking = async () => {
+    // 1. 先にUIを即座に更新
     if (watchIdRef.current != null) {
       navigator.geolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = null;
@@ -195,7 +204,9 @@ function AdminPage({ signOut }) {
 
     setIsTracking(false);
     isSendingStoreUpdateRef.current = false;
+    setStatusMessage("営業停止中バイ...");
 
+    // 2. 裏で非同期にサーバー更新
     try {
       await client.graphql({
         query: updateStore,
@@ -208,9 +219,12 @@ function AdminPage({ signOut }) {
         authMode: "userPool",
       });
       await syncTracker(VAN_ID, myPos[0], myPos[1], false);
-      console.log("営業停止を保存したバイ");
+      setStatusMessage("営業停止を保存したバイ");
     } catch (err) {
       console.error("営業停止保存エラー:", err);
+      setStatusMessage("営業停止の保存に失敗したバイ...");
+    } finally {
+      setTimeout(() => setStatusMessage(null), 2000);
     }
   };
 
@@ -229,8 +243,12 @@ function AdminPage({ signOut }) {
     }
 
     trackingErrorShownRef.current = false;
+    // 1. 先にUIを即座に更新（体感速度アップ）
     setIsTracking(true);
+    setStatusMessage("営業開始バイ！位置情報を取得中...");
+    setTimeout(() => setStatusMessage(null), 2000);
 
+    // 2. 裏で非同期にGPS追跡を開始
     const watchId = navigator.geolocation.watchPosition(
       async (pos) => {
         const lat = pos.coords.latitude;
@@ -311,8 +329,31 @@ function AdminPage({ signOut }) {
     };
   }, []);
 
+
   return (
     <div style={{ position: "relative", height: "100vh", width: "100%" }}>
+      {statusMessage && (
+        <div
+          style={{
+            position: "fixed",
+            top: 20,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 3000,
+            background: "#333",
+            color: "#fff",
+            padding: "10px 24px",
+            borderRadius: 20,
+            fontSize: "0.95rem",
+            fontWeight: "bold",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+            animation: "fadeIn 0.2s ease",
+          }}
+        >
+          {statusMessage}
+        </div>
+      )}
+
       <div
         style={{
           position: "absolute",
@@ -659,7 +700,67 @@ function AdminPage({ signOut }) {
         >
           🗓️ 予定編集
         </button>
+
+        <button
+          onClick={() => setShowQR(true)}
+          style={{
+            padding: "12px 20px",
+            background: "#8e44ad",
+            color: "white",
+            border: "none",
+            borderRadius: "10px",
+            fontWeight: "bold",
+            fontSize: "1rem",
+          }}
+        >
+          🍠 QRコード
+        </button>
       </div>
+
+      {showQR && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.4)",
+            zIndex: 2000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            style={{
+              background: "#fffaf2",
+              borderRadius: 15,
+              padding: 24,
+              minWidth: 320,
+              maxWidth: 500,
+              width: "90%",
+              maxHeight: "85vh",
+              overflowY: "auto",
+            }}
+          >
+            <AdminPointPanel />
+
+            <div style={{ textAlign: "center", marginTop: 16 }}>
+              <button
+                onClick={() => setShowQR(false)}
+                style={{
+                  padding: "10px 30px",
+                  background: "#e6ecf1",
+                  color: "#444",
+                  border: "none",
+                  borderRadius: 8,
+                  fontWeight: "bold",
+                }}
+              >
+                閉じる
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <MapContainer
         center={myPos}
