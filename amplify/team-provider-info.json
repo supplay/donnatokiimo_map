@@ -1,6 +1,7 @@
 {
-  "dev": {
+  "de": {
     "awscloudformation": {
+<<<<<<< HEAD
       "AuthRoleName": "amplify-donnatokiimomap-dev-83b9b-authRole",
       "UnauthRoleArn": "arn:aws:iam::209479306837:role/amplify-donnatokiimomap-dev-83b9b-unauthRole",
       "AuthRoleArn": "arn:aws:iam::209479306837:role/amplify-donnatokiimomap-dev-83b9b-authRole",
@@ -31,6 +32,37 @@
       },
       "api": {
         "donnatokiimomap": {}
+=======
+      "AuthRoleName": "amplify-donnatokiimomap-de-23f9e-authRole",
+      "UnauthRoleArn": "arn:aws:iam::209479306837:role/amplify-donnatokiimomap-de-23f9e-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::209479306837:role/amplify-donnatokiimomap-de-23f9e-authRole",
+      "Region": "ap-northeast-1",
+      "DeploymentBucketName": "amplify-donnatokiimomap-de-23f9e-deployment",
+      "UnauthRoleName": "amplify-donnatokiimomap-de-23f9e-unauthRole",
+      "StackName": "amplify-donnatokiimomap-de-23f9e",
+      "StackId": "arn:aws:cloudformation:ap-northeast-1:209479306837:stack/amplify-donnatokiimomap-de-23f9e/8d4b21b0-264b-11f1-93b9-06a3d8c34f91",
+      "AmplifyAppId": "d1s6z8mw18wui2"
+    },
+    "categories": {
+      "function": {
+        "locationHandler": {
+          "trackerName": "DonnnatokiimoTracker",
+          "deploymentBucketName": "amplify-donnatokiimomap-de-23f9e-deployment",
+          "s3Key": "amplify-builds/locationHandler-676268594d6677336366-build.zip"
+        }
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d1s6z8mw18wui2",
+          "type": "manual"
+        }
+      },
+      "auth": {
+        "donnatokiimomapa632128a": {}
+      },
+      "storage": {
+        "s3948ce30c": {}
+>>>>>>> main
       }
     }
   }

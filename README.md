@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🍠 donnatokiimo_map  -Realtime SweetPotato Van Tracker- 🍠
 
 移動販売の焼き芋屋さん（店主）と、焼き芋を買いたいお客さん（ユーザー）をつなぐ、リアルタイム位置情報＆ポイントシステムアプリです。PWA（Progressive Web App）として構築されており、スマートフォンのホーム画面に追加してアプリのように利用できます。
@@ -194,3 +195,21 @@ graph TD
 ・視覚的ヒューリスティクス: ✅（他のアプリ操作はOK）と⚠️（スリープ/タスク終了はNG）を対比させた直感的なガイドを実装。技術的な説明を避けつつ、ユーザーが「何をすべきか」を一目で理解できる設計を徹底しました。
 
 ・心理的オーナーシップの醸成: 単なる警告ではなく「おじさんの道案内をお願いする」という文脈にすることで、ユーザーの離脱を防ぎ、アプリとのエンゲージメントを高める工夫を施しました
+=======
+# React + Vite
+
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+
+Currently, two official plugins are available:
+
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+## React Compiler
+
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+>>>>>>> main

@@ -33,6 +33,7 @@ export const listUserPoints = /* GraphQL */ `
     }
   }
 `;
+<<<<<<< HEAD
 export const getUserSubscription = /* GraphQL */ `
   query GetUserSubscription($id: ID!) {
     getUserSubscription(id: $id) {
@@ -82,6 +83,16 @@ export const getStore = /* GraphQL */ `
       lng
       isOperating
       catchCopy
+=======
+export const getShop = /* GraphQL */ `
+  query GetShop($id: ID!) {
+    getShop(id: $id) {
+      id
+      name
+      latitude
+      longitude
+      isOperating
+>>>>>>> main
       lastUpdated
       createdAt
       updatedAt
@@ -89,6 +100,7 @@ export const getStore = /* GraphQL */ `
     }
   }
 `;
+<<<<<<< HEAD
 export const listStores = /* GraphQL */ `
   query ListStores(
     $filter: ModelStoreFilterInput
@@ -103,6 +115,21 @@ export const listStores = /* GraphQL */ `
         lng
         isOperating
         catchCopy
+=======
+export const listShops = /* GraphQL */ `
+  query ListShops(
+    $filter: ModelShopFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listShops(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        name
+        latitude
+        longitude
+        isOperating
+>>>>>>> main
         lastUpdated
         createdAt
         updatedAt

@@ -1,6 +1,7 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+<<<<<<< HEAD
 export const createStore = /* GraphQL */ `
   mutation CreateStore(
     $input: CreateStoreInput!
@@ -13,6 +14,19 @@ export const createStore = /* GraphQL */ `
       lng
       isOperating
       catchCopy
+=======
+export const createShop = /* GraphQL */ `
+  mutation CreateShop(
+    $input: CreateShopInput!
+    $condition: ModelShopConditionInput
+  ) {
+    createShop(input: $input, condition: $condition) {
+      id
+      name
+      latitude
+      longitude
+      isOperating
+>>>>>>> main
       lastUpdated
       createdAt
       updatedAt
@@ -20,6 +34,7 @@ export const createStore = /* GraphQL */ `
     }
   }
 `;
+<<<<<<< HEAD
 export const updateStore = /* GraphQL */ `
   mutation UpdateStore(
     $input: UpdateStoreInput!
@@ -32,6 +47,19 @@ export const updateStore = /* GraphQL */ `
       lng
       isOperating
       catchCopy
+=======
+export const updateShop = /* GraphQL */ `
+  mutation UpdateShop(
+    $input: UpdateShopInput!
+    $condition: ModelShopConditionInput
+  ) {
+    updateShop(input: $input, condition: $condition) {
+      id
+      name
+      latitude
+      longitude
+      isOperating
+>>>>>>> main
       lastUpdated
       createdAt
       updatedAt
@@ -39,6 +67,7 @@ export const updateStore = /* GraphQL */ `
     }
   }
 `;
+<<<<<<< HEAD
 export const deleteStore = /* GraphQL */ `
   mutation DeleteStore(
     $input: DeleteStoreInput!
@@ -51,6 +80,19 @@ export const deleteStore = /* GraphQL */ `
       lng
       isOperating
       catchCopy
+=======
+export const deleteShop = /* GraphQL */ `
+  mutation DeleteShop(
+    $input: DeleteShopInput!
+    $condition: ModelShopConditionInput
+  ) {
+    deleteShop(input: $input, condition: $condition) {
+      id
+      name
+      latitude
+      longitude
+      isOperating
+>>>>>>> main
       lastUpdated
       createdAt
       updatedAt
@@ -151,6 +193,7 @@ export const deleteUserPoint = /* GraphQL */ `
     }
   }
 `;
+<<<<<<< HEAD
 export const deleteUserSubscription = /* GraphQL */ `
   mutation DeleteUserSubscription(
     $input: DeleteUserSubscriptionInput!
@@ -202,3 +245,5 @@ export const updateUserSubscription = /* GraphQL */ `
     }
   }
 `;
+=======
+>>>>>>> main

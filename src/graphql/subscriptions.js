@@ -46,6 +46,7 @@ export const onDeleteUserPoint = /* GraphQL */ `
     }
   }
 `;
+<<<<<<< HEAD
 export const onCreateUserSubscription = /* GraphQL */ `
   subscription OnCreateUserSubscription(
     $filter: ModelSubscriptionUserSubscriptionFilterInput
@@ -103,6 +104,16 @@ export const onCreateStore = /* GraphQL */ `
       lng
       isOperating
       catchCopy
+=======
+export const onCreateShop = /* GraphQL */ `
+  subscription OnCreateShop($filter: ModelSubscriptionShopFilterInput) {
+    onCreateShop(filter: $filter) {
+      id
+      name
+      latitude
+      longitude
+      isOperating
+>>>>>>> main
       lastUpdated
       createdAt
       updatedAt
@@ -110,6 +121,7 @@ export const onCreateStore = /* GraphQL */ `
     }
   }
 `;
+<<<<<<< HEAD
 export const onUpdateStore = /* GraphQL */ `
   subscription OnUpdateStore($filter: ModelSubscriptionStoreFilterInput) {
     onUpdateStore(filter: $filter) {
@@ -119,6 +131,16 @@ export const onUpdateStore = /* GraphQL */ `
       lng
       isOperating
       catchCopy
+=======
+export const onUpdateShop = /* GraphQL */ `
+  subscription OnUpdateShop($filter: ModelSubscriptionShopFilterInput) {
+    onUpdateShop(filter: $filter) {
+      id
+      name
+      latitude
+      longitude
+      isOperating
+>>>>>>> main
       lastUpdated
       createdAt
       updatedAt
@@ -126,6 +148,7 @@ export const onUpdateStore = /* GraphQL */ `
     }
   }
 `;
+<<<<<<< HEAD
 export const onDeleteStore = /* GraphQL */ `
   subscription OnDeleteStore($filter: ModelSubscriptionStoreFilterInput) {
     onDeleteStore(filter: $filter) {
@@ -135,6 +158,16 @@ export const onDeleteStore = /* GraphQL */ `
       lng
       isOperating
       catchCopy
+=======
+export const onDeleteShop = /* GraphQL */ `
+  subscription OnDeleteShop($filter: ModelSubscriptionShopFilterInput) {
+    onDeleteShop(filter: $filter) {
+      id
+      name
+      latitude
+      longitude
+      isOperating
+>>>>>>> main
       lastUpdated
       createdAt
       updatedAt

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 backend:
   phases:
     build:
@@ -47,3 +48,24 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
+=======
+version: 1
+appSourceDirectory: "frontend"
+backend:
+    phases:
+        build:
+            commands:
+                - 'amplifyPush --simple'
+frontend:
+    phases:
+        preBuild:
+            commands:
+                - 'cd frontend && npm install'
+        build:
+            commands:
+                - 'cd frontend && npm run build'
+    artifacts:
+        baseDirectory: frontend/dist
+        files:
+            - '**/*'
+>>>>>>> main
