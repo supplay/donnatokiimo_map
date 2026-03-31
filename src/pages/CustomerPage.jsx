@@ -23,6 +23,7 @@ import { messaging, getToken } from "../firebase.js";
 // Firebase コンソール > プロジェクト設定 > Cloud Messaging > ウェブプッシュ証明書 の鍵ペア
 const FCM_VAPID_KEY = "BN2AwI13slGtx56om9P68uGilFCIkb8B82yHzKIPYsTD8YLc2N9OdDhTF0W7LhvoShJQr0xaaaieCSOEt30bRso";
 const AWS_API_URL = "https://a79c454sgh.execute-api.us-east-1.amazonaws.com/v1/tokens";
+const AI_GENERATOR_URL = "https://poct5tswijvelf635tfjso5bum0dppiw.lambda-url.ap-northeast-1.on.aws/";
 const VAN_ID = "KEI-VAN-001";
 const CONFIG_ID = "GLOBAL-CONFIG";
 
@@ -564,6 +565,89 @@ export default function CustomerPage() {
     };
   }, [client]);
 
+  const buildWeatherMessage = (weather, temp) => {
+    const pick = (list) => list[Math.floor(Math.random() * list.length)];
+    const maybe = (p) => Math.random() < p;
+    const t = Number(temp);
+    const weatherText = weather || "晴れ";
+
+    const basePhrases = {
+      rain: [
+        "雨でもほくほく！傘さして焼き芋どうぞバイ！",
+        "雨の日はな、暖かい焼き芋が最高よ！心も体も温まるぞ！",
+        "濡れた傘を置いて、ほかほか焼き芋をほおばりや！",
+        "雨音を聞きながら焼き芋…これが粋ってもんじゃ！",
+        "悪天候も吹っ飛ばす！焼き芋の力バイ！",
+      ],
+      snow: [
+        "雪の日こそ焼き芋日和バイ！手も心もあったまるよ！",
+        "雪化粧の中、熱々の焼き芋…天国じゃ！",
+        "寒い…そんな時は焼き芋に限るバイ！指先までぬくぬくよ！",
+        "雪見焼き芋…情緒があるな〜",
+        "白い雪と金色の焼き芋のコントラスト…美しいぞ！",
+      ],
+      cold: [
+        `今日は${!isNaN(t) ? t : "--"}℃、ほかほか焼き芋がしみるバイ！`,
+        `${!isNaN(t) ? t : "--"}℃…こりゃ焼き芋の季節だな！指が凍りそうな時はこれよ！`,
+        `${!isNaN(t) ? t : "--"}℃でな、焼き芋の暖かさが何倍にも感じられるんじゃ！`,
+        `寒々${!isNaN(t) ? t : "--"}℃…焼き芋がこんなに恋しいことがあるかね！`,
+        `${!isNaN(t) ? t : "--"}℃の冷たい空気と焼き芋の温もり…最高のコンビバイ！`,
+      ],
+      hot: [
+        `今日は${!isNaN(t) ? t : "--"}℃、冷たい飲み物と焼き芋の甘さが最高バイ！`,
+        `${!isNaN(t) ? t : "--"}℃じゃな…焼き芋の甘さが一層引き立つぞ！`,
+        `暑い日だからこそ、甘い焼き芋が欲しくなるんよ！${!isNaN(t) ? t : "--"}℃でもうまいバイ！`,
+        `${!isNaN(t) ? t : "--"}℃…焼き芋の自然な甘さが体にしみるのう！`,
+        `残暑厳しい${!isNaN(t) ? t : "--"}℃…焼き芋で英気を養おうぜ！`,
+      ],
+      normal: [
+        `今日は${weatherText}、甘くてねっとり焼き芋できちょるバイ！`,
+        `${weatherText}の中、焼き芋を焼いちょるがね！いい香りがするぞ！`,
+        `${weatherText}か…焼き芋日和じゃな！来てみりゃあ〜！`,
+        `今日も焼き芋の季節バイ！${weatherText}だからこそ、ほかほかが最高！`,
+        `${weatherText}…やっぱり焼き芋に限るな！文句なしよ！`,
+        "んぁ〜、今日も焼き芋おいしくできちょる！食べてきんねえ！",
+        "焼き芋の甘さと香ばしさ…これが人生の楽しみよ！",
+        "毎日焼き芋焼いちょるけど、飽きることなんてないんじゃ！",
+      ],
+    };
+
+    const addOns = {
+      rain: ["足元気をつけて来んね。", "湯気までごちそうじゃ。", "体の芯から温まるぞ。"],
+      snow: ["手袋のままでも香りでわかるぞ。", "白い景色に甘い香りが映えるのう。", "帰り道までぽかぽかバイ。"],
+      cold: ["手がかじかむ前にどうぞ。", "猫舌でもゆっくり楽しめるぞ。", "今日みたいな寒さにぴったりじゃ。"],
+      hot: ["塩気のあるおやつと相性抜群じゃ。", "甘さで元気チャージしていきんしゃい。", "暑さに負けん体づくりバイ。"],
+      normal: ["一本食べたら笑顔になるぞ。", "香りだけでも幸せじゃろ？", "おみやげにも人気バイ。"],
+    };
+
+    const openers = [
+      "おーい、聞いておくれ！",
+      "へい、いらっしゃい！",
+      "今日の焼き上がり情報じゃ！",
+      "通りすがりさん、注目バイ！",
+      "ほかほか速報じゃ〜！",
+    ];
+
+    const closers = [
+      "待っとるけんね！",
+      "気軽に声かけてな！",
+      "今日もええ芋、焼けちょるよ！",
+      "売り切れ前にどうぞバイ！",
+    ];
+
+    let bucket = "normal";
+    if (weatherText.includes("雨")) bucket = "rain";
+    else if (weatherText.includes("雪")) bucket = "snow";
+    else if (!isNaN(t) && t <= 10) bucket = "cold";
+    else if (!isNaN(t) && t >= 28) bucket = "hot";
+
+    let msg = pick(basePhrases[bucket]);
+    if (maybe(0.6)) msg = `${pick(openers)} ${msg}`;
+    if (maybe(0.7)) msg = `${msg} ${pick(addOns[bucket])}`;
+    if (maybe(0.65)) msg = `${msg} ${pick(closers)}`;
+    return msg;
+  };
+
   const fetchWeatherPhrase = async () => {
     setWeatherPhrase("おじさん考え中じゃ...");
 
@@ -575,13 +659,19 @@ export default function CustomerPage() {
       const telop = wData?.forecasts?.[0]?.telop ?? "晴れ";
       const temp = wData?.forecasts?.[0]?.temperature?.max?.celsius ?? "20";
 
-      const candidates = [
-        `${telop}の日も、焼き芋は心にしみるバイ！`,
-        `最高気温${temp}℃。そんな日こそホクホクいも日和じゃ！`,
-        `お天気は${telop}、お芋はいつでも食べごろバイ！`,
-      ];
-
-      setWeatherPhrase(candidates[Math.floor(Math.random() * candidates.length)]);
+      // AI生成（Bedrock Claude 3 Haiku）を試みる
+      try {
+        const aiRes = await fetch(AI_GENERATOR_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ weather: telop, temp }),
+        });
+        const aiData = await aiRes.json();
+        setWeatherPhrase(aiData.message || buildWeatherMessage(telop, temp));
+      } catch {
+        // Bedrockが失敗したらローカルのフレーズで代替
+        setWeatherPhrase(buildWeatherMessage(telop, temp));
+      }
     } catch (err) {
       setWeatherPhrase("おっと、通信がよくなかみたいじゃ。焼き芋は熱々バイ！");
     }

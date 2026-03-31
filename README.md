@@ -31,7 +31,6 @@
     * **Database**: DynamoDB (店舗、設定、ポイント、サブスクリプション情報の格納)
     * **Functions**: Lambda (AWS Location Service との連携、外部API連携、AIロジックの実行)
     * **Location Service**: Maps, Geofences (地図タイル供給、ジオフェンス評価)
-    * **Analytics/Push**: Pinpoint (プッシュ通知の配信)
     * **Amazon EventBridge**: ジオフェンスイベントのルーティング。Location Serviceが検知した「進入（ENTER）」イベントをトリガーに、通知用Lambdaを自動起動するイベントバスとして活用。
     * **Amazon Bedrock (Claude 3)**: Lambda経由で実行。気象データに基づいた「大分弁店主メッセージ」の動的生成。
 * **External API**: WeatherNews API (weather.tsukumijima.net) - リアルタイム気象データの取得
