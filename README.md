@@ -31,6 +31,7 @@
     * **Database**: DynamoDB (店舗、設定、ポイント、サブスクリプション情報の格納)
     * **Functions**: Lambda (AWS Location Service との連携、外部API連携、AIロジックの実行)
     * **Location Service**: Maps, Geofences (地図タイル供給、ジオフェンス評価)
+* **Push Notification**: Firebase Cloud Messaging (FCM) - Service Worker 経由によるブラウザプッシュ通知の配信
     * **Amazon EventBridge**: ジオフェンスイベントのルーティング。Location Serviceが検知した「進入（ENTER）」イベントをトリガーに、通知用Lambdaを自動起動するイベントバスとして活用。
     * **Amazon Bedrock (Claude 3)**: Lambda経由で実行。気象データに基づいた「大分弁店主メッセージ」の動的生成。
 * **External API**: WeatherNews API (weather.tsukumijima.net) - リアルタイム気象データの取得
@@ -136,12 +137,61 @@ graph TD
 
 
 
+## ✅ 前提条件
+
+ローカル環境で動作させるには、以下のツールが必要です。
+
+| ツール | 推奨バージョン |
+|---|---|
+| Node.js | 20.x 以上 |
+| npm | 10.x 以上 |
+| AWS CLI | v2 (AWS アカウントで設定済み) |
+| Amplify CLI | `npm install -g @aws-amplify/cli` |
+
+また、以下の外部サービスアカウントが別途必要です。
+* **AWS アカウント** (Cognito / AppSync / DynamoDB / Lambda / Location Service / EventBridge / Bedrock へのアクセス権)
+* **Firebase プロジェクト** (FCM によるプッシュ通知に使用)
+
+
+## 📁 プロジェクト構成
+
+```
+donnatokiimo_map/
+├── src/
+│   ├── pages/
+│   │   ├── CustomerPage.jsx   # お客さん向けマップ画面
+│   │   ├── AdminPage.jsx      # 店主向け管理画面
+│   │   └── AdminSignup.jsx    # 店主アカウント登録画面
+│   ├── components/
+│   │   ├── PointCard.jsx      # ポイントカード表示
+│   │   ├── AdminPointPanel.jsx # ポイント管理パネル
+│   │   ├── Modal.jsx          # 汎用モーダル
+│   │   └── ErrorBoundary.jsx  # エラー境界
+│   ├── firebase.js            # Firebase / FCM 初期化
+│   ├── amplifyConfig.js       # Amplify 設定
+│   └── main.jsx               # エントリーポイント
+├── backend/
+│   ├── lib/                   # CDK スタック定義
+│   ├── lambda/                # Lambda 関数ソース
+│   └── bin/                   # CDK エントリーポイント
+├── amplify/                   # Amplify Gen2 バックエンド定義
+├── public/
+│   ├── firebase-messaging-sw.js  # FCM Service Worker
+│   ├── sw.js                     # PWA Service Worker
+│   └── manifest.json             # Web App Manifest
+├── admin/
+│   └── index.html             # 店主ページ用エントリーHTML
+├── index.html                 # お客さんページ用エントリーHTML
+└── vite.config.js             # Vite ビルド設定（MPA）
+```
+
+
 ## 📦 インストールと起動
 
 1.  **リポジトリをクローン**:
     ```bash
-    git clone [https://github.com/yourusername/potatgo.git](https://github.com/yourusername/potatgo.git)
-    cd potatgo
+    git clone https://github.com/yourusername/donnatokiimo_map.git
+    cd donnatokiimo_map
     ```
 
 2.  **依存関係をインストール**:
@@ -159,6 +209,23 @@ graph TD
     ```bash
     npm run dev
     ```
+
+
+## 🚀 デプロイ
+
+**Amplify バックエンドをデプロイ:**
+```bash
+amplify push
+```
+
+**フロントエンドをビルド:**
+```bash
+npm run build
+```
+ビルド成果物は `dist/` に出力されます。Amplify Hosting / Amplify Console を使ってホストするか、S3 + CloudFront へ手動デプロイが可能です。
+
+**Amplify Console から自動デプロイ:**
+`amplify.yml` を参照。GitHub リポジトリと連携すると、`main` ブランチへのプッシュで CI/CD が自動実行されます。
 
 ## 🛠 開発上の工夫・技術的ポイント
 **1. Amazon Bedrock × 気象API による「動的接客」の実装**
@@ -194,3 +261,8 @@ graph TD
 ・視覚的ヒューリスティクス: ✅（他のアプリ操作はOK）と⚠️（スリープ/タスク終了はNG）を対比させた直感的なガイドを実装。技術的な説明を避けつつ、ユーザーが「何をすべきか」を一目で理解できる設計を徹底しました。
 
 ・心理的オーナーシップの醸成: 単なる警告ではなく「おじさんの道案内をお願いする」という文脈にすることで、ユーザーの離脱を防ぎ、アプリとのエンゲージメントを高める工夫を施しました
+
+
+## 📄 ライセンス
+
+This project is for personal/portfolio use. All rights reserved.

@@ -26,7 +26,7 @@
       "function": {
         "donnatokiimomap7946ee2e": {
           "deploymentBucketName": "amplify-donnatokiimomap-dev-83b9b-deployment",
-          "s3Key": "amplify-builds/donnatokiimomap7946ee2e-5747477359556f773130-build.zip"
+          "s3Key": "amplify-builds/donnatokiimomap7946ee2e-52507a36534337667564-build.zip"
         }
       },
       "api": {
