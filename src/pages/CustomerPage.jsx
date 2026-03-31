@@ -259,7 +259,23 @@ export default function CustomerPage() {
       }
 
       // 2. 裏で非同期にFCMトークン取得・保存
-      const reg = await navigator.serviceWorker.ready;
+      // firebase-messaging-sw.js を明示的に登録・取得（sw.js との混同を防ぐ）
+      let reg = await navigator.serviceWorker.getRegistration("/firebase-messaging-sw.js");
+      if (!reg) {
+        reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+      }
+      // アクティブになるまで待つ
+      if (reg.installing || reg.waiting) {
+        await new Promise((resolve) => {
+          const worker = reg.installing || reg.waiting;
+          worker.addEventListener("statechange", function onState() {
+            if (worker.state === "activated") {
+              worker.removeEventListener("statechange", onState);
+              resolve();
+            }
+          });
+        });
+      }
 
       const fcmToken = await getToken(messaging, {
         vapidKey: FCM_VAPID_KEY,
@@ -873,10 +889,42 @@ export default function CustomerPage() {
               通知ONになったバイ！
             </div>
 
-            <div style={{ fontSize: "1rem", color: "#333", marginBottom: "20px" }}>
-              焼きいも屋さんが近くに来たら
+            <div style={{ fontSize: "1rem", color: "#333", marginBottom: "16px" }}>
+              焼きいも屋さんが近く(1km圏内)に来たら
               <br />
               通知でお知らせするけんね！
+            </div>
+
+            <div
+              style={{
+                background: "#fff8f0",
+                border: "2px solid #ffcc88",
+                borderRadius: "12px",
+                padding: "12px 14px",
+                marginBottom: "20px",
+                textAlign: "left",
+                fontSize: "0.88rem",
+                color: "#555",
+                lineHeight: "1.7",
+              }}
+            >
+              <div style={{ fontWeight: "bold", marginBottom: "6px", fontSize: "0.9rem", color: "#333" }}>
+                【通知を届かせるためのお願い】
+              </div>
+              <div style={{ marginBottom: "6px" }}>
+                <span style={{ color: "#27ae60", fontWeight: "bold" }}>🙆 これなら届くバイ！</span>
+                <br />
+                ・別のアプリを使いよってもOK！
+                <br />
+                ・画面を真っ暗（スリープ）にしてもOK！
+              </div>
+              <div>
+                <span style={{ color: "#e74c3c", fontWeight: "bold" }}>🙅 これだと届かんバイ…</span>
+                <br />
+                ・アプリを上にスワイプして
+                <br />
+                　「完全に終了」させること
+              </div>
             </div>
 
             <button

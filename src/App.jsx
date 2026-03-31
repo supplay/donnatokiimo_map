@@ -31,8 +31,16 @@ export default function App() {
       setShowSplash(false);
     }, 1500);
 
-    // 2. Firebase Messaging Service Worker の登録
+    // 2. 古い sw.js を登録解除 → Firebase Messaging Service Worker を登録
     if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations().then((regs) => {
+        regs.forEach((r) => {
+          if (r.active?.scriptURL?.includes("/sw.js")) {
+            r.unregister();
+            console.log("古い sw.js を登録解除したバイ！");
+          }
+        });
+      });
       navigator.serviceWorker
         .register("/firebase-messaging-sw.js")
         .then((reg) => console.log("Firebase SW 登録成功バイ！", reg))
