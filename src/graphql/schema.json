@@ -77,11 +77,7 @@
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-<<<<<<< HEAD
-          "name" : "getUserSubscription",
-=======
           "name" : "getShop",
->>>>>>> main
           "description" : null,
           "args" : [ {
             "name" : "id",
@@ -99,32 +95,20 @@
           } ],
           "type" : {
             "kind" : "OBJECT",
-<<<<<<< HEAD
-            "name" : "UserSubscription",
-=======
             "name" : "Shop",
->>>>>>> main
             "ofType" : null
           },
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-<<<<<<< HEAD
-          "name" : "listUserSubscriptions",
-=======
           "name" : "listShops",
->>>>>>> main
           "description" : null,
           "args" : [ {
             "name" : "filter",
             "description" : null,
             "type" : {
               "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-              "name" : "ModelUserSubscriptionFilterInput",
-=======
               "name" : "ModelShopFilterInput",
->>>>>>> main
               "ofType" : null
             },
             "defaultValue" : null
@@ -149,73 +133,7 @@
           } ],
           "type" : {
             "kind" : "OBJECT",
-<<<<<<< HEAD
-            "name" : "ModelUserSubscriptionConnection",
-            "ofType" : null
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
-          "name" : "getStore",
-          "description" : null,
-          "args" : [ {
-            "name" : "id",
-            "description" : null,
-            "type" : {
-              "kind" : "NON_NULL",
-              "name" : null,
-              "ofType" : {
-                "kind" : "SCALAR",
-                "name" : "ID",
-                "ofType" : null
-              }
-            },
-            "defaultValue" : null
-          } ],
-          "type" : {
-            "kind" : "OBJECT",
-            "name" : "Store",
-            "ofType" : null
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
-          "name" : "listStores",
-          "description" : null,
-          "args" : [ {
-            "name" : "filter",
-            "description" : null,
-            "type" : {
-              "kind" : "INPUT_OBJECT",
-              "name" : "ModelStoreFilterInput",
-              "ofType" : null
-            },
-            "defaultValue" : null
-          }, {
-            "name" : "limit",
-            "description" : null,
-            "type" : {
-              "kind" : "SCALAR",
-              "name" : "Int",
-              "ofType" : null
-            },
-            "defaultValue" : null
-          }, {
-            "name" : "nextToken",
-            "description" : null,
-            "type" : {
-              "kind" : "SCALAR",
-              "name" : "String",
-              "ofType" : null
-            },
-            "defaultValue" : null
-          } ],
-          "type" : {
-            "kind" : "OBJECT",
-            "name" : "ModelStoreConnection",
-=======
             "name" : "ModelShopConnection",
->>>>>>> main
             "ofType" : null
           },
           "isDeprecated" : false,
@@ -282,8 +200,6 @@
           },
           "isDeprecated" : false,
           "deprecationReason" : null
-<<<<<<< HEAD
-=======
         }, {
           "name" : "getUserSubscription",
           "description" : null,
@@ -346,7 +262,6 @@
           },
           "isDeprecated" : false,
           "deprecationReason" : null
->>>>>>> main
         } ],
         "inputFields" : null,
         "interfaces" : [ ],
@@ -1096,11 +1011,7 @@
         "possibleTypes" : null
       }, {
         "kind" : "OBJECT",
-<<<<<<< HEAD
-        "name" : "UserSubscription",
-=======
         "name" : "Shop",
->>>>>>> main
         "description" : null,
         "fields" : [ {
           "name" : "id",
@@ -1118,11 +1029,7 @@
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-<<<<<<< HEAD
-          "name" : "userId",
-=======
           "name" : "name",
->>>>>>> main
           "description" : null,
           "args" : [ ],
           "type" : {
@@ -1137,11 +1044,7 @@
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-<<<<<<< HEAD
-          "name" : "subscription",
-=======
           "name" : "latitude",
->>>>>>> main
           "description" : null,
           "args" : [ ],
           "type" : {
@@ -1149,26 +1052,13 @@
             "name" : null,
             "ofType" : {
               "kind" : "SCALAR",
-<<<<<<< HEAD
-              "name" : "String",
-=======
               "name" : "Float",
->>>>>>> main
               "ofType" : null
             }
           },
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-<<<<<<< HEAD
-          "name" : "userLat",
-          "description" : null,
-          "args" : [ ],
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "Float",
-            "ofType" : null
-=======
           "name" : "longitude",
           "description" : null,
           "args" : [ ],
@@ -1180,14 +1070,10 @@
               "name" : "Float",
               "ofType" : null
             }
->>>>>>> main
           },
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-<<<<<<< HEAD
-          "name" : "userLng",
-=======
           "name" : "isOperating",
           "description" : null,
           "args" : [ ],
@@ -1204,16 +1090,11 @@
           "deprecationReason" : null
         }, {
           "name" : "lastUpdated",
->>>>>>> main
           "description" : null,
           "args" : [ ],
           "type" : {
             "kind" : "SCALAR",
-<<<<<<< HEAD
-            "name" : "Float",
-=======
             "name" : "String",
->>>>>>> main
             "ofType" : null
           },
           "isDeprecated" : false,
@@ -1264,11 +1145,7 @@
         "possibleTypes" : null
       }, {
         "kind" : "OBJECT",
-<<<<<<< HEAD
-        "name" : "ModelUserSubscriptionConnection",
-=======
         "name" : "ModelShopConnection",
->>>>>>> main
         "description" : null,
         "fields" : [ {
           "name" : "items",
@@ -1282,11 +1159,7 @@
               "name" : null,
               "ofType" : {
                 "kind" : "OBJECT",
-<<<<<<< HEAD
-                "name" : "UserSubscription",
-=======
                 "name" : "Shop",
->>>>>>> main
                 "ofType" : null
               }
             }
@@ -1311,11 +1184,7 @@
         "possibleTypes" : null
       }, {
         "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-        "name" : "ModelUserSubscriptionFilterInput",
-=======
         "name" : "ModelShopFilterInput",
->>>>>>> main
         "description" : null,
         "fields" : null,
         "inputFields" : [ {
@@ -1328,11 +1197,7 @@
           },
           "defaultValue" : null
         }, {
-<<<<<<< HEAD
-          "name" : "userId",
-=======
           "name" : "name",
->>>>>>> main
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
@@ -1341,9 +1206,6 @@
           },
           "defaultValue" : null
         }, {
-<<<<<<< HEAD
-          "name" : "subscription",
-=======
           "name" : "latitude",
           "description" : null,
           "type" : {
@@ -1372,7 +1234,6 @@
           "defaultValue" : null
         }, {
           "name" : "lastUpdated",
->>>>>>> main
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
@@ -1381,27 +1242,6 @@
           },
           "defaultValue" : null
         }, {
-<<<<<<< HEAD
-          "name" : "userLat",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelFloatInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "userLng",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelFloatInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-=======
->>>>>>> main
           "name" : "createdAt",
           "description" : null,
           "type" : {
@@ -1427,11 +1267,7 @@
             "name" : null,
             "ofType" : {
               "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-              "name" : "ModelUserSubscriptionFilterInput",
-=======
               "name" : "ModelShopFilterInput",
->>>>>>> main
               "ofType" : null
             }
           },
@@ -1444,11 +1280,7 @@
             "name" : null,
             "ofType" : {
               "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-              "name" : "ModelUserSubscriptionFilterInput",
-=======
               "name" : "ModelShopFilterInput",
->>>>>>> main
               "ofType" : null
             }
           },
@@ -1458,11 +1290,7 @@
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-            "name" : "ModelUserSubscriptionFilterInput",
-=======
             "name" : "ModelShopFilterInput",
->>>>>>> main
             "ofType" : null
           },
           "defaultValue" : null
@@ -1565,293 +1393,6 @@
         "enumValues" : null,
         "possibleTypes" : null
       }, {
-<<<<<<< HEAD
-        "kind" : "OBJECT",
-        "name" : "Store",
-        "description" : null,
-        "fields" : [ {
-          "name" : "id",
-          "description" : null,
-          "args" : [ ],
-          "type" : {
-            "kind" : "NON_NULL",
-            "name" : null,
-            "ofType" : {
-              "kind" : "SCALAR",
-              "name" : "ID",
-              "ofType" : null
-            }
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
-          "name" : "name",
-          "description" : null,
-          "args" : [ ],
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "String",
-            "ofType" : null
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
-          "name" : "lat",
-          "description" : null,
-          "args" : [ ],
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "Float",
-            "ofType" : null
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
-          "name" : "lng",
-          "description" : null,
-          "args" : [ ],
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "Float",
-            "ofType" : null
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
-          "name" : "isOperating",
-          "description" : null,
-          "args" : [ ],
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "Boolean",
-            "ofType" : null
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
-          "name" : "catchCopy",
-          "description" : null,
-          "args" : [ ],
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "String",
-            "ofType" : null
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
-          "name" : "lastUpdated",
-          "description" : null,
-          "args" : [ ],
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "AWSDateTime",
-            "ofType" : null
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
-          "name" : "createdAt",
-          "description" : null,
-          "args" : [ ],
-          "type" : {
-            "kind" : "NON_NULL",
-            "name" : null,
-            "ofType" : {
-              "kind" : "SCALAR",
-              "name" : "AWSDateTime",
-              "ofType" : null
-            }
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
-          "name" : "updatedAt",
-          "description" : null,
-          "args" : [ ],
-          "type" : {
-            "kind" : "NON_NULL",
-            "name" : null,
-            "ofType" : {
-              "kind" : "SCALAR",
-              "name" : "AWSDateTime",
-              "ofType" : null
-            }
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        } ],
-        "inputFields" : null,
-        "interfaces" : [ ],
-        "enumValues" : null,
-        "possibleTypes" : null
-      }, {
-        "kind" : "OBJECT",
-        "name" : "ModelStoreConnection",
-        "description" : null,
-        "fields" : [ {
-          "name" : "items",
-          "description" : null,
-          "args" : [ ],
-          "type" : {
-            "kind" : "NON_NULL",
-            "name" : null,
-            "ofType" : {
-              "kind" : "LIST",
-              "name" : null,
-              "ofType" : {
-                "kind" : "OBJECT",
-                "name" : "Store",
-                "ofType" : null
-              }
-            }
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
-          "name" : "nextToken",
-          "description" : null,
-          "args" : [ ],
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "String",
-            "ofType" : null
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        } ],
-        "inputFields" : null,
-        "interfaces" : [ ],
-        "enumValues" : null,
-        "possibleTypes" : null
-      }, {
-        "kind" : "INPUT_OBJECT",
-        "name" : "ModelStoreFilterInput",
-        "description" : null,
-        "fields" : null,
-        "inputFields" : [ {
-          "name" : "id",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelIDInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "name",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelStringInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "lat",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelFloatInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "lng",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelFloatInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "isOperating",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelBooleanInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "catchCopy",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelStringInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "lastUpdated",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelStringInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "createdAt",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelStringInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "updatedAt",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelStringInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "and",
-          "description" : null,
-          "type" : {
-            "kind" : "LIST",
-            "name" : null,
-            "ofType" : {
-              "kind" : "INPUT_OBJECT",
-              "name" : "ModelStoreFilterInput",
-              "ofType" : null
-            }
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "or",
-          "description" : null,
-          "type" : {
-            "kind" : "LIST",
-            "name" : null,
-            "ofType" : {
-              "kind" : "INPUT_OBJECT",
-              "name" : "ModelStoreFilterInput",
-              "ofType" : null
-            }
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "not",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelStoreFilterInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        } ],
-        "interfaces" : null,
-        "enumValues" : null,
-        "possibleTypes" : null
-      }, {
-=======
->>>>>>> main
         "kind" : "INPUT_OBJECT",
         "name" : "ModelBooleanInput",
         "description" : null,
@@ -2122,12 +1663,6 @@
         "possibleTypes" : null
       }, {
         "kind" : "OBJECT",
-<<<<<<< HEAD
-        "name" : "Mutation",
-        "description" : null,
-        "fields" : [ {
-          "name" : "createStore",
-=======
         "name" : "UserSubscription",
         "description" : null,
         "fields" : [ {
@@ -2380,7 +1915,6 @@
         "description" : null,
         "fields" : [ {
           "name" : "createShop",
->>>>>>> main
           "description" : null,
           "args" : [ {
             "name" : "input",
@@ -2390,11 +1924,7 @@
               "name" : null,
               "ofType" : {
                 "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-                "name" : "CreateStoreInput",
-=======
                 "name" : "CreateShopInput",
->>>>>>> main
                 "ofType" : null
               }
             },
@@ -2404,32 +1934,20 @@
             "description" : null,
             "type" : {
               "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-              "name" : "ModelStoreConditionInput",
-=======
               "name" : "ModelShopConditionInput",
->>>>>>> main
               "ofType" : null
             },
             "defaultValue" : null
           } ],
           "type" : {
             "kind" : "OBJECT",
-<<<<<<< HEAD
-            "name" : "Store",
-=======
             "name" : "Shop",
->>>>>>> main
             "ofType" : null
           },
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-<<<<<<< HEAD
-          "name" : "updateStore",
-=======
           "name" : "updateShop",
->>>>>>> main
           "description" : null,
           "args" : [ {
             "name" : "input",
@@ -2439,11 +1957,7 @@
               "name" : null,
               "ofType" : {
                 "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-                "name" : "UpdateStoreInput",
-=======
                 "name" : "UpdateShopInput",
->>>>>>> main
                 "ofType" : null
               }
             },
@@ -2453,32 +1967,20 @@
             "description" : null,
             "type" : {
               "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-              "name" : "ModelStoreConditionInput",
-=======
               "name" : "ModelShopConditionInput",
->>>>>>> main
               "ofType" : null
             },
             "defaultValue" : null
           } ],
           "type" : {
             "kind" : "OBJECT",
-<<<<<<< HEAD
-            "name" : "Store",
-=======
             "name" : "Shop",
->>>>>>> main
             "ofType" : null
           },
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-<<<<<<< HEAD
-          "name" : "deleteStore",
-=======
           "name" : "deleteShop",
->>>>>>> main
           "description" : null,
           "args" : [ {
             "name" : "input",
@@ -2488,11 +1990,7 @@
               "name" : null,
               "ofType" : {
                 "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-                "name" : "DeleteStoreInput",
-=======
                 "name" : "DeleteShopInput",
->>>>>>> main
                 "ofType" : null
               }
             },
@@ -2502,22 +2000,14 @@
             "description" : null,
             "type" : {
               "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-              "name" : "ModelStoreConditionInput",
-=======
               "name" : "ModelShopConditionInput",
->>>>>>> main
               "ofType" : null
             },
             "defaultValue" : null
           } ],
           "type" : {
             "kind" : "OBJECT",
-<<<<<<< HEAD
-            "name" : "Store",
-=======
             "name" : "Shop",
->>>>>>> main
             "ofType" : null
           },
           "isDeprecated" : false,
@@ -2826,11 +2316,7 @@
         "possibleTypes" : null
       }, {
         "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-        "name" : "CreateStoreInput",
-=======
         "name" : "CreateShopInput",
->>>>>>> main
         "description" : null,
         "fields" : null,
         "inputFields" : [ {
@@ -2846,29 +2332,6 @@
           "name" : "name",
           "description" : null,
           "type" : {
-<<<<<<< HEAD
-            "kind" : "SCALAR",
-            "name" : "String",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "lat",
-          "description" : null,
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "Float",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "lng",
-          "description" : null,
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "Float",
-            "ofType" : null
-=======
             "kind" : "NON_NULL",
             "name" : null,
             "ofType" : {
@@ -2902,27 +2365,12 @@
               "name" : "Float",
               "ofType" : null
             }
->>>>>>> main
           },
           "defaultValue" : null
         }, {
           "name" : "isOperating",
           "description" : null,
           "type" : {
-<<<<<<< HEAD
-            "kind" : "SCALAR",
-            "name" : "Boolean",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "catchCopy",
-          "description" : null,
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "String",
-            "ofType" : null
-=======
             "kind" : "NON_NULL",
             "name" : null,
             "ofType" : {
@@ -2930,7 +2378,6 @@
               "name" : "Boolean",
               "ofType" : null
             }
->>>>>>> main
           },
           "defaultValue" : null
         }, {
@@ -2938,11 +2385,7 @@
           "description" : null,
           "type" : {
             "kind" : "SCALAR",
-<<<<<<< HEAD
-            "name" : "AWSDateTime",
-=======
             "name" : "String",
->>>>>>> main
             "ofType" : null
           },
           "defaultValue" : null
@@ -2952,11 +2395,7 @@
         "possibleTypes" : null
       }, {
         "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-        "name" : "ModelStoreConditionInput",
-=======
         "name" : "ModelShopConditionInput",
->>>>>>> main
         "description" : null,
         "fields" : null,
         "inputFields" : [ {
@@ -2969,11 +2408,7 @@
           },
           "defaultValue" : null
         }, {
-<<<<<<< HEAD
-          "name" : "lat",
-=======
           "name" : "latitude",
->>>>>>> main
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
@@ -2982,11 +2417,7 @@
           },
           "defaultValue" : null
         }, {
-<<<<<<< HEAD
-          "name" : "lng",
-=======
           "name" : "longitude",
->>>>>>> main
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
@@ -3004,18 +2435,6 @@
           },
           "defaultValue" : null
         }, {
-<<<<<<< HEAD
-          "name" : "catchCopy",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelStringInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-=======
->>>>>>> main
           "name" : "lastUpdated",
           "description" : null,
           "type" : {
@@ -3032,11 +2451,7 @@
             "name" : null,
             "ofType" : {
               "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-              "name" : "ModelStoreConditionInput",
-=======
               "name" : "ModelShopConditionInput",
->>>>>>> main
               "ofType" : null
             }
           },
@@ -3049,11 +2464,7 @@
             "name" : null,
             "ofType" : {
               "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-              "name" : "ModelStoreConditionInput",
-=======
               "name" : "ModelShopConditionInput",
->>>>>>> main
               "ofType" : null
             }
           },
@@ -3063,11 +2474,7 @@
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-            "name" : "ModelStoreConditionInput",
-=======
             "name" : "ModelShopConditionInput",
->>>>>>> main
             "ofType" : null
           },
           "defaultValue" : null
@@ -3095,11 +2502,7 @@
         "possibleTypes" : null
       }, {
         "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-        "name" : "UpdateStoreInput",
-=======
         "name" : "UpdateShopInput",
->>>>>>> main
         "description" : null,
         "fields" : null,
         "inputFields" : [ {
@@ -3125,11 +2528,7 @@
           },
           "defaultValue" : null
         }, {
-<<<<<<< HEAD
-          "name" : "lat",
-=======
           "name" : "latitude",
->>>>>>> main
           "description" : null,
           "type" : {
             "kind" : "SCALAR",
@@ -3138,11 +2537,7 @@
           },
           "defaultValue" : null
         }, {
-<<<<<<< HEAD
-          "name" : "lng",
-=======
           "name" : "longitude",
->>>>>>> main
           "description" : null,
           "type" : {
             "kind" : "SCALAR",
@@ -3160,27 +2555,11 @@
           },
           "defaultValue" : null
         }, {
-<<<<<<< HEAD
-          "name" : "catchCopy",
-          "description" : null,
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "String",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-=======
->>>>>>> main
           "name" : "lastUpdated",
           "description" : null,
           "type" : {
             "kind" : "SCALAR",
-<<<<<<< HEAD
-            "name" : "AWSDateTime",
-=======
             "name" : "String",
->>>>>>> main
             "ofType" : null
           },
           "defaultValue" : null
@@ -3190,11 +2569,7 @@
         "possibleTypes" : null
       }, {
         "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-        "name" : "DeleteStoreInput",
-=======
         "name" : "DeleteShopInput",
->>>>>>> main
         "description" : null,
         "fields" : null,
         "inputFields" : [ {
@@ -3734,19 +3109,9 @@
           "name" : "subscription",
           "description" : null,
           "type" : {
-<<<<<<< HEAD
-            "kind" : "NON_NULL",
-            "name" : null,
-            "ofType" : {
-              "kind" : "SCALAR",
-              "name" : "String",
-              "ofType" : null
-            }
-=======
             "kind" : "SCALAR",
             "name" : "String",
             "ofType" : null
->>>>>>> main
           },
           "defaultValue" : null
         }, {
@@ -3921,157 +3286,61 @@
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-<<<<<<< HEAD
-          "name" : "onCreateUserSubscription",
-=======
           "name" : "onCreateShop",
->>>>>>> main
           "description" : null,
           "args" : [ {
             "name" : "filter",
             "description" : null,
             "type" : {
               "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-              "name" : "ModelSubscriptionUserSubscriptionFilterInput",
-=======
               "name" : "ModelSubscriptionShopFilterInput",
->>>>>>> main
               "ofType" : null
             },
             "defaultValue" : null
           } ],
           "type" : {
             "kind" : "OBJECT",
-<<<<<<< HEAD
-            "name" : "UserSubscription",
-=======
             "name" : "Shop",
->>>>>>> main
             "ofType" : null
           },
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-<<<<<<< HEAD
-          "name" : "onUpdateUserSubscription",
-=======
           "name" : "onUpdateShop",
->>>>>>> main
           "description" : null,
           "args" : [ {
             "name" : "filter",
             "description" : null,
             "type" : {
               "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-              "name" : "ModelSubscriptionUserSubscriptionFilterInput",
-=======
               "name" : "ModelSubscriptionShopFilterInput",
->>>>>>> main
               "ofType" : null
             },
             "defaultValue" : null
           } ],
           "type" : {
             "kind" : "OBJECT",
-<<<<<<< HEAD
-            "name" : "UserSubscription",
-=======
             "name" : "Shop",
->>>>>>> main
             "ofType" : null
           },
           "isDeprecated" : false,
           "deprecationReason" : null
         }, {
-<<<<<<< HEAD
-          "name" : "onDeleteUserSubscription",
-=======
           "name" : "onDeleteShop",
->>>>>>> main
           "description" : null,
           "args" : [ {
             "name" : "filter",
             "description" : null,
             "type" : {
               "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-              "name" : "ModelSubscriptionUserSubscriptionFilterInput",
-=======
               "name" : "ModelSubscriptionShopFilterInput",
->>>>>>> main
               "ofType" : null
             },
             "defaultValue" : null
           } ],
           "type" : {
             "kind" : "OBJECT",
-<<<<<<< HEAD
-            "name" : "UserSubscription",
-            "ofType" : null
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
-          "name" : "onCreateStore",
-          "description" : null,
-          "args" : [ {
-            "name" : "filter",
-            "description" : null,
-            "type" : {
-              "kind" : "INPUT_OBJECT",
-              "name" : "ModelSubscriptionStoreFilterInput",
-              "ofType" : null
-            },
-            "defaultValue" : null
-          } ],
-          "type" : {
-            "kind" : "OBJECT",
-            "name" : "Store",
-            "ofType" : null
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
-          "name" : "onUpdateStore",
-          "description" : null,
-          "args" : [ {
-            "name" : "filter",
-            "description" : null,
-            "type" : {
-              "kind" : "INPUT_OBJECT",
-              "name" : "ModelSubscriptionStoreFilterInput",
-              "ofType" : null
-            },
-            "defaultValue" : null
-          } ],
-          "type" : {
-            "kind" : "OBJECT",
-            "name" : "Store",
-            "ofType" : null
-          },
-          "isDeprecated" : false,
-          "deprecationReason" : null
-        }, {
-          "name" : "onDeleteStore",
-          "description" : null,
-          "args" : [ {
-            "name" : "filter",
-            "description" : null,
-            "type" : {
-              "kind" : "INPUT_OBJECT",
-              "name" : "ModelSubscriptionStoreFilterInput",
-              "ofType" : null
-            },
-            "defaultValue" : null
-          } ],
-          "type" : {
-            "kind" : "OBJECT",
-            "name" : "Store",
-=======
             "name" : "Shop",
->>>>>>> main
             "ofType" : null
           },
           "isDeprecated" : false,
@@ -4136,8 +3405,6 @@
           },
           "isDeprecated" : false,
           "deprecationReason" : null
-<<<<<<< HEAD
-=======
         }, {
           "name" : "onCreateUserSubscription",
           "description" : null,
@@ -4198,7 +3465,6 @@
           },
           "isDeprecated" : false,
           "deprecationReason" : null
->>>>>>> main
         } ],
         "inputFields" : null,
         "interfaces" : [ ],
@@ -4646,11 +3912,7 @@
         "possibleTypes" : null
       }, {
         "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-        "name" : "ModelSubscriptionUserSubscriptionFilterInput",
-=======
         "name" : "ModelSubscriptionShopFilterInput",
->>>>>>> main
         "description" : null,
         "fields" : null,
         "inputFields" : [ {
@@ -4663,11 +3925,7 @@
           },
           "defaultValue" : null
         }, {
-<<<<<<< HEAD
-          "name" : "userId",
-=======
           "name" : "name",
->>>>>>> main
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
@@ -4676,9 +3934,6 @@
           },
           "defaultValue" : null
         }, {
-<<<<<<< HEAD
-          "name" : "subscription",
-=======
           "name" : "latitude",
           "description" : null,
           "type" : {
@@ -4707,7 +3962,6 @@
           "defaultValue" : null
         }, {
           "name" : "lastUpdated",
->>>>>>> main
           "description" : null,
           "type" : {
             "kind" : "INPUT_OBJECT",
@@ -4716,27 +3970,6 @@
           },
           "defaultValue" : null
         }, {
-<<<<<<< HEAD
-          "name" : "userLat",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelSubscriptionFloatInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "userLng",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelSubscriptionFloatInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-=======
->>>>>>> main
           "name" : "createdAt",
           "description" : null,
           "type" : {
@@ -4762,11 +3995,7 @@
             "name" : null,
             "ofType" : {
               "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-              "name" : "ModelSubscriptionUserSubscriptionFilterInput",
-=======
               "name" : "ModelSubscriptionShopFilterInput",
->>>>>>> main
               "ofType" : null
             }
           },
@@ -4779,11 +4008,7 @@
             "name" : null,
             "ofType" : {
               "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-              "name" : "ModelSubscriptionUserSubscriptionFilterInput",
-=======
               "name" : "ModelSubscriptionShopFilterInput",
->>>>>>> main
               "ofType" : null
             }
           },
@@ -4896,125 +4121,6 @@
         "possibleTypes" : null
       }, {
         "kind" : "INPUT_OBJECT",
-<<<<<<< HEAD
-        "name" : "ModelSubscriptionStoreFilterInput",
-        "description" : null,
-        "fields" : null,
-        "inputFields" : [ {
-          "name" : "id",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelSubscriptionIDInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "name",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelSubscriptionStringInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "lat",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelSubscriptionFloatInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "lng",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelSubscriptionFloatInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "isOperating",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelSubscriptionBooleanInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "catchCopy",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelSubscriptionStringInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "lastUpdated",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelSubscriptionStringInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "createdAt",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelSubscriptionStringInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "updatedAt",
-          "description" : null,
-          "type" : {
-            "kind" : "INPUT_OBJECT",
-            "name" : "ModelSubscriptionStringInput",
-            "ofType" : null
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "and",
-          "description" : null,
-          "type" : {
-            "kind" : "LIST",
-            "name" : null,
-            "ofType" : {
-              "kind" : "INPUT_OBJECT",
-              "name" : "ModelSubscriptionStoreFilterInput",
-              "ofType" : null
-            }
-          },
-          "defaultValue" : null
-        }, {
-          "name" : "or",
-          "description" : null,
-          "type" : {
-            "kind" : "LIST",
-            "name" : null,
-            "ofType" : {
-              "kind" : "INPUT_OBJECT",
-              "name" : "ModelSubscriptionStoreFilterInput",
-              "ofType" : null
-            }
-          },
-          "defaultValue" : null
-        } ],
-        "interfaces" : null,
-        "enumValues" : null,
-        "possibleTypes" : null
-      }, {
-        "kind" : "INPUT_OBJECT",
-=======
->>>>>>> main
         "name" : "ModelSubscriptionBooleanInput",
         "description" : null,
         "fields" : null,
@@ -5130,8 +4236,6 @@
         "enumValues" : null,
         "possibleTypes" : null
       }, {
-<<<<<<< HEAD
-=======
         "kind" : "INPUT_OBJECT",
         "name" : "ModelSubscriptionUserSubscriptionFilterInput",
         "description" : null,
@@ -5230,7 +4334,6 @@
         "enumValues" : null,
         "possibleTypes" : null
       }, {
->>>>>>> main
         "kind" : "ENUM",
         "name" : "ModelSortDirection",
         "description" : null,
@@ -6033,8 +5136,6 @@
         "onFragment" : false,
         "onField" : true
       }, {
-<<<<<<< HEAD
-=======
         "name" : "aws_subscribe",
         "description" : "Tells the service which mutation triggers this subscription.",
         "locations" : [ "FIELD_DEFINITION" ],
@@ -6072,7 +5173,6 @@
         "onFragment" : false,
         "onField" : false
       }, {
->>>>>>> main
         "name" : "aws_iam",
         "description" : "Tells the service this field/object has access authorized by sigv4 signing.",
         "locations" : [ "OBJECT", "FIELD_DEFINITION" ],
@@ -6081,8 +5181,6 @@
         "onFragment" : false,
         "onField" : false
       }, {
-<<<<<<< HEAD
-=======
         "name" : "deprecated",
         "description" : null,
         "locations" : [ "FIELD_DEFINITION", "ENUM_VALUE" ],
@@ -6100,7 +5198,6 @@
         "onFragment" : false,
         "onField" : false
       }, {
->>>>>>> main
         "name" : "aws_cognito_user_pools",
         "description" : "Tells the service this field/object has access authorized by a Cognito User Pools token.",
         "locations" : [ "OBJECT", "FIELD_DEFINITION" ],
@@ -6122,25 +5219,6 @@
         "onFragment" : false,
         "onField" : false
       }, {
-<<<<<<< HEAD
-        "name" : "aws_lambda",
-        "description" : "Tells the service this field/object has access authorized by a Lambda Authorizer.",
-        "locations" : [ "OBJECT", "FIELD_DEFINITION" ],
-        "args" : [ ],
-        "onOperation" : false,
-        "onFragment" : false,
-        "onField" : false
-      }, {
-        "name" : "aws_api_key",
-        "description" : "Tells the service this field/object has access authorized by an API key.",
-        "locations" : [ "OBJECT", "FIELD_DEFINITION" ],
-        "args" : [ ],
-        "onOperation" : false,
-        "onFragment" : false,
-        "onField" : false
-      }, {
-=======
->>>>>>> main
         "name" : "aws_auth",
         "description" : "Directs the schema to enforce authorization on a field",
         "locations" : [ "FIELD_DEFINITION" ],
@@ -6162,55 +5240,6 @@
         "onFragment" : false,
         "onField" : false
       }, {
-<<<<<<< HEAD
-        "name" : "aws_oidc",
-        "description" : "Tells the service this field/object has access authorized by an OIDC token.",
-        "locations" : [ "OBJECT", "FIELD_DEFINITION" ],
-        "args" : [ ],
-        "onOperation" : false,
-        "onFragment" : false,
-        "onField" : false
-      }, {
-        "name" : "deprecated",
-        "description" : null,
-        "locations" : [ "FIELD_DEFINITION", "ENUM_VALUE" ],
-        "args" : [ {
-          "name" : "reason",
-          "description" : null,
-          "type" : {
-            "kind" : "SCALAR",
-            "name" : "String",
-            "ofType" : null
-          },
-          "defaultValue" : "\"No longer supported\""
-        } ],
-        "onOperation" : false,
-        "onFragment" : false,
-        "onField" : false
-      }, {
-        "name" : "aws_subscribe",
-        "description" : "Tells the service which mutation triggers this subscription.",
-        "locations" : [ "FIELD_DEFINITION" ],
-        "args" : [ {
-          "name" : "mutations",
-          "description" : "List of mutations which will trigger this subscription when they are called.",
-          "type" : {
-            "kind" : "LIST",
-            "name" : null,
-            "ofType" : {
-              "kind" : "SCALAR",
-              "name" : "String",
-              "ofType" : null
-            }
-          },
-          "defaultValue" : null
-        } ],
-        "onOperation" : false,
-        "onFragment" : false,
-        "onField" : false
-      }, {
-=======
->>>>>>> main
         "name" : "aws_publish",
         "description" : "Tells the service which subscriptions will be published to when this mutation is called. This directive is deprecated use @aws_susbscribe directive instead.",
         "locations" : [ "FIELD_DEFINITION" ],
@@ -6231,8 +5260,6 @@
         "onOperation" : false,
         "onFragment" : false,
         "onField" : false
-<<<<<<< HEAD
-=======
       }, {
         "name" : "aws_lambda",
         "description" : "Tells the service this field/object has access authorized by a Lambda Authorizer.",
@@ -6241,7 +5268,6 @@
         "onOperation" : false,
         "onFragment" : false,
         "onField" : false
->>>>>>> main
       } ]
     }
   }
