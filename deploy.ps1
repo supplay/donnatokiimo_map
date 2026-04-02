@@ -4,17 +4,22 @@ $root = "c:\Users\suppl\Desktop\donnatokiimo_map"
 $distPath = "$root\dist"
 $zipPath = "$root\deploy_fs.zip"
 
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-
+# Python を使って / 区切りの正しい zip を作成する
+# (PowerShell の Compress-Archive は \ 区切りになり Amplify の Linux サーバーが
+#  assets/ サブディレクトリを認識できず 404 になるため)
 if (Test-Path $zipPath) { Remove-Item $zipPath }
-
-$zip = [System.IO.Compression.ZipFile]::Open($zipPath, [System.IO.Compression.ZipArchiveMode]::Create)
-Get-ChildItem -Path $distPath -Recurse -File | ForEach-Object {
-    $entryName = $_.FullName.Substring("$distPath\".Length).Replace('\', '/')
-    [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $_.FullName, $entryName) | Out-Null
-}
-$zip.Dispose()
-Write-Host "zip created: $zipPath"
+python -c @"
+import zipfile, os
+dist = r'$distPath'
+out  = r'$zipPath'
+with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as zf:
+    for root, dirs, files in os.walk(dist):
+        for file in files:
+            abspath = os.path.join(root, file)
+            relpath = os.path.relpath(abspath, dist).replace(os.sep, '/')
+            zf.write(abspath, relpath)
+"@
+Write-Host "zip created: $zipPath ($([Math]::Round((Get-Item $zipPath).Length/1KB)) KB)"
 
 $r = aws amplify create-deployment --app-id $AppId --branch-name $Branch --region $Region | ConvertFrom-Json
 Write-Host "jobId: $($r.jobId)"
