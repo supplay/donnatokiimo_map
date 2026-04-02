@@ -8,17 +8,7 @@ $zipPath = "$root\deploy_fs.zip"
 # (PowerShell の Compress-Archive は \ 区切りになり Amplify の Linux サーバーが
 #  assets/ サブディレクトリを認識できず 404 になるため)
 if (Test-Path $zipPath) { Remove-Item $zipPath }
-python -c @"
-import zipfile, os
-dist = r'$distPath'
-out  = r'$zipPath'
-with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as zf:
-    for root, dirs, files in os.walk(dist):
-        for file in files:
-            abspath = os.path.join(root, file)
-            relpath = os.path.relpath(abspath, dist).replace(os.sep, '/')
-            zf.write(abspath, relpath)
-"@
+python "$root\make_zip.py"
 Write-Host "zip created: $zipPath ($([Math]::Round((Get-Item $zipPath).Length/1KB)) KB)"
 
 $r = aws amplify create-deployment --app-id $AppId --branch-name $Branch --region $Region | ConvertFrom-Json
