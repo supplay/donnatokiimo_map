@@ -52,16 +52,16 @@
     "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
       "Type": "String"
     },
-    "referencetotransformerrootstackShopNestedStackShopNestedStackResource86971CFCOutputstransformerrootstackShopQuerygetShoppostAuth0FunctionQuerygetShoppostAuth0FunctionAppSyncFunction6FAA0A8AFunctionId": {
+    "referencetotransformerrootstackStoreNestedStackStoreNestedStackResource158BCF63OutputstransformerrootstackStoreQuerygetStorepostAuth0FunctionQuerygetStorepostAuth0FunctionAppSyncFunction72FEF36FFunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackShopNestedStackShopNestedStackResource86971CFCOutputstransformerrootstackShopMutationcreateShopinit0FunctionMutationcreateShopinit0FunctionAppSyncFunction0AAABB9FFunctionId": {
+    "referencetotransformerrootstackStoreNestedStackStoreNestedStackResource158BCF63OutputstransformerrootstackStoreMutationcreateStoreinit0FunctionMutationcreateStoreinit0FunctionAppSyncFunction10A476FFFunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackShopNestedStackShopNestedStackResource86971CFCOutputstransformerrootstackShopMutationupdateShopinit0FunctionMutationupdateShopinit0FunctionAppSyncFunction184BEA30FunctionId": {
+    "referencetotransformerrootstackStoreNestedStackStoreNestedStackResource158BCF63OutputstransformerrootstackStoreMutationupdateStoreinit0FunctionMutationupdateStoreinit0FunctionAppSyncFunction4F9F2ED6FunctionId": {
       "Type": "String"
     },
-    "referencetotransformerrootstackShopNestedStackShopNestedStackResource86971CFCOutputstransformerrootstackShopSubscriptionOnCreateShopDataResolverFnSubscriptionOnCreateShopDataResolverFnAppSyncFunctionDFC345B8FunctionId": {
+    "referencetotransformerrootstackStoreNestedStackStoreNestedStackResource158BCF63OutputstransformerrootstackStoreSubscriptionOnCreateStoreDataResolverFnSubscriptionOnCreateStoreDataResolverFnAppSyncFunctionE0643BB6FunctionId": {
       "Type": "String"
     }
   },
@@ -460,7 +460,7 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackShopNestedStackShopNestedStackResource86971CFCOutputstransformerrootstackShopQuerygetShoppostAuth0FunctionQuerygetShoppostAuth0FunctionAppSyncFunction6FAA0A8AFunctionId"
+              "Ref": "referencetotransformerrootstackStoreNestedStackStoreNestedStackResource158BCF63OutputstransformerrootstackStoreQuerygetStorepostAuth0FunctionQuerygetStorepostAuth0FunctionAppSyncFunction72FEF36FFunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -482,7 +482,7 @@
               {
                 "Ref": "UserPointTable"
               },
-              "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"locationHandler-de\"]))\n$util.toJson({})"
+              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-northeast-1:2fb28ee4-bf7e-42d5-bd1f-1017ec1a2e24\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
             ]
           ]
         },
@@ -558,7 +558,7 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackShopNestedStackShopNestedStackResource86971CFCOutputstransformerrootstackShopQuerygetShoppostAuth0FunctionQuerygetShoppostAuth0FunctionAppSyncFunction6FAA0A8AFunctionId"
+              "Ref": "referencetotransformerrootstackStoreNestedStackStoreNestedStackResource158BCF63OutputstransformerrootstackStoreQuerygetStorepostAuth0FunctionQuerygetStorepostAuth0FunctionAppSyncFunction72FEF36FFunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -580,7 +580,7 @@
               {
                 "Ref": "UserPointTable"
               },
-              "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"locationHandler-de\"]))\n$util.toJson({})"
+              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-northeast-1:2fb28ee4-bf7e-42d5-bd1f-1017ec1a2e24\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
             ]
           ]
         },
@@ -680,7 +680,7 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackShopNestedStackShopNestedStackResource86971CFCOutputstransformerrootstackShopMutationcreateShopinit0FunctionMutationcreateShopinit0FunctionAppSyncFunction0AAABB9FFunctionId"
+              "Ref": "referencetotransformerrootstackStoreNestedStackStoreNestedStackResource158BCF63OutputstransformerrootstackStoreMutationcreateStoreinit0FunctionMutationcreateStoreinit0FunctionAppSyncFunction10A476FFFunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -689,7 +689,7 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackShopNestedStackShopNestedStackResource86971CFCOutputstransformerrootstackShopQuerygetShoppostAuth0FunctionQuerygetShoppostAuth0FunctionAppSyncFunction6FAA0A8AFunctionId"
+              "Ref": "referencetotransformerrootstackStoreNestedStackStoreNestedStackResource158BCF63OutputstransformerrootstackStoreQuerygetStorepostAuth0FunctionQuerygetStorepostAuth0FunctionAppSyncFunction72FEF36FFunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -711,7 +711,7 @@
               {
                 "Ref": "UserPointTable"
               },
-              "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"locationHandler-de\"]))\n$util.toJson({})"
+              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-northeast-1:2fb28ee4-bf7e-42d5-bd1f-1017ec1a2e24\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
             ]
           ]
         },
@@ -832,7 +832,7 @@
         "PipelineConfig": {
           "Functions": [
             {
-              "Ref": "referencetotransformerrootstackShopNestedStackShopNestedStackResource86971CFCOutputstransformerrootstackShopMutationupdateShopinit0FunctionMutationupdateShopinit0FunctionAppSyncFunction184BEA30FunctionId"
+              "Ref": "referencetotransformerrootstackStoreNestedStackStoreNestedStackResource158BCF63OutputstransformerrootstackStoreMutationupdateStoreinit0FunctionMutationupdateStoreinit0FunctionAppSyncFunction4F9F2ED6FunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -841,7 +841,7 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackShopNestedStackShopNestedStackResource86971CFCOutputstransformerrootstackShopQuerygetShoppostAuth0FunctionQuerygetShoppostAuth0FunctionAppSyncFunction6FAA0A8AFunctionId"
+              "Ref": "referencetotransformerrootstackStoreNestedStackStoreNestedStackResource158BCF63OutputstransformerrootstackStoreQuerygetStorepostAuth0FunctionQuerygetStorepostAuth0FunctionAppSyncFunction72FEF36FFunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -863,7 +863,7 @@
               {
                 "Ref": "UserPointTable"
               },
-              "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"locationHandler-de\"]))\n$util.toJson({})"
+              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-northeast-1:2fb28ee4-bf7e-42d5-bd1f-1017ec1a2e24\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
             ]
           ]
         },
@@ -990,7 +990,7 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackShopNestedStackShopNestedStackResource86971CFCOutputstransformerrootstackShopQuerygetShoppostAuth0FunctionQuerygetShoppostAuth0FunctionAppSyncFunction6FAA0A8AFunctionId"
+              "Ref": "referencetotransformerrootstackStoreNestedStackStoreNestedStackResource158BCF63OutputstransformerrootstackStoreQuerygetStorepostAuth0FunctionQuerygetStorepostAuth0FunctionAppSyncFunction72FEF36FFunctionId"
             },
             {
               "Fn::GetAtt": [
@@ -1012,7 +1012,7 @@
               {
                 "Ref": "UserPointTable"
               },
-              "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"locationHandler-de\"]))\n$util.toJson({})"
+              "\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-northeast-1:2fb28ee4-bf7e-42d5-bd1f-1017ec1a2e24\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
             ]
           ]
         },
@@ -1067,10 +1067,10 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackShopNestedStackShopNestedStackResource86971CFCOutputstransformerrootstackShopQuerygetShoppostAuth0FunctionQuerygetShoppostAuth0FunctionAppSyncFunction6FAA0A8AFunctionId"
+              "Ref": "referencetotransformerrootstackStoreNestedStackStoreNestedStackResource158BCF63OutputstransformerrootstackStoreQuerygetStorepostAuth0FunctionQuerygetStorepostAuth0FunctionAppSyncFunction72FEF36FFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackShopNestedStackShopNestedStackResource86971CFCOutputstransformerrootstackShopSubscriptionOnCreateShopDataResolverFnSubscriptionOnCreateShopDataResolverFnAppSyncFunctionDFC345B8FunctionId"
+              "Ref": "referencetotransformerrootstackStoreNestedStackStoreNestedStackResource158BCF63OutputstransformerrootstackStoreSubscriptionOnCreateStoreDataResolverFnSubscriptionOnCreateStoreDataResolverFnAppSyncFunctionE0643BB6FunctionId"
             }
           ]
         },
@@ -1082,7 +1082,7 @@
               {
                 "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
               },
-              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"adminRoles\", [\"locationHandler-de\"]))\n$util.toJson({})"
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-northeast-1:2fb28ee4-bf7e-42d5-bd1f-1017ec1a2e24\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
             ]
           ]
         },
@@ -1107,10 +1107,10 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackShopNestedStackShopNestedStackResource86971CFCOutputstransformerrootstackShopQuerygetShoppostAuth0FunctionQuerygetShoppostAuth0FunctionAppSyncFunction6FAA0A8AFunctionId"
+              "Ref": "referencetotransformerrootstackStoreNestedStackStoreNestedStackResource158BCF63OutputstransformerrootstackStoreQuerygetStorepostAuth0FunctionQuerygetStorepostAuth0FunctionAppSyncFunction72FEF36FFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackShopNestedStackShopNestedStackResource86971CFCOutputstransformerrootstackShopSubscriptionOnCreateShopDataResolverFnSubscriptionOnCreateShopDataResolverFnAppSyncFunctionDFC345B8FunctionId"
+              "Ref": "referencetotransformerrootstackStoreNestedStackStoreNestedStackResource158BCF63OutputstransformerrootstackStoreSubscriptionOnCreateStoreDataResolverFnSubscriptionOnCreateStoreDataResolverFnAppSyncFunctionE0643BB6FunctionId"
             }
           ]
         },
@@ -1122,7 +1122,7 @@
               {
                 "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
               },
-              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"adminRoles\", [\"locationHandler-de\"]))\n$util.toJson({})"
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-northeast-1:2fb28ee4-bf7e-42d5-bd1f-1017ec1a2e24\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
             ]
           ]
         },
@@ -1147,10 +1147,10 @@
               ]
             },
             {
-              "Ref": "referencetotransformerrootstackShopNestedStackShopNestedStackResource86971CFCOutputstransformerrootstackShopQuerygetShoppostAuth0FunctionQuerygetShoppostAuth0FunctionAppSyncFunction6FAA0A8AFunctionId"
+              "Ref": "referencetotransformerrootstackStoreNestedStackStoreNestedStackResource158BCF63OutputstransformerrootstackStoreQuerygetStorepostAuth0FunctionQuerygetStorepostAuth0FunctionAppSyncFunction72FEF36FFunctionId"
             },
             {
-              "Ref": "referencetotransformerrootstackShopNestedStackShopNestedStackResource86971CFCOutputstransformerrootstackShopSubscriptionOnCreateShopDataResolverFnSubscriptionOnCreateShopDataResolverFnAppSyncFunctionDFC345B8FunctionId"
+              "Ref": "referencetotransformerrootstackStoreNestedStackStoreNestedStackResource158BCF63OutputstransformerrootstackStoreSubscriptionOnCreateStoreDataResolverFnSubscriptionOnCreateStoreDataResolverFnAppSyncFunctionE0643BB6FunctionId"
             }
           ]
         },
@@ -1162,7 +1162,7 @@
               {
                 "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
               },
-              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"adminRoles\", [\"locationHandler-de\"]))\n$util.toJson({})"
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-northeast-1:2fb28ee4-bf7e-42d5-bd1f-1017ec1a2e24\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
             ]
           ]
         },
@@ -1241,7 +1241,7 @@
               {
                 "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
               },
-              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"adminRoles\", [\"locationHandler-de\"]))\n$util.toJson({})"
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ap-northeast-1:2fb28ee4-bf7e-42d5-bd1f-1017ec1a2e24\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
             ]
           ]
         },

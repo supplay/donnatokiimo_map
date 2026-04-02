@@ -63,7 +63,7 @@ const sweetPotatoIcon = L.divIcon({
   popupAnchor: [0, -18],
 });
 
-async function syncTracker(id, lat, lng, isOperating) {
+async function syncTracker(id, lat, lng, isOperating, forceEnter = false) {
   try {
     await fetch(TRACKER_SYNC_URL, {
       method: "POST",
@@ -77,6 +77,7 @@ async function syncTracker(id, lat, lng, isOperating) {
         lat,
         lng,
         isOperating,
+        forceEnter,
       }),
     });
   } catch (err) {
@@ -103,6 +104,7 @@ function AdminPage({ signOut }) {
   const lastStoreUpdateAtRef = useRef(0);
   const isSendingStoreUpdateRef = useRef(false);
   const trackingErrorShownRef = useRef(false);
+  const isFirstPositionRef = useRef(true);
 
   useEffect(() => {
     const manifestTag = document.querySelector('link[rel="manifest"]');
@@ -253,6 +255,7 @@ function AdminPage({ signOut }) {
     }
 
     trackingErrorShownRef.current = false;
+    isFirstPositionRef.current = true;
     // 1. 先にUIを即座に更新（体感速度アップ）
     setIsTracking(true);
     setStatusMessage("営業開始バイ！位置情報を取得中...");
@@ -291,8 +294,10 @@ function AdminPage({ signOut }) {
             variables: { input },
             authMode: "userPool",
           });
-          await syncTracker(VAN_ID, lat, lng, true);
-          console.log("店主位置を更新したバイ！");
+          const shouldForceEnter = isFirstPositionRef.current;
+          isFirstPositionRef.current = false;
+          await syncTracker(VAN_ID, lat, lng, true, shouldForceEnter);
+          console.log("店主位置を更新したバイ！" + (shouldForceEnter ? "（forceEnter）" : ""));
         } catch (err) {
           try {
             await client.graphql({
@@ -300,7 +305,9 @@ function AdminPage({ signOut }) {
               variables: { input },
               authMode: "userPool",
             });
-            await syncTracker(VAN_ID, lat, lng, true);
+            const shouldForceEnter = isFirstPositionRef.current;
+            isFirstPositionRef.current = false;
+            await syncTracker(VAN_ID, lat, lng, true, shouldForceEnter);
             console.log("Storeを新規作成したバイ！");
           } catch (createErr) {
             console.error("Store更新/作成エラー:", createErr);
@@ -310,6 +317,11 @@ function AdminPage({ signOut }) {
         }
       },
       (error) => {
+        if (error?.code === 3) {
+          // タイムアウトは一時的なもの。watchPosition は継続する
+          console.warn("位置取得タイムアウト（リトライ中）:", error);
+          return;
+        }
         console.error("位置取得エラー:", error);
 
         if (error?.code === 1 && !trackingErrorShownRef.current) {

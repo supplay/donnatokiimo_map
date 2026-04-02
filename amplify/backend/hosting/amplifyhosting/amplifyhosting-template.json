@@ -20,11 +20,16 @@
         },
         "manual"
       ]
+    },
+    "neverTrue": {
+      "Fn::Equals": ["a", "b"]
     }
   },
   "Resources": {
     "AmplifyBranch": {
-      "Condition": "isManual",
+      "Condition": "neverTrue",
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
       "Type": "AWS::Amplify::Branch",
       "Properties": {
         "BranchName": {

@@ -1,38 +1,30 @@
-﻿type Shop @model @auth(rules: [
-  # 1. ログインした店主（User Pool）は、データの作成・更新・削除が全部できるバイ！
-  { allow: groups, groups: ["Admins"], operations: [create, update, delete, read] },
-
-  # 1.5 認証済みユーザーも営業状態・現在地の更新をできるようにする
-  { allow: private, operations: [create, update, read] },
-
-  
-  # 2. 一般のお客さん（API Key）は、データを見る（Read）だけできるバイ！
-  { allow: public, provider: apiKey, operations: [read] }
-]) {
+type Store
+  @model
+  @auth(rules: [
+    { allow: public, operations: [read] },
+    { allow: private, operations: [read, create, update] }
+  ]) {
   id: ID!
-  name: String!
-  latitude: Float!
-  longitude: Float!
-  isOperating: Boolean!
-  lastUpdated: String
+  name: String
+  lat: Float
+  lng: Float
+  isOperating: Boolean
+  catchCopy: String
+  lastUpdated: AWSDateTime
 }
+
 type Config
   @model
   @auth(rules: [
-    # 店主（Admins）は全部OK
-    { allow: groups, groups: ["Admins"], operations: [create, update, delete, read] },
-
-    # ログイン者全員でもOK（必要なら残す）
-    { allow: private, operations: [create, update, delete, read] },
-
-    # お客さん（API Key）は読むだけ
-    { allow: public, provider: apiKey, operations: [read] }
+    { allow: public, operations: [read] },
+    { allow: private, operations: [read, create, update] }
   ]) {
   id: ID!
   menuJson: String
   scheduleJson: String
   dummy: String
 }
+
 type UserPoint
   @model
   @auth(rules: [{ allow: owner }]) {
@@ -43,14 +35,12 @@ type UserPoint
 type UserSubscription
   @model
   @auth(rules: [
-    # お客さん（API Key）も作成・更新できる
-    { allow: public, provider: apiKey, operations: [create, update, read] },
-    # ログインユーザーも作成・更新できる
-    { allow: private, operations: [create, update, delete, read] }
+    { allow: public, operations: [read, create, update, delete] },
+    { allow: private, operations: [read, create, update, delete] }
   ]) {
   id: ID!
   userId: String!
-  subscription: String
+  subscription: String!
   userLat: Float
   userLng: Float
 }

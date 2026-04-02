@@ -7,7 +7,7 @@
             "UserPoolId"
           ],
           "category": "auth",
-          "resourceName": "donnatokiimomapa632128a"
+          "resourceName": "donnatokiimomap7659bd90"
         }
       ],
       "output": {
@@ -15,9 +15,9 @@
           "additionalAuthenticationProviders": [
             {
               "apiKeyConfig": {
-                "apiKeyExpirationDate": "2027-03-03T02:52:50.969Z",
+                "apiKeyExpirationDate": "2027-03-26T05:27:35.650Z",
                 "apiKeyExpirationDays": 365,
-                "description": "public-read-access"
+                "description": "public-access"
               },
               "authenticationType": "API_KEY"
             }
@@ -25,31 +25,17 @@
           "defaultAuthentication": {
             "authenticationType": "AMAZON_COGNITO_USER_POOLS",
             "userPoolConfig": {
-              "userPoolId": "authdonnatokiimomapa632128a"
+              "userPoolId": "authdonnatokiimomap7659bd90"
             }
           }
         }
       },
       "providerPlugin": "awscloudformation",
       "service": "AppSync"
-    },
-    "locationApi": {
-      "dependsOn": [
-        {
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
-          "category": "function",
-          "resourceName": "locationHandler"
-        }
-      ],
-      "providerPlugin": "awscloudformation",
-      "service": "API Gateway"
     }
   },
   "auth": {
-    "donnatokiimomapa632128a": {
+    "donnatokiimomap7659bd90": {
       "customAuth": false,
       "dependsOn": [],
       "frontendAuthConfig": {
@@ -75,19 +61,9 @@
     }
   },
   "function": {
-    "locationHandler": {
+    "donnatokiimomap7946ee2e": {
       "build": true,
-      "dependsOn": [
-        {
-          "attributes": [
-            "GraphQLAPIIdOutput",
-            "GraphQLAPIEndpointOutput",
-            "GraphQLAPIKeyOutput"
-          ],
-          "category": "api",
-          "resourceName": "donnatokiimomap"
-        }
-      ],
+      "dependsOn": [],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     }
@@ -100,27 +76,19 @@
     }
   },
   "parameters": {
-    "AMPLIFY_function_locationHandler_deploymentBucketName": {
+    "AMPLIFY_function_donnatokiimomap7946ee2e_deploymentBucketName": {
       "usedBy": [
         {
           "category": "function",
-          "resourceName": "locationHandler"
+          "resourceName": "donnatokiimomap7946ee2e"
         }
       ]
     },
-    "AMPLIFY_function_locationHandler_s3Key": {
+    "AMPLIFY_function_donnatokiimomap7946ee2e_s3Key": {
       "usedBy": [
         {
           "category": "function",
-          "resourceName": "locationHandler"
-        }
-      ]
-    },
-    "AMPLIFY_function_locationHandler_trackerName": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "locationHandler"
+          "resourceName": "donnatokiimomap7946ee2e"
         }
       ]
     },
@@ -139,13 +107,6 @@
           "resourceName": "amplifyhosting"
         }
       ]
-    }
-  },
-  "storage": {
-    "s3948ce30c": {
-      "dependsOn": [],
-      "providerPlugin": "awscloudformation",
-      "service": "S3"
     }
   }
 }

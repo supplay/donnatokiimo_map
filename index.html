@@ -1,12 +1,9 @@
-<<<<<<< HEAD
-﻿<!doctype html>
-=======
 <!doctype html>
->>>>>>> main
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/icon-192.png" />
+    <link rel="shortcut icon" href="/icon-192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>どんなとき芋 巡り店</title>
 
@@ -25,8 +22,6 @@
     <meta name="apple-mobile-web-app-title" content="どんなとき芋" />
 
     <script>
-<<<<<<< HEAD
-      // loadイベントを待つことで、画面全体が準備できてから書き換える
       window.addEventListener("DOMContentLoaded", () => {
         var isAdminPath = window.location.pathname.startsWith("/kanri_aki");
         if (isAdminPath) {
@@ -40,20 +35,6 @@
           if (appleTitle) appleTitle.setAttribute("content", "芋・管理");
         }
       });
-=======
-      (function () {
-        var isAdminPath = window.location.pathname.startsWith("/kanri_aki");
-        var manifest = document.getElementById("app-manifest");
-        var themeColor = document.querySelector('meta[name="theme-color"]');
-        var appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
-
-        if (isAdminPath) {
-          if (manifest) manifest.setAttribute("href", "/manifest-admin.json");
-          if (themeColor) themeColor.setAttribute("content", "#2c3e50");
-          if (appleTitle) appleTitle.setAttribute("content", "芋・管理");
-        }
-      })();
->>>>>>> main
     </script>
 
     <style>
@@ -81,11 +62,7 @@
   <body>
     <div id="boot-splash"><img src="/splash.png" alt="どんなとき芋" /></div>
     <div id="root"></div>
-<<<<<<< HEAD
     <script type="module" src="/src/main.jsx"></script>
-=======
-    <script type="module" src="./src/main.jsx"></script>
->>>>>>> main
     <script>
       window.addEventListener("load", () => {
         const splash = document.getElementById("boot-splash");
@@ -95,8 +72,4 @@
       });
     </script>
   </body>
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> main

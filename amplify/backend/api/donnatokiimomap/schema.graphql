@@ -35,8 +35,8 @@ type UserPoint
 type UserSubscription
   @model
   @auth(rules: [
-    { allow: public, operations: [create, update] },
-    { allow: private, operations: [read, create, update] }
+    { allow: public, operations: [read, create, update, delete] },
+    { allow: private, operations: [read, create, update, delete] }
   ]) {
   id: ID!
   userId: String!

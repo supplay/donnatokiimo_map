@@ -35,7 +35,10 @@ export default function App() {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistrations().then((regs) => {
         regs.forEach((r) => {
-          if (r.active?.scriptURL?.includes("/sw.js")) {
+          const url = r.active?.scriptURL || r.installing?.scriptURL || "";
+          // "/sw.js" のみ削除。"/firebase-messaging-sw.js" は含まれるが削除しない。
+          // ※ endsWith を使って厳密一致させる
+          if (url.endsWith("/sw.js")) {
             r.unregister();
             console.log("古い sw.js を登録解除したバイ！");
           }
@@ -56,10 +59,10 @@ export default function App() {
       const body = notif.body || data.body || "";
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker.ready
-          .then((reg) => reg.showNotification(title, { body, icon: "/favicon.ico" }))
+          .then((reg) => reg.showNotification(title, { body, icon: "https://dev.d3nlv05moq0vc5.amplifyapp.com/icon-192.png" }))
           .catch(() => {
             if (Notification.permission === "granted") {
-              new Notification(title, { body, icon: "/favicon.ico" });
+              new Notification(title, { body, icon: "https://dev.d3nlv05moq0vc5.amplifyapp.com/icon-192.png" });
             }
           });
       }

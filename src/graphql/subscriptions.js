@@ -46,7 +46,93 @@ export const onDeleteUserPoint = /* GraphQL */ `
     }
   }
 `;
-<<<<<<< HEAD
+export const onCreateStore = /* GraphQL */ `
+  subscription OnCreateStore($filter: ModelSubscriptionStoreFilterInput) {
+    onCreateStore(filter: $filter) {
+      id
+      name
+      lat
+      lng
+      isOperating
+      catchCopy
+      lastUpdated
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateStore = /* GraphQL */ `
+  subscription OnUpdateStore($filter: ModelSubscriptionStoreFilterInput) {
+    onUpdateStore(filter: $filter) {
+      id
+      name
+      lat
+      lng
+      isOperating
+      catchCopy
+      lastUpdated
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteStore = /* GraphQL */ `
+  subscription OnDeleteStore($filter: ModelSubscriptionStoreFilterInput) {
+    onDeleteStore(filter: $filter) {
+      id
+      name
+      lat
+      lng
+      isOperating
+      catchCopy
+      lastUpdated
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateConfig = /* GraphQL */ `
+  subscription OnCreateConfig($filter: ModelSubscriptionConfigFilterInput) {
+    onCreateConfig(filter: $filter) {
+      id
+      menuJson
+      scheduleJson
+      dummy
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateConfig = /* GraphQL */ `
+  subscription OnUpdateConfig($filter: ModelSubscriptionConfigFilterInput) {
+    onUpdateConfig(filter: $filter) {
+      id
+      menuJson
+      scheduleJson
+      dummy
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteConfig = /* GraphQL */ `
+  subscription OnDeleteConfig($filter: ModelSubscriptionConfigFilterInput) {
+    onDeleteConfig(filter: $filter) {
+      id
+      menuJson
+      scheduleJson
+      dummy
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
 export const onCreateUserSubscription = /* GraphQL */ `
   subscription OnCreateUserSubscription(
     $filter: ModelSubscriptionUserSubscriptionFilterInput
@@ -89,125 +175,6 @@ export const onDeleteUserSubscription = /* GraphQL */ `
       subscription
       userLat
       userLng
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onCreateStore = /* GraphQL */ `
-  subscription OnCreateStore($filter: ModelSubscriptionStoreFilterInput) {
-    onCreateStore(filter: $filter) {
-      id
-      name
-      lat
-      lng
-      isOperating
-      catchCopy
-=======
-export const onCreateShop = /* GraphQL */ `
-  subscription OnCreateShop($filter: ModelSubscriptionShopFilterInput) {
-    onCreateShop(filter: $filter) {
-      id
-      name
-      latitude
-      longitude
-      isOperating
->>>>>>> main
-      lastUpdated
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-<<<<<<< HEAD
-export const onUpdateStore = /* GraphQL */ `
-  subscription OnUpdateStore($filter: ModelSubscriptionStoreFilterInput) {
-    onUpdateStore(filter: $filter) {
-      id
-      name
-      lat
-      lng
-      isOperating
-      catchCopy
-=======
-export const onUpdateShop = /* GraphQL */ `
-  subscription OnUpdateShop($filter: ModelSubscriptionShopFilterInput) {
-    onUpdateShop(filter: $filter) {
-      id
-      name
-      latitude
-      longitude
-      isOperating
->>>>>>> main
-      lastUpdated
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-<<<<<<< HEAD
-export const onDeleteStore = /* GraphQL */ `
-  subscription OnDeleteStore($filter: ModelSubscriptionStoreFilterInput) {
-    onDeleteStore(filter: $filter) {
-      id
-      name
-      lat
-      lng
-      isOperating
-      catchCopy
-=======
-export const onDeleteShop = /* GraphQL */ `
-  subscription OnDeleteShop($filter: ModelSubscriptionShopFilterInput) {
-    onDeleteShop(filter: $filter) {
-      id
-      name
-      latitude
-      longitude
-      isOperating
->>>>>>> main
-      lastUpdated
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onCreateConfig = /* GraphQL */ `
-  subscription OnCreateConfig($filter: ModelSubscriptionConfigFilterInput) {
-    onCreateConfig(filter: $filter) {
-      id
-      menuJson
-      scheduleJson
-      dummy
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onUpdateConfig = /* GraphQL */ `
-  subscription OnUpdateConfig($filter: ModelSubscriptionConfigFilterInput) {
-    onUpdateConfig(filter: $filter) {
-      id
-      menuJson
-      scheduleJson
-      dummy
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onDeleteConfig = /* GraphQL */ `
-  subscription OnDeleteConfig($filter: ModelSubscriptionConfigFilterInput) {
-    onDeleteConfig(filter: $filter) {
-      id
-      menuJson
-      scheduleJson
-      dummy
       createdAt
       updatedAt
       __typename

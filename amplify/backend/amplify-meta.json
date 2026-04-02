@@ -1,15 +1,15 @@
 {
   "providers": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-donnatokiimomap-de-23f9e-authRole",
-      "UnauthRoleArn": "arn:aws:iam::209479306837:role/amplify-donnatokiimomap-de-23f9e-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::209479306837:role/amplify-donnatokiimomap-de-23f9e-authRole",
+      "AuthRoleName": "amplify-donnatokiimomap-dev-83b9b-authRole",
+      "UnauthRoleArn": "arn:aws:iam::209479306837:role/amplify-donnatokiimomap-dev-83b9b-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::209479306837:role/amplify-donnatokiimomap-dev-83b9b-authRole",
       "Region": "ap-northeast-1",
-      "DeploymentBucketName": "amplify-donnatokiimomap-de-23f9e-deployment",
-      "UnauthRoleName": "amplify-donnatokiimomap-de-23f9e-unauthRole",
-      "StackName": "amplify-donnatokiimomap-de-23f9e",
-      "StackId": "arn:aws:cloudformation:ap-northeast-1:209479306837:stack/amplify-donnatokiimomap-de-23f9e/8d4b21b0-264b-11f1-93b9-06a3d8c34f91",
-      "AmplifyAppId": "d1s6z8mw18wui2"
+      "DeploymentBucketName": "amplify-donnatokiimomap-dev-83b9b-deployment",
+      "UnauthRoleName": "amplify-donnatokiimomap-dev-83b9b-unauthRole",
+      "StackName": "amplify-donnatokiimomap-dev-83b9b",
+      "StackId": "arn:aws:cloudformation:ap-northeast-1:209479306837:stack/amplify-donnatokiimomap-dev-83b9b/32dc60d0-274b-11f1-ab4c-0a7b4c22c3df",
+      "AmplifyAppId": "d3nlv05moq0vc5"
     }
   },
   "api": {
@@ -20,7 +20,7 @@
             "UserPoolId"
           ],
           "category": "auth",
-          "resourceName": "donnatokiimomapa632128a"
+          "resourceName": "donnatokiimomap7659bd90"
         }
       ],
       "output": {
@@ -38,49 +38,26 @@
           "defaultAuthentication": {
             "authenticationType": "AMAZON_COGNITO_USER_POOLS",
             "userPoolConfig": {
-              "userPoolId": "authdonnatokiimomapa632128a"
+              "userPoolId": "authdonnatokiimomap7659bd90"
             }
           }
         },
-        "GraphQLAPIIdOutput": "y37e7hal6vdjbccnwnccmeygze",
-        "GraphQLAPIEndpointOutput": "https://5lnk5kjxl5gzteggpytjahlimy.appsync-api.ap-northeast-1.amazonaws.com/graphql",
-        "GraphQLAPIKeyOutput": "da2-impbcyh2f5hg3dnr52xd24vkbi"
+        "GraphQLAPIIdOutput": "am4o5w4fdfbiflmztjnv4saobi",
+        "GraphQLAPIEndpointOutput": "https://fliomdzyc5erhbr35jafl6o4q4.appsync-api.ap-northeast-1.amazonaws.com/graphql",
+        "GraphQLAPIKeyOutput": "da2-g7dzoznkhjfzzhk46z6xgz4sfy"
       },
       "providerPlugin": "awscloudformation",
       "service": "AppSync",
-      "lastPushTimeStamp": "2026-03-23T05:39:32.455Z",
+      "lastPushTimeStamp": "2026-04-02T03:49:43.908Z",
       "providerMetadata": {
-        "s3TemplateURL": "https://s3.amazonaws.com/amplify-donnatokiimomap-de-23f9e-deployment/amplify-cfn-templates/api/cloudformation-template.json",
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-donnatokiimomap-dev-83b9b-deployment/amplify-cfn-templates/api/cloudformation-template.json",
         "logicalId": "apidonnatokiimomap"
-      }
-    },
-    "locationApi": {
-      "dependsOn": [
-        {
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
-          "category": "function",
-          "resourceName": "locationHandler"
-        }
-      ],
-      "providerPlugin": "awscloudformation",
-      "service": "API Gateway",
-      "output": {
-        "ApiName": "locationApi",
-        "RootUrl": "https://gnzjh4wmt7.execute-api.ap-northeast-1.amazonaws.com/de",
-        "ApiId": "gnzjh4wmt7"
       },
-      "lastPushTimeStamp": "2026-03-23T05:39:32.458Z",
-      "providerMetadata": {
-        "s3TemplateURL": "https://s3.amazonaws.com/amplify-donnatokiimomap-de-23f9e-deployment/amplify-cfn-templates/api/locationApi-cloudformation-template.json",
-        "logicalId": "apilocationApi"
-      }
+      "lastPushDirHash": "SxVki/hlsA/0FvZ+Kj041ZxNNs0="
     }
   },
   "auth": {
-    "donnatokiimomapa632128a": {
+    "donnatokiimomap7659bd90": {
       "customAuth": false,
       "dependsOn": [],
       "frontendAuthConfig": {
@@ -104,82 +81,35 @@
       "providerPlugin": "awscloudformation",
       "service": "Cognito",
       "output": {
-        "UserPoolId": "ap-northeast-1_R75j9TRkg",
-        "AppClientIDWeb": "48nerje8g2m47qrkj72o10g884",
-        "AppClientID": "46bg6orte0ji9scq2ftn9g1mmu",
-        "IdentityPoolId": "ap-northeast-1:2631ee89-fe7b-42f1-9313-33829315611e",
-        "UserPoolArn": "arn:aws:cognito-idp:ap-northeast-1:209479306837:userpool/ap-northeast-1_R75j9TRkg",
-        "IdentityPoolName": "donnatokiimomapa632128a_identitypool_a632128a__de",
-        "UserPoolName": "donnatokiimomapa632128a_userpool_a632128a"
+        "UserPoolId": "ap-northeast-1_R0DgmzeCE",
+        "AppClientIDWeb": "4huo2hbm1hcmtd0f2a822qd3a7",
+        "AppClientID": "6v5uo6pb1uns7kv4qqmtnk4hlq",
+        "IdentityPoolId": "ap-northeast-1:2fb28ee4-bf7e-42d5-bd1f-1017ec1a2e24",
+        "UserPoolArn": "arn:aws:cognito-idp:ap-northeast-1:209479306837:userpool/ap-northeast-1_R0DgmzeCE",
+        "IdentityPoolName": "donnatokiimomap7659bd90_identitypool_7659bd90__dev",
+        "UserPoolName": "donnatokiimomap7659bd90_userpool_7659bd90"
       },
-      "lastPushTimeStamp": "2026-03-23T05:39:32.462Z",
+      "lastPushTimeStamp": "2026-04-02T03:49:43.913Z",
       "providerMetadata": {
-        "s3TemplateURL": "https://s3.amazonaws.com/amplify-donnatokiimomap-de-23f9e-deployment/amplify-cfn-templates/auth/donnatokiimomapa632128a-cloudformation-template.json",
-        "logicalId": "authdonnatokiimomapa632128a"
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-donnatokiimomap-dev-83b9b-deployment/amplify-cfn-templates/auth/donnatokiimomap7659bd90-cloudformation-template.json",
+        "logicalId": "authdonnatokiimomap7659bd90"
       }
     }
   },
-  "function": {
-    "locationHandler": {
-      "build": true,
-      "dependsOn": [
-        {
-          "attributes": [
-            "GraphQLAPIIdOutput",
-            "GraphQLAPIEndpointOutput",
-            "GraphQLAPIKeyOutput"
-          ],
-          "category": "api",
-          "resourceName": "donnatokiimomap"
-        }
-      ],
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "output": {
-        "LambdaExecutionRoleArn": "arn:aws:iam::209479306837:role/donnatokiimomapLambdaRole4d3f95dd-de",
-        "Region": "ap-northeast-1",
-        "Arn": "arn:aws:lambda:ap-northeast-1:209479306837:function:locationHandler-de",
-        "Name": "locationHandler-de",
-        "LambdaExecutionRole": "donnatokiimomapLambdaRole4d3f95dd-de"
-      },
-      "lastPushTimeStamp": "2026-03-23T05:39:32.465Z",
-      "providerMetadata": {
-        "s3TemplateURL": "https://s3.amazonaws.com/amplify-donnatokiimomap-de-23f9e-deployment/amplify-cfn-templates/function/locationHandler-cloudformation-template.json",
-        "logicalId": "functionlocationHandler"
-      },
-      "s3Bucket": {
-        "deploymentBucketName": "amplify-donnatokiimomap-de-23f9e-deployment",
-        "s3Key": "amplify-builds/locationHandler-676268594d6677336366-build.zip"
-      }
-    }
-  },
+  "function": {},
   "hosting": {
     "amplifyhosting": {
       "providerPlugin": "awscloudformation",
       "service": "amplifyhosting",
       "type": "manual",
       "output": {},
-      "lastPushTimeStamp": "2026-03-23T05:39:32.468Z",
+      "lastPushTimeStamp": "2026-04-02T03:49:43.917Z",
       "providerMetadata": {
-        "s3TemplateURL": "https://s3.amazonaws.com/amplify-donnatokiimomap-de-23f9e-deployment/amplify-cfn-templates/hosting/amplifyhosting-template.json",
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-donnatokiimomap-dev-83b9b-deployment/amplify-cfn-templates/hosting/amplifyhosting-template.json",
         "logicalId": "hostingamplifyhosting"
-      }
+      },
+      "lastPushDirHash": "OGgSe6YaEeHgHHkAxUrxaeRMNcA="
     }
   },
-  "storage": {
-    "s3948ce30c": {
-      "dependsOn": [],
-      "providerPlugin": "awscloudformation",
-      "service": "S3",
-      "output": {
-        "BucketName": "donnatokiimomap15b93e887cea408581f9179079a6963223f9e-de",
-        "Region": "ap-northeast-1"
-      },
-      "lastPushTimeStamp": "2026-03-23T05:39:35.188Z",
-      "providerMetadata": {
-        "s3TemplateURL": "https://s3.amazonaws.com/amplify-donnatokiimomap-de-23f9e-deployment/amplify-cfn-templates/storage/cloudformation-template.json",
-        "logicalId": "storages3948ce30c"
-      }
-    }
-  }
+  "storage": {}
 }

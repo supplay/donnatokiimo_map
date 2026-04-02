@@ -7,11 +7,7 @@
 
 .logo {
   height: 6em;
-<<<<<<< HEAD
   padding: 1.5em;
-=======
-  padding: 1.5rem;
->>>>>>> main
   will-change: filter;
   transition: filter 300ms;
 }
@@ -43,8 +39,4 @@
 
 .read-the-docs {
   color: #888;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> main

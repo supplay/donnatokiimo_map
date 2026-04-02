@@ -1,10 +1,11 @@
-type Shop @aws_api_key @aws_cognito_user_pools {
+type Store @aws_api_key @aws_cognito_user_pools {
   id: ID!
-  name: String!
-  latitude: Float!
-  longitude: Float!
-  isOperating: Boolean!
-  lastUpdated: String
+  name: String
+  lat: Float
+  lng: Float
+  isOperating: Boolean
+  catchCopy: String
+  lastUpdated: AWSDateTime
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -29,7 +30,7 @@ type UserPoint {
 type UserSubscription @aws_api_key @aws_cognito_user_pools {
   id: ID!
   userId: String!
-  subscription: String
+  subscription: String!
   userLat: Float
   userLng: Float
   createdAt: AWSDateTime!
@@ -186,106 +187,111 @@ enum ModelSortDirection {
   DESC
 }
 
-type ModelShopConnection @aws_api_key @aws_cognito_user_pools {
-  items: [Shop]!
+type ModelStoreConnection @aws_api_key @aws_cognito_user_pools {
+  items: [Store]!
   nextToken: String
 }
 
-input ModelShopFilterInput {
+input ModelStoreFilterInput {
   id: ModelIDInput
   name: ModelStringInput
-  latitude: ModelFloatInput
-  longitude: ModelFloatInput
+  lat: ModelFloatInput
+  lng: ModelFloatInput
   isOperating: ModelBooleanInput
+  catchCopy: ModelStringInput
   lastUpdated: ModelStringInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
-  and: [ModelShopFilterInput]
-  or: [ModelShopFilterInput]
-  not: ModelShopFilterInput
+  and: [ModelStoreFilterInput]
+  or: [ModelStoreFilterInput]
+  not: ModelStoreFilterInput
 }
 
 type Query {
   getUserPoint(id: ID!): UserPoint
   listUserPoints(filter: ModelUserPointFilterInput, limit: Int, nextToken: String): ModelUserPointConnection
-  getShop(id: ID!): Shop @aws_api_key @aws_cognito_user_pools
-  listShops(filter: ModelShopFilterInput, limit: Int, nextToken: String): ModelShopConnection @aws_api_key @aws_cognito_user_pools
+  getStore(id: ID!): Store @aws_api_key @aws_cognito_user_pools
+  listStores(filter: ModelStoreFilterInput, limit: Int, nextToken: String): ModelStoreConnection @aws_api_key @aws_cognito_user_pools
   getConfig(id: ID!): Config @aws_api_key @aws_cognito_user_pools
   listConfigs(filter: ModelConfigFilterInput, limit: Int, nextToken: String): ModelConfigConnection @aws_api_key @aws_cognito_user_pools
   getUserSubscription(id: ID!): UserSubscription @aws_api_key @aws_cognito_user_pools
   listUserSubscriptions(filter: ModelUserSubscriptionFilterInput, limit: Int, nextToken: String): ModelUserSubscriptionConnection @aws_api_key @aws_cognito_user_pools
 }
 
-input ModelShopConditionInput {
+input ModelStoreConditionInput {
   name: ModelStringInput
-  latitude: ModelFloatInput
-  longitude: ModelFloatInput
+  lat: ModelFloatInput
+  lng: ModelFloatInput
   isOperating: ModelBooleanInput
+  catchCopy: ModelStringInput
   lastUpdated: ModelStringInput
-  and: [ModelShopConditionInput]
-  or: [ModelShopConditionInput]
-  not: ModelShopConditionInput
+  and: [ModelStoreConditionInput]
+  or: [ModelStoreConditionInput]
+  not: ModelStoreConditionInput
   createdAt: ModelStringInput
   updatedAt: ModelStringInput
 }
 
-input CreateShopInput {
+input CreateStoreInput {
   id: ID
-  name: String!
-  latitude: Float!
-  longitude: Float!
-  isOperating: Boolean!
-  lastUpdated: String
+  name: String
+  lat: Float
+  lng: Float
+  isOperating: Boolean
+  catchCopy: String
+  lastUpdated: AWSDateTime
 }
 
-input UpdateShopInput {
+input UpdateStoreInput {
   id: ID!
   name: String
-  latitude: Float
-  longitude: Float
+  lat: Float
+  lng: Float
   isOperating: Boolean
-  lastUpdated: String
+  catchCopy: String
+  lastUpdated: AWSDateTime
 }
 
-input DeleteShopInput {
+input DeleteStoreInput {
   id: ID!
 }
 
 type Mutation {
-  createShop(input: CreateShopInput!, condition: ModelShopConditionInput): Shop
-  updateShop(input: UpdateShopInput!, condition: ModelShopConditionInput): Shop
-  deleteShop(input: DeleteShopInput!, condition: ModelShopConditionInput): Shop
+  createStore(input: CreateStoreInput!, condition: ModelStoreConditionInput): Store
+  updateStore(input: UpdateStoreInput!, condition: ModelStoreConditionInput): Store
+  deleteStore(input: DeleteStoreInput!, condition: ModelStoreConditionInput): Store
   createConfig(input: CreateConfigInput!, condition: ModelConfigConditionInput): Config
   updateConfig(input: UpdateConfigInput!, condition: ModelConfigConditionInput): Config
   deleteConfig(input: DeleteConfigInput!, condition: ModelConfigConditionInput): Config
   createUserPoint(input: CreateUserPointInput!, condition: ModelUserPointConditionInput): UserPoint
   updateUserPoint(input: UpdateUserPointInput!, condition: ModelUserPointConditionInput): UserPoint
   deleteUserPoint(input: DeleteUserPointInput!, condition: ModelUserPointConditionInput): UserPoint
-  deleteUserSubscription(input: DeleteUserSubscriptionInput!, condition: ModelUserSubscriptionConditionInput): UserSubscription
   createUserSubscription(input: CreateUserSubscriptionInput!, condition: ModelUserSubscriptionConditionInput): UserSubscription @aws_api_key @aws_cognito_user_pools
   updateUserSubscription(input: UpdateUserSubscriptionInput!, condition: ModelUserSubscriptionConditionInput): UserSubscription @aws_api_key @aws_cognito_user_pools
+  deleteUserSubscription(input: DeleteUserSubscriptionInput!, condition: ModelUserSubscriptionConditionInput): UserSubscription @aws_api_key @aws_cognito_user_pools
 }
 
-input ModelSubscriptionShopFilterInput {
+input ModelSubscriptionStoreFilterInput {
   id: ModelSubscriptionIDInput
   name: ModelSubscriptionStringInput
-  latitude: ModelSubscriptionFloatInput
-  longitude: ModelSubscriptionFloatInput
+  lat: ModelSubscriptionFloatInput
+  lng: ModelSubscriptionFloatInput
   isOperating: ModelSubscriptionBooleanInput
+  catchCopy: ModelSubscriptionStringInput
   lastUpdated: ModelSubscriptionStringInput
   createdAt: ModelSubscriptionStringInput
   updatedAt: ModelSubscriptionStringInput
-  and: [ModelSubscriptionShopFilterInput]
-  or: [ModelSubscriptionShopFilterInput]
+  and: [ModelSubscriptionStoreFilterInput]
+  or: [ModelSubscriptionStoreFilterInput]
 }
 
 type Subscription {
   onCreateUserPoint(filter: ModelSubscriptionUserPointFilterInput, owner: String): UserPoint @aws_subscribe(mutations: ["createUserPoint"])
   onUpdateUserPoint(filter: ModelSubscriptionUserPointFilterInput, owner: String): UserPoint @aws_subscribe(mutations: ["updateUserPoint"])
   onDeleteUserPoint(filter: ModelSubscriptionUserPointFilterInput, owner: String): UserPoint @aws_subscribe(mutations: ["deleteUserPoint"])
-  onCreateShop(filter: ModelSubscriptionShopFilterInput): Shop @aws_subscribe(mutations: ["createShop"]) @aws_api_key @aws_cognito_user_pools
-  onUpdateShop(filter: ModelSubscriptionShopFilterInput): Shop @aws_subscribe(mutations: ["updateShop"]) @aws_api_key @aws_cognito_user_pools
-  onDeleteShop(filter: ModelSubscriptionShopFilterInput): Shop @aws_subscribe(mutations: ["deleteShop"]) @aws_api_key @aws_cognito_user_pools
+  onCreateStore(filter: ModelSubscriptionStoreFilterInput): Store @aws_subscribe(mutations: ["createStore"]) @aws_api_key @aws_cognito_user_pools
+  onUpdateStore(filter: ModelSubscriptionStoreFilterInput): Store @aws_subscribe(mutations: ["updateStore"]) @aws_api_key @aws_cognito_user_pools
+  onDeleteStore(filter: ModelSubscriptionStoreFilterInput): Store @aws_subscribe(mutations: ["deleteStore"]) @aws_api_key @aws_cognito_user_pools
   onCreateConfig(filter: ModelSubscriptionConfigFilterInput): Config @aws_subscribe(mutations: ["createConfig"]) @aws_api_key @aws_cognito_user_pools
   onUpdateConfig(filter: ModelSubscriptionConfigFilterInput): Config @aws_subscribe(mutations: ["updateConfig"]) @aws_api_key @aws_cognito_user_pools
   onDeleteConfig(filter: ModelSubscriptionConfigFilterInput): Config @aws_subscribe(mutations: ["deleteConfig"]) @aws_api_key @aws_cognito_user_pools
@@ -434,7 +440,7 @@ input ModelUserSubscriptionConditionInput {
 input CreateUserSubscriptionInput {
   id: ID
   userId: String!
-  subscription: String
+  subscription: String!
   userLat: Float
   userLng: Float
 }

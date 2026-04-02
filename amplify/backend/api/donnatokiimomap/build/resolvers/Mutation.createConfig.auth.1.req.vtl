@@ -8,20 +8,6 @@ $util.unauthorized()
 #end
 #if( $util.authType() == "User Pool Authorization" )
   #set( $isAuthorized = true )
-  #if( !$isAuthorized )
-    #set( $staticGroupRoles = [{"claim":"cognito:groups","entity":"Admins","allowedFields":["id","menuJson","scheduleJson","dummy"],"isAuthorizedOnAllFields":true}] )
-    #foreach( $groupRole in $staticGroupRoles )
-      #set( $groupsInToken = $util.defaultIfNull($ctx.identity.claims.get($groupRole.claim), []) )
-      #if( $groupsInToken.contains($groupRole.entity) )
-        #if( $groupRole.isAuthorizedOnAllFields )
-          #set( $isAuthorized = true )
-          #break
-        #else
-          $util.qr($allowedFields.addAll($groupRole.allowedFields))
-        #end
-      #end
-    #end
-  #end
 #end
 #if( !$isAuthorized && $allowedFields.isEmpty() )
 $util.unauthorized()
