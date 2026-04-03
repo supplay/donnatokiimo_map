@@ -1,7 +1,7 @@
 {
   "short_name": "芋・管理",
   "name": "どんなとき芋 管理画面",
- "icons": [
+  "icons": [
     {
       "src": "/icon-512.png",
       "type": "image/png",
@@ -18,16 +18,16 @@
   "start_url": "/kanri_aki",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#2c3e50",  
+  "background_color": "#2c3e50",
   "theme_color": "#2c3e50",
   "description": "どんなとき芋 巡り店 管理者専用アプリ",
   "lang": "ja",
-"splash_pages": null,
-"screenshots": [
-  {
-    "src": "/splash.png",
-    "type": "image/png",
-    "sizes": "1284x2778"
-  }
-]
+  "splash_pages": null,
+  "screenshots": [
+    {
+      "src": "/splash.png",
+      "type": "image/png",
+      "sizes": "1284x2778"
+    }
+  ]
 }

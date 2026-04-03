@@ -1,0 +1,1 @@
+{"source":["aws.geo"],"detail-type":["Location Geofence Event"],"detail":{"EventType":["ENTER"],"GeofenceId":[{"prefix":"GF_"}]}}

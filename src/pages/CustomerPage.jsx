@@ -23,7 +23,8 @@ import { messaging, getToken } from "../firebase.js";
 // Firebase コンソール > プロジェクト設定 > Cloud Messaging > ウェブプッシュ証明書 の鍵ペア
 const FCM_VAPID_KEY = "BN2AwI13slGtx56om9P68uGilFCIkb8B82yHzKIPYsTD8YLc2N9OdDhTF0W7LhvoShJQr0xaaaieCSOEt30bRso";
 const AWS_API_URL = "https://a79c454sgh.execute-api.us-east-1.amazonaws.com/v1/tokens";
-const AI_GENERATOR_URL = "https://poct5tswijvelf635tfjso5bum0dppiw.lambda-url.ap-northeast-1.on.aws/";
+const AI_GENERATOR_URL = "https://ih62xeb603.execute-api.ap-northeast-1.amazonaws.com/generate";
+const SEND_NOTIFICATION_URL = "https://a6fcbrvrm4vc3fruetu5y2zywa0fzqll.lambda-url.ap-northeast-1.on.aws/";
 const VAN_ID = "KEI-VAN-001";
 const CONFIG_ID = "GLOBAL-CONFIG";
 
@@ -57,6 +58,32 @@ const CREATE_USER_SUBSCRIPTION = /* GraphQL */ `
       subscription
       userLat
       userLng
+    }
+  }
+`;
+
+const DELETE_USER_SUBSCRIPTION = /* GraphQL */ `
+  mutation DeleteUserSubscription($input: DeleteUserSubscriptionInput!) {
+    deleteUserSubscription(input: $input) {
+      id
+    }
+  }
+`;
+
+const LIST_USER_SUBSCRIPTIONS_BY_TOKEN = /* GraphQL */ `
+  query ListUserSubscriptions($filter: ModelUserSubscriptionFilterInput, $limit: Int) {
+    listUserSubscriptions(filter: $filter, limit: $limit) {
+      items {
+        id
+      }
+    }
+  }
+`;
+
+const GET_USER_SUBSCRIPTION = /* GraphQL */ `
+  query GetUserSubscription($id: ID!) {
+    getUserSubscription(id: $id) {
+      id
     }
   }
 `;
@@ -210,12 +237,34 @@ export default function CustomerPage() {
   const [showNotifyInfo, setShowNotifyInfo] = useState(false);
   const [notifyStatus, setNotifyStatus] = useState(null);
 
+  // iOS Safari (非PWA) のときホーム画面追加バナーを表示
+  const isIOSSafari = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+  const showIOSBanner = isIOSSafari && !isStandalone;
+
   const lastToggleAtRef = useRef(0);
   const isMountedRef = useRef(true);
   const userSubscriptionIdRef = useRef(null);
+  const notifyTimerRef = useRef(null);
+
+  // マウント時: 常にOFFから始める。前回のDynamoDB登録エントリを削除する
+  useEffect(() => {
+    const savedId = localStorage.getItem("fcmSubscriptionId");
+    localStorage.removeItem("fcmSubscriptionId");
+    if (!savedId) return;
+    client
+      .graphql({ query: DELETE_USER_SUBSCRIPTION, variables: { input: { id: savedId } }, authMode: "apiKey" })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     userSubscriptionIdRef.current = userSubscriptionId;
+    if (userSubscriptionId) {
+      localStorage.setItem("fcmSubscriptionId", userSubscriptionId);
+    } else {
+      localStorage.removeItem("fcmSubscriptionId");
+    }
   }, [userSubscriptionId]);
 
   const handleNotifyButtonPress = (e) => {
@@ -227,15 +276,35 @@ export default function CustomerPage() {
 
   const toggleGeofence = async () => {
     if (isGeofenceOn) {
+      const subId = userSubscriptionIdRef.current;
       setIsGeofenceOn(false);
+      setUserSubscriptionId(null);
       setNotifyStatus("通知OFFにしたバイ！");
       setTimeout(() => setNotifyStatus(null), 2000);
+      // 登録済みエントリを削除
+      if (subId) {
+        client
+          .graphql({
+            query: DELETE_USER_SUBSCRIPTION,
+            variables: { input: { id: subId } },
+            authMode: "apiKey",
+          })
+          .catch(() => {});
+      }
       return;
     }
 
     if (!("Notification" in window)) {
-      setNotifyStatus("このブラウザは通知機能に対応してないバイ...");
-      setTimeout(() => setNotifyStatus(null), 3000);
+      // iOS Safari (ブラウザ) または古い iOS の場合
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+      if (isIOS && !isStandalone) {
+        setNotifyStatus("iPhoneで通知を受け取るには、Safariの「共有」ボタン →「ホーム画面に追加」してアプリとして開いてね！");
+        setTimeout(() => setNotifyStatus(null), 6000);
+      } else {
+        setNotifyStatus("このブラウザは通知機能に対応してないバイ...");
+        setTimeout(() => setNotifyStatus(null), 3000);
+      }
       return;
     }
 
@@ -244,25 +313,30 @@ export default function CustomerPage() {
       if (now - lastToggleAtRef.current < 500) return;
       lastToggleAtRef.current = now;
 
-      // 1. 先にUIを動かす（体感速度アップ）
-      setNotifyStatus("通知ONにしたバイ！...（登録中）");
+      // 1. ボタン押下と同時にガイドを表示
+      setIsGeofenceOn(true);
+      setShowNotifyInfo(true);
 
       const permission = await Notification.requestPermission();
 
       if (permission !== "granted") {
+        setIsGeofenceOn(false);
+        setShowNotifyInfo(false);
+        clearTimeout(notifyTimerRef.current);
         if (permission === "denied") {
-          setNotifyStatus("通知がブロックされてるバイ！設定から許可してね！");
+          setNotifyStatus("通知がブロックされてるバイ！ブラウザの設定から許可してね！");
         } else {
           setNotifyStatus("通知を許可してもらわないとONにできんバイ...");
         }
-        setTimeout(() => setNotifyStatus(null), 3000);
+        notifyTimerRef.current = setTimeout(() => setNotifyStatus(null), 3000);
         return;
       }
 
       // 2. 裏で非同期にFCMトークン取得・保存
       // firebase-messaging-sw.js を明示的に登録・取得（sw.js との混同を防ぐ）
-      let reg = await navigator.serviceWorker.getRegistration("/firebase-messaging-sw.js");
-      if (!reg) {
+      // getRegistration の引数はスクリプトパスではなくスコープURL
+      let reg = await navigator.serviceWorker.getRegistration("/");
+      if (!reg || !reg.active?.scriptURL?.includes("firebase-messaging-sw.js")) {
         reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
       }
       // アクティブになるまで待つ
@@ -284,8 +358,11 @@ export default function CustomerPage() {
       });
 
       if (!fcmToken) {
-        setNotifyStatus("FCMトークンの取得に失敗したバイ...");
-        setTimeout(() => setNotifyStatus(null), 3000);
+        setIsGeofenceOn(false);
+        setShowNotifyInfo(false);
+        clearTimeout(notifyTimerRef.current);
+        setNotifyStatus("通知の準備に失敗したバイ...もう一回試してみて！");
+        notifyTimerRef.current = setTimeout(() => setNotifyStatus(null), 3000);
         return;
       }
 
@@ -310,6 +387,30 @@ export default function CustomerPage() {
       });
       console.log("あなたの周り1kmに柵を張ったバイ！");
 
+      // 同じFCMトークンの既存エントリを削除（重複防止）
+      try {
+        const existing = await client.graphql({
+          query: LIST_USER_SUBSCRIPTIONS_BY_TOKEN,
+          variables: {
+            filter: { subscription: { eq: fcmToken } },
+            limit: 20,
+          },
+          authMode: "apiKey",
+        });
+        const existingItems = existing?.data?.listUserSubscriptions?.items ?? [];
+        await Promise.all(
+          existingItems.map((item) =>
+            client.graphql({
+              query: DELETE_USER_SUBSCRIPTION,
+              variables: { input: { id: item.id } },
+              authMode: "apiKey",
+            }).catch(() => {})
+          )
+        );
+      } catch (e) {
+        console.warn("既存エントリ削除エラー（無視）:", e);
+      }
+
       const currentLat = gpsPos.lat;
       const currentLng = gpsPos.lng;
       const guestUserId = `guest-${Date.now()}`;
@@ -331,16 +432,26 @@ export default function CustomerPage() {
         setUserSubscriptionId(response.data.createUserSubscription.id);
       }
 
-      // 3. 完了したらメッセージを更新
-      setIsGeofenceOn(true);
-      setShowNotifyInfo(true);
-      setNotifyStatus("通知ONになったバイ！準備万端バイ！");
+      // 4. バンが既に圏内にいる場合は即時通知（FCM経由）
+      if (vanPos?.lat && vanPos?.lng && vanPos?.isOperating && gpsPos?.lat && gpsPos?.lng) {
+        const dist = getDistance(gpsPos.lat, gpsPos.lng, vanPos.lat, vanPos.lng);
+        if (dist <= 1000) {
+          fetch(SEND_NOTIFICATION_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ single_token: fcmToken }),
+          }).catch(() => {});
+        }
+      }
+
+      // 3. 完了（ガイドは既に表示済みなので何もしない）
     } catch (err) {
       console.error("通知許可エラー:", err);
-      setNotifyStatus("通知の設定に失敗したバイ...");
       setIsGeofenceOn(false);
-    } finally {
-      setTimeout(() => setNotifyStatus(null), 2500);
+      setShowNotifyInfo(false);
+      clearTimeout(notifyTimerRef.current);
+      setNotifyStatus("通知の設定に失敗したバイ...時間をおいてもう一回試してみて！");
+      notifyTimerRef.current = setTimeout(() => setNotifyStatus(null), 3000);
     }
   };
 
@@ -381,31 +492,6 @@ export default function CustomerPage() {
       });
     }
   }, [vanPos]);
-
-  useEffect(() => {
-    if (isGeofenceOn && vanPos && userPos) {
-      const dist = getDistance(userPos.lat, userPos.lng, vanPos.lat, vanPos.lng);
-
-      if (dist <= 1000) {
-        if ("serviceWorker" in navigator) {
-          navigator.serviceWorker.ready
-            .then((registration) => {
-              registration.showNotification("ホカホカのお知らせ！🍠", {
-                body: `焼き芋屋さんが1km圏内に来たバイ！今の距離は約${Math.round(dist)}m。`,
-                icon: "/favicon.ico",
-                badge: "/favicon.ico",
-                vibrate: [200, 100, 200],
-              });
-            })
-            .catch((err) => {
-              console.error("通知表示エラー:", err);
-            });
-        }
-
-        setIsGeofenceOn(false);
-      }
-    }
-  }, [vanPos, userPos, isGeofenceOn]);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -707,6 +793,32 @@ export default function CustomerPage() {
         </div>
       )}
 
+      {showIOSBanner && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 80,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 9999998,
+            background: "#fff8f0",
+            border: "2px solid #ff7e5f",
+            borderRadius: 16,
+            padding: "10px 16px",
+            width: "min(90vw, 340px)",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+            fontSize: "0.82rem",
+            color: "#333",
+            textAlign: "center",
+            lineHeight: 1.6,
+          }}
+        >
+          <span style={{ fontWeight: "bold", color: "#ff7e5f" }}>📱 iPhoneで通知を使うには</span>
+          <br />
+          下の共有ボタン（□↑）→「ホーム画面に追加」してアプリとして開いてね！
+        </div>
+      )}
+
       <div
         style={{
           position: "absolute",
@@ -920,6 +1032,7 @@ export default function CustomerPage() {
           <Marker
             position={[vanPos.lat, vanPos.lng]}
             icon={sweetPotatoIcon}
+            zIndexOffset={1000}
             eventHandlers={{ click: fetchWeatherPhrase }}
           >
             <Popup>

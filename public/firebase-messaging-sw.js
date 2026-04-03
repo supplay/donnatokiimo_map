@@ -1,44 +1,41 @@
 // Firebase Cloud Messaging Service Worker
-importScripts("https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js");
-importScripts("https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js");
+// Firebase compat SDK への依存を排除し、push イベントを直接処理する。
+// これにより SDK バージョン不一致の問題を回避し、スリープ時の通知を確実に届ける。
 
-// 古い sw.js が残っている場合でも即時に置き換える
 self.addEventListener("install", (event) => {
   event.waitUntil(self.skipWaiting());
 });
+
 self.addEventListener("activate", (event) => {
   event.waitUntil(clients.claim());
 });
 
-firebase.initializeApp({
-  apiKey: "AIzaSyDIpgZj68CdmN85wSuLFlyYQDcvFfQdr1E",
-  authDomain: "donnatokiimo-6e7be.firebaseapp.com",
-  projectId: "donnatokiimo-6e7be",
-  storageBucket: "donnatokiimo-6e7be.firebasestorage.app",
-  messagingSenderId: "154464848783",
-  appId: "1:154464848783:web:e68ae3d04a193c20c659fa",
-  measurementId: "G-4D7XK01FY0",
-});
+self.addEventListener("push", (event) => {
+  let payload = {};
+  try {
+    payload = event.data ? event.data.json() : {};
+  } catch (e) {
+    payload = {};
+  }
 
-const messaging = firebase.messaging();
-
-// バックグラウンド通知ハンドラ
-messaging.onBackgroundMessage((payload) => {
-  console.log("[firebase-messaging-sw.js] バックグラウンド通知:", payload);
-
-  // notification フィールド優先、なければ data フィールドで代替
+  // FCM の webpush ペイロード形式: payload.notification または payload.data に情報が入る
   const notif = payload.notification || {};
   const data = payload.data || {};
   const title = notif.title || data.title || "どんなとき芋";
   const body = notif.body || data.body || "";
+  const icon = notif.icon || data.icon || "https://dev.d3nlv05moq0vc5.amplifyapp.com/icon-192.png";
 
-  self.registration.showNotification(title, {
-    body,
-    icon: "/favicon.ico",
-    badge: "/favicon.ico",
-    vibrate: [200, 100, 200],
-    data: payload.data || {},
-  });
+  // event.waitUntil を必ず呼ぶことで、スリープ中でも SW が終了される前に通知を表示する
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body,
+      icon,
+      badge: "https://dev.d3nlv05moq0vc5.amplifyapp.com/icon-192.png",
+      vibrate: [200, 100, 200],
+      requireInteraction: false,
+      data: payload.data || {},
+    })
+  );
 });
 
 // 通知クリックで PWA を開く

@@ -151,23 +151,6 @@ export const deleteUserPoint = /* GraphQL */ `
     }
   }
 `;
-export const deleteUserSubscription = /* GraphQL */ `
-  mutation DeleteUserSubscription(
-    $input: DeleteUserSubscriptionInput!
-    $condition: ModelUserSubscriptionConditionInput
-  ) {
-    deleteUserSubscription(input: $input, condition: $condition) {
-      id
-      userId
-      subscription
-      userLat
-      userLng
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
 export const createUserSubscription = /* GraphQL */ `
   mutation CreateUserSubscription(
     $input: CreateUserSubscriptionInput!
@@ -191,6 +174,23 @@ export const updateUserSubscription = /* GraphQL */ `
     $condition: ModelUserSubscriptionConditionInput
   ) {
     updateUserSubscription(input: $input, condition: $condition) {
+      id
+      userId
+      subscription
+      userLat
+      userLng
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteUserSubscription = /* GraphQL */ `
+  mutation DeleteUserSubscription(
+    $input: DeleteUserSubscriptionInput!
+    $condition: ModelUserSubscriptionConditionInput
+  ) {
+    deleteUserSubscription(input: $input, condition: $condition) {
       id
       userId
       subscription

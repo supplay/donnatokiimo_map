@@ -1,9 +1,16 @@
 {
   "auth": {
+<<<<<<< HEAD
     "user_pool_id": "ap-northeast-1_21jSPkeNx",
     "aws_region": "ap-northeast-1",
     "user_pool_client_id": "6g0ood8plbldsclonrugj2iiin",
     "identity_pool_id": "ap-northeast-1:dd5b3881-7bc2-433e-a423-5474b9b34099",
+=======
+    "user_pool_id": "ap-northeast-1_Y1NbwKql3",
+    "aws_region": "ap-northeast-1",
+    "user_pool_client_id": "39rh9j03c9loi29jnjoh8fcpof",
+    "identity_pool_id": "ap-northeast-1:2c5ab98f-8661-4ff0-94f4-1f1d53760a6f",
+>>>>>>> main
     "mfa_methods": [],
     "standard_required_attributes": [
       "email"
@@ -26,7 +33,11 @@
     "unauthenticated_identities_enabled": true
   },
   "data": {
+<<<<<<< HEAD
     "url": "https://35seq7ua6ncg7a3vtg76k4hj74.appsync-api.ap-northeast-1.amazonaws.com/graphql",
+=======
+    "url": "https://2jaii6xiczd2npoyal7u23iqma.appsync-api.ap-northeast-1.amazonaws.com/graphql",
+>>>>>>> main
     "aws_region": "ap-northeast-1",
     "default_authorization_type": "AWS_IAM",
     "authorization_types": [
@@ -107,11 +118,19 @@
   },
   "storage": {
     "aws_region": "ap-northeast-1",
+<<<<<<< HEAD
     "bucket_name": "amplify-frontend-suppl-sa-flyerdrivebucket3c89a6b5-lmjbvf3u0j8h",
     "buckets": [
       {
         "name": "flyerDrive",
         "bucket_name": "amplify-frontend-suppl-sa-flyerdrivebucket3c89a6b5-lmjbvf3u0j8h",
+=======
+    "bucket_name": "amplify-d2lilo273ta3mj-ma-flyerdrivebucket3c89a6b5-tgdur9duhliy",
+    "buckets": [
+      {
+        "name": "flyerDrive",
+        "bucket_name": "amplify-d2lilo273ta3mj-ma-flyerdrivebucket3c89a6b5-tgdur9duhliy",
+>>>>>>> main
         "aws_region": "ap-northeast-1",
         "paths": {
           "public/*": {

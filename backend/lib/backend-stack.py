@@ -8,6 +8,8 @@ from constructs import Construct
 from aws_cdk import aws_dynamodb as dynamodb
 from aws_cdk import aws_lambda as _lambda
 from aws_cdk import aws_iam as iam
+from aws_cdk import aws_events as events
+from aws_cdk import aws_events_targets as targets
 import os
 
 # AppSync alpha module for Python CDK is not always available; if not, use Cfn resources or CDK L2 if available
@@ -93,3 +95,48 @@ class BackendStack(Stack):
             # 出力（確認用）
             CfnOutput(self, "GraphQLAPIURL", value=api.graphql_url)
             CfnOutput(self, "GraphQLAPIKey", value=api.api_key or "")
+
+        # 9. ジオフェンス通知用Lambda
+        notification_lambda = _lambda.Function(
+            self, "NotificationLambda",
+            runtime=_lambda.Runtime.PYTHON_3_12,
+            handler="lambda_function.lambda_handler",
+            code=_lambda.Code.from_asset(
+                os.path.join(os.path.dirname(__file__), '../../'),
+                exclude=[
+                    "node_modules", ".git", "amplify", "frontend", "src",
+                    "public", "admin", "backend", "backend-py", "python",
+                    "docs", "_archive", "donnatokiimo_map",
+                    "donnatokiimo_map-ed36854d73ed7af8e50bee75cc75a4a62b4beddc",
+                    "amplify-backup", "amplify_outputs.json", "package.json",
+                    "vite.config.js", "index.html", "eslint.config.js",
+                    "amplify.yml", "README.md", "*.zip",
+                ]
+            ),
+            timeout=Duration.seconds(60),
+            environment={
+                "APPSYNC_ENDPOINT": "https://5lnk5kjxl5gzteggpytjahlimy.appsync-api.ap-northeast-1.amazonaws.com/graphql",
+                "APPSYNC_API_KEY": "da2-impbcyh2f5hg3dnr52xd24vkbi",
+            }
+        )
+
+        # 10. Secrets Manager権限（Firebaseサービスアカウント取得）
+        notification_lambda.add_to_role_policy(iam.PolicyStatement(
+            actions=["secretsmanager:GetSecretValue"],
+            resources=["arn:aws:secretsmanager:ap-northeast-1:*:secret:firebase-service-account*"]
+        ))
+
+        # 11. EventBridgeルール: Location Serviceジオフェンスイベント(ENTER) → 通知Lambda
+        geofence_rule = events.Rule(
+            self, "GeofenceEnterRule",
+            event_pattern=events.EventPattern(
+                source=["aws.geo"],
+                detail_type=["Location Geofence Event"],
+                detail={
+                    "EventType": ["ENTER"]
+                }
+            )
+        )
+        geofence_rule.add_target(targets.LambdaFunction(notification_lambda))
+
+        CfnOutput(self, "NotificationLambdaName", value=notification_lambda.function_name)

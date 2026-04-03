@@ -8,6 +8,7 @@ import config from "./amplifyConfig";
 
 Amplify.configure(config);
 I18n.putVocabularies(translations);
+console.debug("build:20260402-1");
 I18n.setLanguage("ja");
 
 ReactDOM.createRoot(document.getElementById("root")).render(

@@ -1,4 +1,4 @@
-import { Authenticator } from "@aws-amplify/ui-react";
+﻿import { Authenticator } from "@aws-amplify/ui-react";
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AdminSignup from "./pages/AdminSignup.jsx";
@@ -35,7 +35,10 @@ export default function App() {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistrations().then((regs) => {
         regs.forEach((r) => {
-          if (r.active?.scriptURL?.includes("/sw.js")) {
+          const url = r.active?.scriptURL || r.installing?.scriptURL || "";
+          // "/sw.js" のみ削除。"/firebase-messaging-sw.js" は含まれるが削除しない。
+          // ※ endsWith を使って厳密一致させる
+          if (url.endsWith("/sw.js")) {
             r.unregister();
             console.log("古い sw.js を登録解除したバイ！");
           }
@@ -47,7 +50,7 @@ export default function App() {
         .catch((err) => console.error("Firebase SW 登録失敗:", err));
     }
 
-    // 3. フォアグラウンド通知ハンドラ（SW経由でないと Chrome では表示されないため registration を使う）
+    // 3. フォアグラウンド通知ハンドラ
     const unsubscribe = onMessage(messaging, (payload) => {
       console.log("📩 フォアグラウンド通知:", payload);
       const notif = payload.notification || {};
@@ -56,10 +59,10 @@ export default function App() {
       const body = notif.body || data.body || "";
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker.ready
-          .then((reg) => reg.showNotification(title, { body, icon: "/favicon.ico" }))
+          .then((reg) => reg.showNotification(title, { body, icon: "https://dev.d3nlv05moq0vc5.amplifyapp.com/icon-192.png" }))
           .catch(() => {
             if (Notification.permission === "granted") {
-              new Notification(title, { body, icon: "/favicon.ico" });
+              new Notification(title, { body, icon: "https://dev.d3nlv05moq0vc5.amplifyapp.com/icon-192.png" });
             }
           });
       }
@@ -76,10 +79,7 @@ export default function App() {
       {showSplash && <LaunchSplash />}
       <BrowserRouter>
         <Routes>
-          {/* お客さん用トップページ */}
           <Route path="/" element={<CustomerPage />} />
-
-          {/* 【新】管理画面の入り口 */}
           <Route
             path="/kanri_aki"
             element={
@@ -88,11 +88,7 @@ export default function App() {
               </Authenticator>
             }
           />
-
-          {/* 旧 /admin へのアクセスを /kanri_aki へリダイレクト（転送） */}
           <Route path="/admin/*" element={<Navigate to="/kanri_aki" replace />} />
-
-          {/* 指定外のURLはすべてトップページへ飛ばす */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

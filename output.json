@@ -1,0 +1,1 @@
+{"statusCode": 200, "headers": {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Content-Type", "Access-Control-Allow-Methods": "OPTIONS,POST", "Content-Type": "application/json"}, "body": "{\"message\": \"あったかで晴れやかな1日じゃ!芋ん焼きを食べてお散歩しながら、ゆっくりした時間を過ごしてみんさいよ。\"}"}
