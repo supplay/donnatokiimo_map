@@ -1,215 +1,367 @@
-<<<<<<< HEAD
-# 🍠 donnatokiimo_map  -Realtime SweetPotato Van Tracker- 🍠
+# donnatokiimo_map
 
-移動販売の焼き芋屋さん（店主）と、焼き芋を買いたいお客さん（ユーザー）をつなぐ、リアルタイム位置情報＆ポイントシステムアプリです。PWA（Progressive Web App）として構築されており、スマートフォンのホーム画面に追加してアプリのように利用できます。
+## 移動式焼き芋屋の「今どこ？」をゼロにするリアルタイム位置共有アプリ
 
-## 🌟 主な機能
+移動販売の焼き芋屋における
+「今どこにいますか？」という問い合わせ対応を削減するために開発した、
+**リアルタイム位置共有 × プッシュ通知 × ポイント機能**を備えたPWAアプリです。
 
-### 👨‍🍳 店主向け機能 (Admin Page)
-* **営業開始/停止**: 営業状態（マップへの表示有無）をワンクリックで切り替え。
-* **リアルタイム位置配信**: `watchPosition`により、移動中も現在地を自動的にマップへ反映。
-* **ポイント付与QR生成**: お客さんに読み取ってもらうための、セキュリティ（時間制限）付きポイント付与QRコードを表示。
-* **特典交換QR生成**: お客さんのポイントを消費するための、ポイント数指定付きQRコードを表示。
-* **メニュー・イベント出店予定編集**: アプリ上で販売メニューや今後のスケジュールを動的に更新。
+---
 
-### 🧑‍🤝‍🧑 お客さん向け機能 (Customer Page)
-* **リアルタイム販売車マップ**: 営業中の焼き芋屋さんの現在地を Leaflet マップ上で確認。
-* **現在地表示**: 自分の位置と販売車との距離感を把握。
-* **ジオフェンス通知**: 販売車が自分の現在地から1km圏内に近づいた際、プッシュ通知でお知らせ。
-* **天気連動メッセージ**: 店主アイコンをクリックすると、現在地の天気に合わせた店主からのメッセージを表示。
-* **デジタルポイントカード**: ログインして、お店のQRコードをスキャンすることでポイントを収集・利用。
+## 🚀 デモ
 
+※ここに動画を配置予定
+（例: `![demo](./docs/demo.gif)`）
 
+---
 
-## 🛠 技術スタック
+## 🧠 開発背景
 
-* **Frontend**: React, React Router
-* **Build Tool**: Vite
-* **UI/Styles**: Leaflet (Map), Tailwind CSS, Lucide React (Icons), AWS Amplify UI
-* **Backend/Infrastructure (AWS Amplify)**:
-    * **Authentication**: Cognito (店主・顧客の認証管理)
-    * **API (GraphQL)**: AppSync (リアルタイムSubscription、データ操作)
-    * **Database**: DynamoDB (店舗、設定、ポイント、サブスクリプション情報の格納)
-    * **Functions**: Lambda (AWS Location Service との連携、外部API連携、AIロジックの実行)
-    * **Location Service**: Maps, Geofences (地図タイル供給、ジオフェンス評価)
-    * **Amazon EventBridge**: ジオフェンスイベントのルーティング。Location Serviceが検知した「進入（ENTER）」イベントをトリガーに、通知用Lambdaを自動起動するイベントバスとして活用。
-    * **Amazon Bedrock (Claude 3)**: Lambda経由で実行。気象データに基づいた「大分弁店主メッセージ」の動的生成。
-* **External API**: WeatherNews API (weather.tsukumijima.net) - リアルタイム気象データの取得
-* **PWA**: Service Worker, Web App Manifest
+副業で移動式焼き芋屋をしている義兄が、営業中に以下の問い合わせを頻繁に受けていました。
 
-## 🌐インフラ構成図
-本システムは、**イベント駆動型（Event-Driven）**のサーバーレスアーキテクチャを採用しています。
+* 今どこにいますか？
+* 今日はどの辺を回っていますか？
+* まだ来ますか？
 
-```mermaid
-graph TD
-    %% クラウド層（AWS）
-    subgraph AWS_Amplify [AWS CLOUD / Amplify Project Environment]
-        %% 認証
-        subgraph Auth [AUTHENTICATION]
-            Cognito[Amazon Cognito Pool]
-        end
+これらはすべて手動対応であり、
+**運転中・接客中にも対応が必要になる非効率な業務**でした。
 
-        %% 位置情報
-        subgraph Location [LOCATION Service]
-            ALS_Tracker[Tracker & Geofences]
-            ALS_Maps["Maps (Tiles)"]
-        end
+そこで、
 
-        %% API & ロジック
-        subgraph Logic_Layer [API & LOGIC]
-            AppSync[AWS AppSync / GraphQL API]
-            L_Update[Lambda: updatePosition]
-            L_Notify[Lambda: sendNotification]
-            EB[Amazon EventBridge]
-        
-            subgraph AI [AI & Message Generation]
-                Weather["WeatherNews API (External)"]
-                Bedrock["Amazon Bedrock (Claude 3 Haiku)"]
-                
-                %% 情報の流れを明確化
-                Weather -.->|1. 気象データを注入| Bedrock
-                L_Notify -->|1. メッセージ生成命令| Bedrock
-            end
-        end
+* 店主は営業開始するだけ
+* ユーザーは地図で現在地を確認
+* 近づいたら通知
+* QRでポイント付与
 
-        %% データと通知
-        subgraph Storage [DATABASE]
-            DB[(Amazon DynamoDB Table)]
-        end
+という仕組みを構築し、
+**問い合わせ対応をシステムで自動化**しました。
 
-        subgraph Notification [NOTIFICATION]
-            Pinpoint[Amazon Pinpoint Project]
-        end
-    
-    end
+---
 
-    %% クライアント層（デバイス）
-    subgraph Store_Device ["STORE OWNER DEVICE (Smartphone)"]
-        Store_PWA[Store PWA]
-        SW_Store[PWA Service Worker]
-    end
+## 🚀 運用状況
 
-    subgraph User_Device ["CUSTOMER DEVICE (Smartphone)"]
-        User_PWA[User PWA]
-        SW_User["PWA Service Worker (Web Push)"]
-    end
+本アプリは **2026年4月より実運用を開始** しています。
 
-    %% システム全体の繋がり
-    Store_PWA -->|1. 認証| Cognito
-    User_PWA -->|1. 認証| Cognito
-    User_PWA -->|地図取得| ALS_Maps
+実際の移動販売（焼き芋屋）にて利用されており、
+現在地の問い合わせ削減および来店導線の改善に活用しています。
 
-    Store_PWA -->|2. 位置更新| AppSync
-    AppSync --> L_Update
-    L_Update -->|ALSへ同期| ALS_Tracker
+---
 
-    ALS_Tracker -->|3. 1km進入検知| EB
-    EB -->|トリガー| L_Notify
+## 💰 コスト管理
 
-    L_Notify -->|ユーザー情報取得| DB
-    L_Notify -->|2. 通知命令| Pinpoint
-    Pinpoint -->|Web Push| SW_User
-    SW_User -->|通知表示| User_PWA
+AWSコスト管理として、以下の設定を行っています。
 
-    %% スタイル設定
-    style EB fill:#ff9900,stroke:#fff,stroke-width:2px
-    style Bedrock fill:#3b82f6,stroke:#fff,stroke-width:2px
-    style ALS_Tracker fill:#22c55e,stroke:#fff,stroke-width:2px
-    style AppSync fill:#ed1c24,stroke:#fff,stroke-width:2px
+* AWS Budgets にて月額 **5ドルの上限アラート**を設定
+* サーバーレス構成（Lambda / AppSync / DynamoDB）により低コスト運用
+* イベント駆動設計により無駄な処理を削減
+
+小規模事業者でも運用可能なコスト設計を意識しています。
+
+---
+
+## 🎯 解決した課題
+
+| Before        | After     |
+| ------------- | --------- |
+| 電話・DM対応が必要    | 地図で確認可能   |
+| 営業中に対応が発生     | 自動通知      |
+| 来店タイミングが分からない | 接近通知で来店促進 |
+
+---
+
+## 🧩 主な機能
+
+### 👨‍🍳 店主側
+
+* 営業開始 / 停止
+* リアルタイム位置配信（Geolocation API）
+* QRコード発行（ポイント付与 / 消費）
+* メニュー・スケジュール更新
+
+### 👤 ユーザー側
+
+* 地図で現在地確認（Leaflet）
+* 現在地との距離表示
+* 接近通知（プッシュ通知）
+* QRコード読み取り（ポイント管理）
+* 🍠アイコンタップで天気連動メッセージ表示（遊び機能）
+
+---
+
+## 🍠 遊び機能：天気 × AIメッセージ生成
+
+ユーザー体験向上のため、遊び心として以下の機能を実装しています。
+
+### 概要
+
+地図上の「焼き芋アイコン」をタップすると、
+
+* 天気APIから現在の天気・気温を取得
+* その情報をAmazon Bedrockに送信
+* 焼き芋屋らしい販促メッセージを自動生成
+
+### フロー
+
+1. ユーザーが芋アイコンをタップ
+2. 天気APIから現在の天気情報を取得
+3. Lambda経由でBedrockへリクエスト
+4. AIが販促メッセージを生成
+5. 画面に表示
+
+### 例
+
+* 「今日は寒いけん、あったかい焼き芋ば食べていかんね？」
+* 「晴れとるけん、お散歩ついでに焼き芋どうや？」
+
+### 意図
+
+* 単なる機能ではなく「体験」を作る
+* AWS（Bedrock）の実用的な使い方を取り入れる
+* ユーザーに親しみやすさを持たせる
+
+---
+
+## 🔔 プッシュ通知の仕組み（Firebase）
+
+本アプリでは、**Firebase Cloud Messaging（FCM）**を利用して通知を実装しています。
+
+### フロー
+
+1. ユーザーが通知許可
+2. Firebaseでトークン取得
+3. トークンをAppSyncに保存
+4. ユーザー位置をもとにGeofence登録
+5. 店主が移動
+6. Location Serviceがジオフェンス侵入を検知
+7. EventBridgeがイベント発火
+8. Lambdaが通知処理
+9. Firebase経由でユーザーへプッシュ通知
+
+---
+
+## 🏗 アーキテクチャ
+
+![アーキテクチャ](./docs/architecture.png)
+
+### 構成のポイント
+
+* フロントエンド：React + Vite + PWA
+* 認証：Amazon Cognito
+* API：AWS AppSync（GraphQL）
+* DB：DynamoDB
+* 位置管理：AWS Location Service
+* イベント処理：EventBridge
+* 通知：Lambda → Firebase Cloud Messaging
+* AI連携：Amazon Bedrock
+
+---
+
+## ⚙️ 技術スタック
+
+### フロントエンド
+
+* React
+* Vite
+* React Leaflet
+* AWS Amplify
+* html5-qrcode
+* qrcode.react
+
+### バックエンド
+
+* AWS AppSync (GraphQL)
+* AWS Lambda
+* Amazon DynamoDB
+
+### インフラ / イベント
+
+* AWS Location Service
+* Amazon EventBridge
+
+### 通知
+
+* Firebase Cloud Messaging（FCM）
+
+### AI
+
+* Amazon Bedrock
+
+### その他
+
+* Weather API
+
+---
+
+## 💡 技術的な工夫
+
+### ① イベント駆動設計
+
+ポーリングではなく、Geofenceイベントをトリガーに通知処理を実行
+→ **低コスト・高効率**
+
+---
+
+### ② リアルタイム位置更新
+
+```js
+navigator.geolocation.watchPosition(...)
 ```
 
-![構成図](./docs/images/donnatokiimo.drawio.svg)
+位置変化に応じてAppSync + Location Service に即時反映
 
+---
 
-## システムアーキテクチャの解説
-本アプリは、スケーラビリティとリアルタイム性を両立するため、AWS Amplifyをベースとしたイベント駆動型（Event-Driven）のサーバーレスアーキテクチャを採用しています。
+### ③ ジオフェンス活用
 
-### 💡 アーキテクチャの解説
+ユーザーごとに半径1kmのエリアを作成し、
 
-1. **認証とリアルタイム同期**　
-   ユーザーおよび店主の認証には **Amazon Cognito** を使用。店主のデバイスから送信される位置情報は、**AWS AppSync (GraphQL)** を経由して低遅延でバックエンドに送られ、**Amazon Location Service** のトラッカーに同期されます。
+* 入った → 通知
+* 出た → 無視
 
-2. **イベント駆動型の接近検知**　
-   店主が顧客の「半径1km圏内（ジオフェンス）」に進入すると、**Amazon EventBridge** がそのイベントを即座にキャッチし、通知用の **AWS Lambda** を起動します。これにより、クライアント側での常時ポーリング（監視）を排除し、デバイスのバッテリー消費とサーバーコストを最小限に抑えています。
+を自動化
 
-3. **コンテキストを注入したAIメッセージ生成**　
-   起動した Lambda 関数は、**WeatherNews API** からその対象エリアのリアルタイムな気象データ（天気・気温）を取得します。そのデータをプロンプトとして **Amazon Bedrock (Claude 3 Haiku)** に注入することで、「今の寒さ・暑さ」に寄り添った大分弁の接客メッセージを動的に生成します。
+---
 
+### ④ 不正防止QR
 
+```
+POTATO-<timestamp>-USE-<amount>
+```
 
-## 📦 インストールと起動
+* 時間制限付き
+* 再利用防止
 
-1.  **リポジトリをクローン**:
-    ```bash
-    git clone [https://github.com/yourusername/potatgo.git](https://github.com/yourusername/potatgo.git)
-    cd potatgo
-    ```
+---
 
-2.  **依存関係をインストール**:
-    ```bash
-    npm install
-    ```
+### ⑤ UX × AIの融合
 
-3.  **Amplify 環境を初期化 (初回のみ)**:
-    ```bash
-    amplify init
-    # 既存の環境を引き継ぐ場合: amplify pull
-    ```
+実用機能だけでなく、
 
-4.  **ローカル開発サーバーを起動**:
-    ```bash
-    npm run dev
-    ```
+* 天気
+* 地域性
+* 商品（焼き芋）
 
-## 🛠 開発上の工夫・技術的ポイント
-**1. Amazon Bedrock × 気象API による「動的接客」の実装**
-単なる定型文の配信ではなく、**「その時、その場所、その天気にしか聞けない言葉」**をAIで生成する仕組みを構築しました。
+を掛け合わせたメッセージ生成により、
+「また見たくなる体験」を意識
 
-・コンテキスト認識プロンプト: リアルタイムの天候・気温・時間帯をAIに注入。5℃以下の極寒時には「指先の気遣い」、28℃以上の猛暑時には「冷やし芋の提案」など、状況に即した動的なメッセージを生成。
+---
 
-・ペルソナ・エンジニアリング: 「大分で30年続く店主」という詳細な設定をMarkdown形式で構造化。大分弁（方言）の語彙や語尾を厳密に定義することで、AI特有の不自然さを排除した温かみのあるUXを実現しました。
+### ⑥ バッテリー・発熱を考慮した位置更新制御
 
-・レスポンスの最適化: トークン効率を高める構造化プロンプトにより、生成速度（Latency）と精度のバランスを両立。
+移動販売の焼き芋屋は徒歩程度の速度で移動するため、  
+高頻度での位置更新は不要と判断しました。
 
-**2. ジオフェンスを活用したイベント駆動型プッシュ通知**
-・AWS Location Service 連携: ジオフェンスの「Enter」イベントを Amazon EventBridge で検知し、Lambda経由でプッシュ通知を自動送出するサーバーレス構成を採用。
+そのため、位置情報の更新間隔を**20秒に1回**に制御しています。
 
-・VAPID認証によるセキュア通信: 公開鍵認証（VAPID）を採用し、ブラウザのプッシュサービス（FCM/APNs）を介した安全な配信経路を確保。
+#### 意図
+- スマートフォンのバッテリー消費を抑える
+- GPS使用による発熱を防ぐ
+- 通信回数を減らしコスト削減
 
-・PWA & Service Worker: メインスレッドから独立した Service Worker を実装し、バックグラウンドでの通知受信とネイティブアプリライクなインストール体験を提供。
+#### 効果
+- 長時間の営業でもスマホの負担を軽減
+- 実運用に耐えられる安定した動作を実現
 
-**3. 実運用を見据えたUXとセキュリティの最適化**
-リアルタイム同期: AppSync (GraphQL Subscription) を活用し、店主の移動に合わせてマップ上のアイコンがリロードなしでスムーズに動くリアルタイム性を追求。
+---
 
-・不正防止（時限式QRコード）: QRコードに3分間のみ有効なタイムスタンプを含め、ポイントの不正取得を防止するセキュリティロジックを実装。
+### ⑦ PWAの制約を考慮したUX設計
 
-・省電力・低負荷設計: 移動速度（徒歩〜徐行）に合わせ、現在地更新を20秒に1回に最適化。デバイスの発熱とバッテリー消費を抑える実運用に即した設計。
+PWAはネイティブアプリと比較して、  
+アプリを完全に終了した場合にプッシュ通知が届かないことがあります。
 
-・堅牢なUI/UX: Reactでのステート管理によるレイアウトシフト防止や、Error Boundary の導入により、予期せぬエラー時もアプリ全体をクラッシュさせない親切な設計を徹底。
+そのため、ユーザーが正しく利用できるように、  
+通知設定時にガイドを表示する仕組みを実装しました。
 
-**4. 技術的制約を補完する「UXライティング」とデザイン**
-・PWAにおけるOSのリソース制限（バックグラウンドでの位置情報計算の停止）という課題に対し、ユーザーの行動変容を促す施策を導入しました。
+#### 工夫
+- 通知が届く条件 / 届かない条件を明示
+- 専門用語を使わず、直感的に理解できる表現に調整
+- 「スワイプで完全終了すると届かない」ことを明確に説明
 
-・期待値のコントロール: 画面を閉じると通知が届かない可能性があることを、おじさんのキャラクター性を活かしたメッセージ（「画面はそのままで待っちょってな！」）でポジティブに伝達。
+#### 目的
+- 通知の取りこぼし防止
+- ユーザー体験の低下を防ぐ
+- PWAの制約をUXで補完
 
-・視覚的ヒューリスティクス: ✅（他のアプリ操作はOK）と⚠️（スリープ/タスク終了はNG）を対比させた直感的なガイドを実装。技術的な説明を避けつつ、ユーザーが「何をすべきか」を一目で理解できる設計を徹底しました。
+技術的制約をユーザー体験でカバーする設計を意識しています。
 
-・心理的オーナーシップの醸成: 単なる警告ではなく「おじさんの道案内をお願いする」という文脈にすることで、ユーザーの離脱を防ぎ、アプリとのエンゲージメントを高める工夫を施しました
-=======
-# React + Vite
+---
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 📊 監視（CloudWatch）
 
-Currently, two official plugins are available:
+実運用に向けて、以下の監視を行っています。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 監視対象
 
-## React Compiler
+* Lambdaエラー（通知処理 / 位置更新 / AI連携）
+* AppSync APIエラー
+* Geofenceイベント処理（EventBridge）
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### アラート設計
 
-## Expanding the ESLint configuration
+* Lambda Errors 発生時に通知
+* 通知処理の失敗時に検知
+* APIエラー増加時に通知
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
->>>>>>> main
+### 監視方針
+
+ユーザー体験に直結する以下を重点監視：
+
+* 通知が正常に届くこと
+* 位置情報が更新されること
+* APIが正常に応答すること
+
+---
+
+## 🧪 セットアップ
+
+```bash
+git clone https://github.com/supplay/donnatokiimo_map.git
+cd donnatokiimo_map
+npm install
+```
+
+```bash
+amplify pull
+npm run dev
+```
+
+---
+
+## 📂 ディレクトリ構成
+
+```
+src/
+├─ components/
+├─ pages/
+├─ graphql/
+├─ amplify/
+```
+
+---
+
+## 🔥 このプロジェクトでアピールしたいこと
+
+* 実際の課題から設計している
+* AWSマネージドサービスを組み合わせた構成
+* イベント駆動アーキテクチャの実装
+* フロント〜インフラまで一貫して開発
+* 実運用（2026年4月〜）している
+* UXを意識した遊び機能（AI活用）
+
+---
+
+## 🚧 今後の改善
+
+* 通知精度のチューニング
+* UI/UX改善
+* マルチ店舗対応
+* 分析機能の追加
+
+---
+
+## 👤 作者
+
+supplay
+https://github.com/supplay
+
+---
