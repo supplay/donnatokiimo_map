@@ -18,7 +18,7 @@ import "leaflet/dist/leaflet.css";
 import { Bell, BellOff } from "lucide-react";
 
 import PointCard from "../components/PointCard.jsx";
-import { messaging, getToken } from "../firebase.js";
+import { messaging, getToken, onMessage } from "../firebase.js";
 
 // Firebase コンソール > プロジェクト設定 > Cloud Messaging > ウェブプッシュ証明書 の鍵ペア
 const FCM_VAPID_KEY = "BN2AwI13slGtx56om9P68uGilFCIkb8B82yHzKIPYsTD8YLc2N9OdDhTF0W7LhvoShJQr0xaaaieCSOEt30bRso";
@@ -266,6 +266,26 @@ export default function CustomerPage() {
       localStorage.removeItem("fcmSubscriptionId");
     }
   }, [userSubscriptionId]);
+
+  // フォアグラウンドで通知を受信したら通知OFFにする
+  useEffect(() => {
+    const unsubscribe = onMessage(messaging, () => {
+      const subId = userSubscriptionIdRef.current;
+      setIsGeofenceOn(false);
+      setUserSubscriptionId(null);
+      if (subId) {
+        client
+          .graphql({
+            query: DELETE_USER_SUBSCRIPTION,
+            variables: { input: { id: subId } },
+            authMode: "apiKey",
+          })
+          .catch(() => {});
+      }
+    });
+    return () => unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleNotifyButtonPress = (e) => {
     e.preventDefault();
