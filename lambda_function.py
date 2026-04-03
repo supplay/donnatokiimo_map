@@ -39,7 +39,7 @@ query ListUserSubscriptions($limit: Int, $nextToken: String) {
 }
 """
 
-NOTIFICATION_COOLDOWN_SECONDS = 300  # 5分間は同一デバイスの重複通知を防ぐ
+NOTIFICATION_COOLDOWN_SECONDS = 120  # 2分間は同一デバイスの重複通知を防ぐ
 
 
 def try_acquire_notification_lock(device_id):
@@ -193,7 +193,46 @@ def send_fcm_notification(device_token, title, body, access_token=None):
     return response.json()
 
 
+CORS_ALLOW_ORIGIN = "https://dev.d3nlv05moq0vc5.amplifyapp.com"
+
+CORS_HEADERS = {
+    "Access-Control-Allow-Origin": CORS_ALLOW_ORIGIN,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+}
+
+
 def lambda_handler(event, context):
+    # Function URL (HTTP) からの直接呼び出し判定
+    is_http = "requestContext" in event or "rawPath" in event
+
+    if is_http:
+        method = event.get("requestContext", {}).get("http", {}).get("method", "")
+        if method == "OPTIONS":
+            return {"statusCode": 200, "headers": CORS_HEADERS, "body": ""}
+
+        try:
+            body = json.loads(event.get("body") or "{}")
+        except json.JSONDecodeError:
+            return {"statusCode": 400, "headers": CORS_HEADERS, "body": json.dumps({"error": "invalid JSON"})}
+
+        single_token = body.get("single_token", "").strip()
+        if not single_token:
+            return {"statusCode": 400, "headers": CORS_HEADERS, "body": json.dumps({"error": "single_token is required"})}
+
+        logger.info(f"シングルトークンモード（直接HTTP呼び出し）: token={single_token[:20]}...")
+        title = "🍠 どんなとき芋が近くにいるバイ！"
+        body_text = "焼き芋屋さんが1km圏内に来たバイ！急いで外に出てみてね！"
+        try:
+            access_token = get_access_token()
+            result = send_fcm_notification(single_token, title, body_text, access_token)
+            logger.info(f"シングルトークン送信成功: {result}")
+            return {"statusCode": 200, "headers": CORS_HEADERS, "body": json.dumps({"ok": True, "result": result})}
+        except Exception as e:
+            logger.error(f"シングルトークン送信失敗: {e}")
+            return {"statusCode": 500, "headers": CORS_HEADERS, "body": json.dumps({"ok": False, "error": str(e)})}
+
+    # ---- 以下は EventBridge 経由の通常フロー ----
     logger.info(f"ジオフェンスイベント受信: {json.dumps(event, ensure_ascii=False)}")
 
     detail = event.get("detail", {})

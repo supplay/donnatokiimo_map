@@ -261,7 +261,48 @@ function AdminPage({ signOut }) {
     setStatusMessage("営業開始バイ！位置情報を取得中...");
     setTimeout(() => setStatusMessage(null), 2000);
 
-    // 2. 裏で非同期にGPS追跡を開始
+    // 2a. 即座にキャッシュ位置を取得してforceEnterを送信（GPS冷起動待ちを回避）
+    //     enableHighAccuracy:false + maximumAge:60000 = キャッシュ位置を即時返す
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        setMyPos([lat, lng]);
+        // watchPosition側がforceEnterを重複送信しないよう先にフラグを落とす
+        isFirstPositionRef.current = false;
+        lastStoreUpdateAtRef.current = Date.now();
+        isSendingStoreUpdateRef.current = true;
+        const input = {
+          id: VAN_ID,
+          name: "どんなとき芋",
+          lat,
+          lng,
+          isOperating: true,
+        };
+        try {
+          await client.graphql({
+            query: updateStore,
+            variables: { input },
+            authMode: "userPool",
+          });
+          await syncTracker(VAN_ID, lat, lng, true, true); // forceEnter=true
+          console.log("営業開始: キャッシュ位置を即時送信したバイ！（forceEnter）");
+        } catch (err) {
+          console.error("即時位置送信エラー:", err);
+          // 失敗した場合はwatchPositionにforceEnterを任せる
+          isFirstPositionRef.current = true;
+        } finally {
+          isSendingStoreUpdateRef.current = false;
+        }
+      },
+      (err) => {
+        // キャッシュ位置取得失敗 → watchPositionが代わりにforceEnterする（fallback）
+        console.warn("即時位置取得失敗、watchPositionに委任:", err);
+      },
+      { enableHighAccuracy: false, maximumAge: 60000, timeout: 5000 },
+    );
+
+    // 2b. 継続的な高精度GPS追跡（watchPosition）
     const watchId = navigator.geolocation.watchPosition(
       async (pos) => {
         const lat = pos.coords.latitude;

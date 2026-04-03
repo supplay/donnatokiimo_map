@@ -24,6 +24,7 @@ import { messaging, getToken } from "../firebase.js";
 const FCM_VAPID_KEY = "BN2AwI13slGtx56om9P68uGilFCIkb8B82yHzKIPYsTD8YLc2N9OdDhTF0W7LhvoShJQr0xaaaieCSOEt30bRso";
 const AWS_API_URL = "https://a79c454sgh.execute-api.us-east-1.amazonaws.com/v1/tokens";
 const AI_GENERATOR_URL = "https://ih62xeb603.execute-api.ap-northeast-1.amazonaws.com/generate";
+const SEND_NOTIFICATION_URL = "https://a6fcbrvrm4vc3fruetu5y2zywa0fzqll.lambda-url.ap-northeast-1.on.aws/";
 const VAN_ID = "KEI-VAN-001";
 const CONFIG_ID = "GLOBAL-CONFIG";
 
@@ -333,8 +334,9 @@ export default function CustomerPage() {
 
       // 2. 裏で非同期にFCMトークン取得・保存
       // firebase-messaging-sw.js を明示的に登録・取得（sw.js との混同を防ぐ）
-      let reg = await navigator.serviceWorker.getRegistration("/firebase-messaging-sw.js");
-      if (!reg) {
+      // getRegistration の引数はスクリプトパスではなくスコープURL
+      let reg = await navigator.serviceWorker.getRegistration("/");
+      if (!reg || !reg.active?.scriptURL?.includes("firebase-messaging-sw.js")) {
         reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
       }
       // アクティブになるまで待つ
@@ -430,20 +432,15 @@ export default function CustomerPage() {
         setUserSubscriptionId(response.data.createUserSubscription.id);
       }
 
-      // 4. バンが既に圏内にいる場合は即時通知
+      // 4. バンが既に圏内にいる場合は即時通知（FCM経由）
       if (vanPos?.lat && vanPos?.lng && vanPos?.isOperating && gpsPos?.lat && gpsPos?.lng) {
         const dist = getDistance(gpsPos.lat, gpsPos.lng, vanPos.lat, vanPos.lng);
         if (dist <= 1000) {
-          navigator.serviceWorker.ready
-            .then((registration) => {
-              registration.showNotification("🍠 どんなとき芋がもうそこにいるバイ！", {
-                body: `焼き芋屋さんが約${Math.round(dist)}m先にいるバイ！急いで！`,
-                icon: "https://dev.d3nlv05moq0vc5.amplifyapp.com/icon-192.png",
-                badge: "https://dev.d3nlv05moq0vc5.amplifyapp.com/icon-192.png",
-                vibrate: [200, 100, 200],
-              });
-            })
-            .catch(() => {});
+          fetch(SEND_NOTIFICATION_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ single_token: fcmToken }),
+          }).catch(() => {});
         }
       }
 
@@ -495,31 +492,6 @@ export default function CustomerPage() {
       });
     }
   }, [vanPos]);
-
-  useEffect(() => {
-    if (isGeofenceOn && vanPos && userPos) {
-      const dist = getDistance(userPos.lat, userPos.lng, vanPos.lat, vanPos.lng);
-
-      if (dist <= 1000) {
-        if ("serviceWorker" in navigator) {
-          navigator.serviceWorker.ready
-            .then((registration) => {
-              registration.showNotification("ホカホカのお知らせ！🍠", {
-                body: `焼き芋屋さんが1km圏内に来たバイ！今の距離は約${Math.round(dist)}m。`,
-                icon: "https://dev.d3nlv05moq0vc5.amplifyapp.com/icon-192.png",
-                badge: "https://dev.d3nlv05moq0vc5.amplifyapp.com/icon-192.png",
-                vibrate: [200, 100, 200],
-              });
-            })
-            .catch((err) => {
-              console.error("通知表示エラー:", err);
-            });
-        }
-
-        setIsGeofenceOn(false);
-      }
-    }
-  }, [vanPos, userPos, isGeofenceOn]);
 
   useEffect(() => {
     isMountedRef.current = true;
