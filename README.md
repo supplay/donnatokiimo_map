@@ -141,7 +141,7 @@ AWSコスト管理として、以下の設定を行っています。
 
 ## 🏗 アーキテクチャ
 
-![アーキテクチャ](./docs/architecture.png)
+![アーキテクチャ](./docs/images/architecture.png)
 
 ### 構成のポイント
 
