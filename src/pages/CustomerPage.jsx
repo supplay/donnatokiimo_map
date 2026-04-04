@@ -24,7 +24,7 @@ import { messaging, getToken, onMessage } from "../firebase.js";
 const FCM_VAPID_KEY = "BN2AwI13slGtx56om9P68uGilFCIkb8B82yHzKIPYsTD8YLc2N9OdDhTF0W7LhvoShJQr0xaaaieCSOEt30bRso";
 const AWS_API_URL = "https://f4gs0fq9vh.execute-api.ap-northeast-1.amazonaws.com/v1/tokens";
 const AI_GENERATOR_URL = "https://ih62xeb603.execute-api.ap-northeast-1.amazonaws.com/generate";
-const SEND_NOTIFICATION_URL = "https://a6fcbrvrm4vc3fruetu5y2zywa0fzqll.lambda-url.ap-northeast-1.on.aws/";
+const SEND_NOTIFICATION_URL = "https://f4gs0fq9vh.execute-api.ap-northeast-1.amazonaws.com/v1/notify";
 const VAN_ID = "KEI-VAN-001";
 const CONFIG_ID = "GLOBAL-CONFIG";
 
