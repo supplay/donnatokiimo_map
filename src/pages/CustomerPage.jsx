@@ -246,15 +246,31 @@ export default function CustomerPage() {
   const isMountedRef = useRef(true);
   const userSubscriptionIdRef = useRef(null);
   const notifyTimerRef = useRef(null);
+  const fcmTokenRef = useRef(null);
+
+  // UserTokens + ジオフェンス削除ヘルパー（通知OFF時に呼ぶ）
+  const deleteGeofenceToken = (token) => {
+    if (!token) return;
+    fetch(AWS_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ delete: true, token }),
+    }).catch(() => {});
+  };
 
   // マウント時: 常にOFFから始める。前回のDynamoDB登録エントリを削除する
   useEffect(() => {
     const savedId = localStorage.getItem("fcmSubscriptionId");
     localStorage.removeItem("fcmSubscriptionId");
-    if (!savedId) return;
-    client
-      .graphql({ query: DELETE_USER_SUBSCRIPTION, variables: { input: { id: savedId } }, authMode: "apiKey" })
-      .catch(() => {});
+    if (savedId) {
+      client
+        .graphql({ query: DELETE_USER_SUBSCRIPTION, variables: { input: { id: savedId } }, authMode: "apiKey" })
+        .catch(() => {});
+    }
+    // UserTokens + ジオフェンスのクリーンアップ（前回セッション分）
+    const savedToken = localStorage.getItem("fcmToken");
+    localStorage.removeItem("fcmToken");
+    if (savedToken) deleteGeofenceToken(savedToken);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -271,8 +287,11 @@ export default function CustomerPage() {
   useEffect(() => {
     const unsubscribe = onMessage(messaging, () => {
       const subId = userSubscriptionIdRef.current;
+      const token = fcmTokenRef.current;
       setIsGeofenceOn(false);
       setUserSubscriptionId(null);
+      fcmTokenRef.current = null;
+      localStorage.removeItem("fcmToken");
       if (subId) {
         client
           .graphql({
@@ -282,6 +301,7 @@ export default function CustomerPage() {
           })
           .catch(() => {});
       }
+      deleteGeofenceToken(token);
     });
     return () => unsubscribe();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -297,11 +317,13 @@ export default function CustomerPage() {
   const toggleGeofence = async () => {
     if (isGeofenceOn) {
       const subId = userSubscriptionIdRef.current;
+      const token = fcmTokenRef.current;
       setIsGeofenceOn(false);
       setUserSubscriptionId(null);
+      fcmTokenRef.current = null;
+      localStorage.removeItem("fcmToken");
       setNotifyStatus("通知OFFにしたバイ！");
       setTimeout(() => setNotifyStatus(null), 2000);
-      // 登録済みエントリを削除
       if (subId) {
         client
           .graphql({
@@ -311,6 +333,8 @@ export default function CustomerPage() {
           })
           .catch(() => {});
       }
+      // UserTokens + ジオフェンスを削除（通知OFFの確実な解除）
+      deleteGeofenceToken(token);
       return;
     }
 
@@ -387,6 +411,10 @@ export default function CustomerPage() {
       }
 
       console.log("FCMトークン取得成功:", fcmToken);
+
+      // トークンをrefとlocalStorageに保存（OFF時のクリーンアップ用）
+      fcmTokenRef.current = fcmToken;
+      localStorage.setItem("fcmToken", fcmToken);
 
       const gpsPos = await new Promise((resolve) => {
         navigator.geolocation.getCurrentPosition(

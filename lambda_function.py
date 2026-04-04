@@ -14,6 +14,7 @@ DYNAMODB_TABLE = os.environ.get(
     "DYNAMODB_TABLE",
     "UserSubscription-am4o5w4fdfbiflmztjnv4saobi-dev",
 )
+USER_TOKENS_TABLE = os.environ.get("USER_TOKENS_TABLE", "UserTokens")
 
 dynamodb = boto3.resource("dynamodb", region_name="ap-northeast-1")
 FCM_URL = "https://fcm.googleapis.com/v1/projects/donnatokiimo-6e7be/messages:send"
@@ -94,42 +95,33 @@ def get_access_token():
     return _credentials.token
 
 
-def get_all_fcm_tokens():
-    """DynamoDB から全 UserSubscription の FCM トークンと ID を取得する（重複排除済み）"""
-    table = dynamodb.Table(DYNAMODB_TABLE)
-    # token -> DynamoDB item id のマッピング（重複排除 + 削除用 ID 保持）
-    token_to_id = {}
-    scan_kwargs = {
-        "ProjectionExpression": "id, #sub",
-        "ExpressionAttributeNames": {"#sub": "subscription"},
-        "FilterExpression": "#sub <> :lock",
-        "ExpressionAttributeValues": {":lock": "LOCK"},
-    }
-
-    while True:
-        response = table.scan(**scan_kwargs)
+def get_tokens_by_geofence_id(geofence_id):
+    """UserTokensテーブルからgeofence_idに対応するFCMトークンを取得する"""
+    from boto3.dynamodb.conditions import Key
+    table = dynamodb.Table(USER_TOKENS_TABLE)
+    # {device_token: (geofence_id, device_token)} のマッピング（削除用キー付き）
+    token_map = {}
+    try:
+        response = table.query(
+            KeyConditionExpression=Key("geofence_id").eq(geofence_id)
+        )
         for item in response.get("Items", []):
-            token = item.get("subscription", "").strip()
-            item_id = item.get("id", "")
-            if token and item_id:
-                token_to_id[token] = item_id  # 同じトークンが複数あれば最後の1件だけ残る
-
-        last_key = response.get("LastEvaluatedKey")
-        if not last_key:
-            break
-        scan_kwargs["ExclusiveStartKey"] = last_key
-
-    return token_to_id  # {token: dynamodb_id}
+            device_token = item.get("device_token", "").strip()
+            if device_token:
+                token_map[device_token] = (geofence_id, device_token)
+    except Exception as e:
+        logger.error(f"UserTokensテーブルクエリ失敗: geofence_id={geofence_id}, error={e}")
+    return token_map  # {token: (geofence_id, device_token)}
 
 
-def delete_invalid_token(dynamodb_id):
+def delete_invalid_token(geofence_id, device_token):
     """無効になった FCM トークンに対応する DynamoDB エントリを削除する"""
     try:
-        table = dynamodb.Table(DYNAMODB_TABLE)
-        table.delete_item(Key={"id": dynamodb_id})
-        logger.info(f"無効トークンを DynamoDB から削除: id={dynamodb_id}")
+        table = dynamodb.Table(USER_TOKENS_TABLE)
+        table.delete_item(Key={"geofence_id": geofence_id, "device_token": device_token})
+        logger.info(f"無効トークンを DynamoDB から削除: geofence_id={geofence_id}")
     except Exception as e:
-        logger.warning(f"無効トークン削除失敗（無視）: id={dynamodb_id}, error={e}")
+        logger.warning(f"無効トークン削除失敗（無視）: geofence_id={geofence_id}, error={e}")
 
 
 def send_fcm_notification(device_token, title, body, access_token=None):
@@ -243,24 +235,25 @@ def lambda_handler(event, context):
         return {"statusCode": 200, "body": "skipped"}
 
     device_id = detail.get("DeviceId", "unknown")
+    geofence_id = detail.get("GeofenceId", "")
 
-    # DynamoDB ロックで重複通知を防ぐ（5分間クールダウン）
+    # DynamoDB ロックで重複通知を防ぐ（ユーザーごとに2分クールダウン）
+    # ロックキーは geofence_id（ユーザーごと）にすることで、
+    # 複数ユーザーが同時にジオフェンスに入ってもそれぞれ通知が届く
+    lock_key = geofence_id if geofence_id else device_id
     try:
-        if not try_acquire_notification_lock(device_id):
+        if not try_acquire_notification_lock(lock_key):
             return {"statusCode": 200, "body": "rate limited (cooldown active)"}
     except Exception as e:
         logger.warning(f"通知ロック取得中にエラー（通知は継続）: {e}")
-
-    # DynamoDB から全FCMトークンを取得
     try:
-        tokens = get_all_fcm_tokens()
+        token_map = get_tokens_by_geofence_id(geofence_id)
     except Exception as e:
         logger.error(f"DynamoDB からトークン取得失敗: {e}")
         return {"statusCode": 500, "body": f"failed to fetch tokens: {e}"}
 
-    token_map = tokens  # get_all_fcm_tokens() が dict を返すように変更済み
     if not token_map:
-        logger.warning("登録済みトークンが見つかりませんでした")
+        logger.warning(f"登録済みトークンが見つかりませんでした: geofence_id={geofence_id}")
         return {"statusCode": 200, "body": "no tokens found"}
 
     logger.info(f"通知対象トークン数: {len(token_map)}")
@@ -279,15 +272,15 @@ def lambda_handler(event, context):
         return {"statusCode": 500, "body": f"failed to get access token: {e}"}
 
     def send_one(item):
-        device_token, db_id = item
-        return send_fcm_notification(device_token=device_token, title=title, body=body, access_token=access_token), db_id
+        device_token, key_tuple = item
+        return send_fcm_notification(device_token=device_token, title=title, body=body, access_token=access_token), key_tuple
 
     with ThreadPoolExecutor(max_workers=10) as executor:
-        futures = {executor.submit(send_one, (t, db_id)): t for t, db_id in token_map.items()}
+        futures = {executor.submit(send_one, (t, key)): t for t, key in token_map.items()}
         for future in as_completed(futures):
             token = futures[future]
             try:
-                result, db_id = future.result()
+                result, key_tuple = future.result()
                 logger.info(f"FCM送信成功 token={token[:20]}...: {result}")
                 sent_count += 1
             except Exception as e:
@@ -296,9 +289,9 @@ def lambda_handler(event, context):
                 error_count += 1
                 # 無効トークン（UNREGISTERED / NOT_FOUND）は DynamoDB から削除
                 if "UNREGISTERED" in err_str or "NOT_FOUND" in err_str or "404" in err_str:
-                    db_id = token_map.get(token)
-                    if db_id:
-                        delete_invalid_token(db_id)
+                    key_tuple = token_map.get(token)
+                    if key_tuple:
+                        delete_invalid_token(*key_tuple)
 
     return {"statusCode": 200, "body": f"notifications sent: {sent_count}/{len(token_map)}, errors: {error_count}"}
 
