@@ -283,27 +283,51 @@ export default function CustomerPage() {
     }
   }, [userSubscriptionId]);
 
+  // 通知OFF共通処理（フォアグラウンド・バックグラウンド・クリック開き，すべてここを通る）
+  const turnOffNotification = () => {
+    const subId = userSubscriptionIdRef.current;
+    const token = fcmTokenRef.current;
+    setIsGeofenceOn(false);
+    setUserSubscriptionId(null);
+    fcmTokenRef.current = null;
+    localStorage.removeItem("fcmToken");
+    if (subId) {
+      client
+        .graphql({
+          query: DELETE_USER_SUBSCRIPTION,
+          variables: { input: { id: subId } },
+          authMode: "apiKey",
+        })
+        .catch(() => {});
+    }
+    deleteGeofenceToken(token);
+  };
+
   // フォアグラウンドで通知を受信したら通知OFFにする
   useEffect(() => {
-    const unsubscribe = onMessage(messaging, () => {
-      const subId = userSubscriptionIdRef.current;
-      const token = fcmTokenRef.current;
-      setIsGeofenceOn(false);
-      setUserSubscriptionId(null);
-      fcmTokenRef.current = null;
-      localStorage.removeItem("fcmToken");
-      if (subId) {
-        client
-          .graphql({
-            query: DELETE_USER_SUBSCRIPTION,
-            variables: { input: { id: subId } },
-            authMode: "apiKey",
-          })
-          .catch(() => {});
-      }
-      deleteGeofenceToken(token);
-    });
+    const unsubscribe = onMessage(messaging, () => turnOffNotification());
     return () => unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // バックグラウンド遯履時に SW から通知を受けた場合
+  useEffect(() => {
+    let bc;
+    try {
+      bc = new BroadcastChannel("fcm-push-received");
+      bc.onmessage = () => turnOffNotification();
+    } catch (e) {}
+    return () => bc?.close();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 通知タップでアプリが開いた場合（?notified=1）
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("notified") === "1") {
+      window.history.replaceState({}, "", window.location.pathname);
+      turnOffNotification();
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

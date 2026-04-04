@@ -25,7 +25,7 @@ self.addEventListener("push", (event) => {
   const body = notif.body || data.body || "";
   const icon = notif.icon || data.icon || "https://dev.d3nlv05moq0vc5.amplifyapp.com/icon-192.png";
 
-  // event.waitUntil を必ず呼ぶことで、スリープ中でも SW が終了される前に通知を表示する
+// event.waitUntil を必ず呼ぶことで、スリープ中でも SW が終了される前に通知を表示する
   event.waitUntil(
     self.registration.showNotification(title, {
       body,
@@ -34,12 +34,33 @@ self.addEventListener("push", (event) => {
       vibrate: [200, 100, 200],
       requireInteraction: false,
       data: payload.data || {},
+    }).then(() => {
+      // バックグラウンドにいるアプリに通知受信を伝える（BroadcastChannel）
+      try {
+        const bc = new BroadcastChannel("fcm-push-received");
+        bc.postMessage({ type: "push-received" });
+        bc.close();
+      } catch (e) {}
     })
   );
 });
 
-// 通知クリックで PWA を開く
+// 通知クリックで PWA を開く（?notified=1 を付けてアプリ側でOFFにさせる）
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  event.waitUntil(clients.openWindow("/"));
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      // 既に開いているウィンドウがあれば通知受信メッセージを送ってフォーカス
+      for (const client of clientList) {
+        try {
+          const bc = new BroadcastChannel("fcm-push-received");
+          bc.postMessage({ type: "push-received" });
+          bc.close();
+        } catch (e) {}
+        return client.focus();
+      }
+      // 開いていなければ新しく開く
+      return clients.openWindow("/?notified=1");
+    })
+  );
 });
