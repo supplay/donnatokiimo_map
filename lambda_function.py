@@ -4,6 +4,11 @@ import os
 import time
 import boto3
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from boto3.dynamodb.conditions import Key
+
+import requests as req
+from google.oauth2 import service_account
+import google.auth.transport.requests
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -17,28 +22,10 @@ DYNAMODB_TABLE = os.environ.get(
 USER_TOKENS_TABLE = os.environ.get("USER_TOKENS_TABLE", "UserTokens")
 
 dynamodb = boto3.resource("dynamodb", region_name="ap-northeast-1")
+
 FCM_URL = "https://fcm.googleapis.com/v1/projects/donnatokiimo-6e7be/messages:send"
 FCM_SCOPES = ["https://www.googleapis.com/auth/firebase.messaging"]
 SECRET_NAME = os.environ.get("SECRET_NAME", "firebase-service-account")
-
-# AppSync 設定（環境変数で上書き可能）
-APPSYNC_ENDPOINT = os.environ.get(
-    "APPSYNC_ENDPOINT",
-    "https://fliomdzyc5erhbr35jafl6o4q4.appsync-api.ap-northeast-1.amazonaws.com/graphql",
-)
-APPSYNC_API_KEY = os.environ.get("APPSYNC_API_KEY", "da2-g7dzoznkhjfzzhk46z6xgz4sfy")
-
-LIST_USER_SUBSCRIPTIONS = """
-query ListUserSubscriptions($limit: Int, $nextToken: String) {
-  listUserSubscriptions(limit: $limit, nextToken: $nextToken) {
-    items {
-      id
-      subscription
-    }
-    nextToken
-  }
-}
-"""
 
 NOTIFICATION_COOLDOWN_SECONDS = 120  # 2分間は同一デバイスの重複通知を防ぐ
 
@@ -79,8 +66,6 @@ _credentials = None
 
 def get_access_token():
     global _credentials
-    from google.oauth2 import service_account
-    import google.auth.transport.requests
 
     if _credentials is None:
         secret = secrets_client.get_secret_value(SecretId=SECRET_NAME)
@@ -97,7 +82,6 @@ def get_access_token():
 
 def get_tokens_by_geofence_id(geofence_id):
     """UserTokensテーブルからgeofence_idに対応するFCMトークンを取得する"""
-    from boto3.dynamodb.conditions import Key
     table = dynamodb.Table(USER_TOKENS_TABLE)
     # {device_token: (geofence_id, device_token)} のマッピング（削除用キー付き）
     token_map = {}
@@ -125,8 +109,6 @@ def delete_invalid_token(geofence_id, device_token):
 
 
 def send_fcm_notification(device_token, title, body, access_token=None):
-    import requests as req
-
     if access_token is None:
         access_token = get_access_token()
     headers = {

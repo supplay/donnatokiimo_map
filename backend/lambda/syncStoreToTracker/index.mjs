@@ -62,7 +62,7 @@ export const handler = async (event) => {
       await client.send(dummyCommand);
       console.log("forceEnter: ダミー位置を送信しました");
       // EventBridge がジオフェンス評価を完了するまで少し待つ
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 200));
     }
 
     const command = new BatchUpdateDevicePositionCommand({

@@ -22,7 +22,7 @@ import { messaging, getToken, onMessage } from "../firebase.js";
 
 // Firebase コンソール > プロジェクト設定 > Cloud Messaging > ウェブプッシュ証明書 の鍵ペア
 const FCM_VAPID_KEY = "BN2AwI13slGtx56om9P68uGilFCIkb8B82yHzKIPYsTD8YLc2N9OdDhTF0W7LhvoShJQr0xaaaieCSOEt30bRso";
-const AWS_API_URL = "https://a79c454sgh.execute-api.us-east-1.amazonaws.com/v1/tokens";
+const AWS_API_URL = "https://f4gs0fq9vh.execute-api.ap-northeast-1.amazonaws.com/v1/tokens";
 const AI_GENERATOR_URL = "https://ih62xeb603.execute-api.ap-northeast-1.amazonaws.com/generate";
 const SEND_NOTIFICATION_URL = "https://a6fcbrvrm4vc3fruetu5y2zywa0fzqll.lambda-url.ap-northeast-1.on.aws/";
 const VAN_ID = "KEI-VAN-001";
@@ -459,30 +459,6 @@ export default function CustomerPage() {
       });
       console.log("あなたの周り1kmに柵を張ったバイ！");
 
-      // 同じFCMトークンの既存エントリを削除（重複防止）
-      try {
-        const existing = await client.graphql({
-          query: LIST_USER_SUBSCRIPTIONS_BY_TOKEN,
-          variables: {
-            filter: { subscription: { eq: fcmToken } },
-            limit: 20,
-          },
-          authMode: "apiKey",
-        });
-        const existingItems = existing?.data?.listUserSubscriptions?.items ?? [];
-        await Promise.all(
-          existingItems.map((item) =>
-            client.graphql({
-              query: DELETE_USER_SUBSCRIPTION,
-              variables: { input: { id: item.id } },
-              authMode: "apiKey",
-            }).catch(() => {})
-          )
-        );
-      } catch (e) {
-        console.warn("既存エントリ削除エラー（無視）:", e);
-      }
-
       const currentLat = gpsPos.lat;
       const currentLng = gpsPos.lng;
       const guestUserId = `guest-${Date.now()}`;
@@ -570,27 +546,20 @@ export default function CustomerPage() {
 
     const loadStoreAndConfig = async () => {
       try {
-        const latest = await client.graphql({
-          query: getStore,
-          variables: { id: VAN_ID },
-          authMode: "apiKey",
-        });
+        const [storeRes, configRes] = await Promise.all([
+          client.graphql({ query: getStore, variables: { id: VAN_ID }, authMode: "apiKey" }),
+          client.graphql({ query: GET_CONFIG, variables: { id: CONFIG_ID }, authMode: "apiKey" }),
+        ]);
 
-        const store = latest?.data?.getStore;
+        const store = storeRes?.data?.getStore;
         if (store?.id === VAN_ID) {
           setVanPos(store.isOperating ? store : null);
         }
 
-        const configResponse = await client.graphql({
-          query: GET_CONFIG,
-          variables: { id: CONFIG_ID },
-          authMode: "apiKey",
-        });
-
-        if (configResponse?.data?.getConfig) {
+        if (configRes?.data?.getConfig) {
           setConfig({
-            menu: JSON.parse(configResponse.data.getConfig.menuJson || "[]"),
-            schedule: JSON.parse(configResponse.data.getConfig.scheduleJson || "[]"),
+            menu: JSON.parse(configRes.data.getConfig.menuJson || "[]"),
+            schedule: JSON.parse(configRes.data.getConfig.scheduleJson || "[]"),
           });
         }
       } catch (e) {
@@ -678,34 +647,9 @@ export default function CustomerPage() {
         { enableHighAccuracy: true },
       );
 
-      let lastUpdateTime = 0;
-
       watchId = navigator.geolocation.watchPosition(
         (pos) => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          setUserPos({ lat, lng });
-
-          const now = Date.now();
-          if (now - lastUpdateTime > 5000) {
-            lastUpdateTime = now;
-            const currentSubscriptionId = userSubscriptionIdRef.current;
-            if (currentSubscriptionId) {
-              client
-                .graphql({
-                  query: UPDATE_USER_SUBSCRIPTION,
-                  variables: {
-                    input: {
-                      id: currentSubscriptionId,
-                      userLat: lat,
-                      userLng: lng,
-                    },
-                  },
-                  authMode: "apiKey",
-                })
-                .catch((err) => console.log("位置更新エラー:", err));
-            }
-          }
+          setUserPos({ lat: pos.coords.latitude, lng: pos.coords.longitude });
         },
         (err) => console.error(err),
         { enableHighAccuracy: true },
