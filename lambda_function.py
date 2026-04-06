@@ -13,7 +13,7 @@ import google.auth.transport.requests
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-secrets_client = boto3.client("secretsmanager")
+ssm_client = boto3.client("ssm")
 
 DYNAMODB_TABLE = os.environ.get(
     "DYNAMODB_TABLE",
@@ -25,7 +25,7 @@ dynamodb = boto3.resource("dynamodb", region_name="ap-northeast-1")
 
 FCM_URL = "https://fcm.googleapis.com/v1/projects/donnatokiimo-6e7be/messages:send"
 FCM_SCOPES = ["https://www.googleapis.com/auth/firebase.messaging"]
-SECRET_NAME = os.environ.get("SECRET_NAME", "firebase-service-account")
+PARAM_NAME = os.environ.get("PARAM_NAME", "/donnatokiimo/firebase-service-account")
 
 NOTIFICATION_COOLDOWN_SECONDS = 120  # 2分間は同一デバイスの重複通知を防ぐ
 
@@ -68,8 +68,8 @@ def get_access_token():
     global _credentials
 
     if _credentials is None:
-        secret = secrets_client.get_secret_value(SecretId=SECRET_NAME)
-        sa_info = json.loads(secret["SecretString"])
+        response = ssm_client.get_parameter(Name=PARAM_NAME, WithDecryption=True)
+        sa_info = json.loads(response["Parameter"]["Value"])
         _credentials = service_account.Credentials.from_service_account_info(
             sa_info, scopes=FCM_SCOPES
         )

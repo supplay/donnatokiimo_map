@@ -70,33 +70,7 @@ const DELETE_USER_SUBSCRIPTION = /* GraphQL */ `
   }
 `;
 
-const LIST_USER_SUBSCRIPTIONS_BY_TOKEN = /* GraphQL */ `
-  query ListUserSubscriptions($filter: ModelUserSubscriptionFilterInput, $limit: Int) {
-    listUserSubscriptions(filter: $filter, limit: $limit) {
-      items {
-        id
-      }
-    }
-  }
-`;
 
-const GET_USER_SUBSCRIPTION = /* GraphQL */ `
-  query GetUserSubscription($id: ID!) {
-    getUserSubscription(id: $id) {
-      id
-    }
-  }
-`;
-
-const UPDATE_USER_SUBSCRIPTION = /* GraphQL */ `
-  mutation UpdateUserSubscription($input: UpdateUserSubscriptionInput!) {
-    updateUserSubscription(input: $input) {
-      id
-      userLat
-      userLng
-    }
-  }
-`;
 
 const sweetPotatoIcon = L.divIcon({
   html: '<div style="font-size: 35px; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));">🍠</div>',
@@ -634,7 +608,6 @@ export default function CustomerPage() {
     });
 
     let watchId;
-    const pollingId = window.setInterval(loadStoreAndConfig, 10000);
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -661,7 +634,6 @@ export default function CustomerPage() {
       isMountedRef.current = false;
       subShop.unsubscribe();
       subConfig.unsubscribe();
-      window.clearInterval(pollingId);
       if (watchId) navigator.geolocation.clearWatch(watchId);
       console.log("🟠 CustomerPage クリーンアップ完了");
     };
