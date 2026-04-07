@@ -3,6 +3,7 @@ import logging
 import os
 import time
 import boto3
+import random
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from boto3.dynamodb.conditions import Key
 
@@ -87,7 +88,8 @@ def get_tokens_by_geofence_id(geofence_id):
     token_map = {}
     try:
         response = table.query(
-            KeyConditionExpression=Key("geofence_id").eq(geofence_id)
+            KeyConditionExpression=Key("geofence_id").eq(geofence_id),
+            ConsistentRead=True,
         )
         for item in response.get("Items", []):
             device_token = item.get("device_token", "").strip()
@@ -228,14 +230,23 @@ def lambda_handler(event, context):
             return {"statusCode": 200, "body": "rate limited (cooldown active)"}
     except Exception as e:
         logger.warning(f"通知ロック取得中にエラー（通知は継続）: {e}")
-    try:
-        token_map = get_tokens_by_geofence_id(geofence_id)
-    except Exception as e:
-        logger.error(f"DynamoDB からトークン取得失敗: {e}")
-        return {"statusCode": 500, "body": f"failed to fetch tokens: {e}"}
+    # DynamoDB 書き込みとEventBridge発火が競合するケースに備えてリトライ
+    token_map = {}
+    for attempt in range(1, 4):  # 最大3回
+        try:
+            token_map = get_tokens_by_geofence_id(geofence_id)
+        except Exception as e:
+            logger.error(f"DynamoDB からトークン取得失敗 (attempt={attempt}): {e}")
+            return {"statusCode": 500, "body": f"failed to fetch tokens: {e}"}
+        if token_map:
+            break
+        if attempt < 3:
+            wait = attempt * 1.0 + random.uniform(0, 0.5)
+            logger.info(f"トークン未発見のため {wait:.1f}秒後にリトライ (attempt={attempt}/3): geofence_id={geofence_id}")
+            time.sleep(wait)
 
     if not token_map:
-        logger.warning(f"登録済みトークンが見つかりませんでした: geofence_id={geofence_id}")
+        logger.warning(f"登録済みトークンが見つかりませんでした (3回試行): geofence_id={geofence_id}")
         return {"statusCode": 200, "body": "no tokens found"}
 
     logger.info(f"通知対象トークン数: {len(token_map)}")
