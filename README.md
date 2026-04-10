@@ -22,7 +22,7 @@ https://github.com/user-attachments/assets/95f543bd-6de9-482c-8274-a41c28b76864
 
 ジオフェンスにより、近づくとプッシュ通知が届きます。
 
-![通知スクリーン](./docs/images/notification.png)
+<img src="./docs/images/notification.png" width="300">
 
 ---
 
