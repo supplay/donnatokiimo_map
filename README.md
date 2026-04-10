@@ -284,7 +284,7 @@ PWAはネイティブアプリと比較して、
 そのため、ユーザーが正しく利用できるように、  
 通知設定時にガイドを表示する仕組みを実装しました。
 
-![通知ガイド](./docs/images/notification-guide.png)
+<img src="./docs/images/notification-guide.png" width="300">
 
 #### 工夫
 - 通知が届く条件 / 届かない条件を明示
